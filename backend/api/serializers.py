@@ -18,6 +18,12 @@ class EntrenamentSerializer(serializers.ModelSerializer):
 
 
 class MetricaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Metrica
+        fields = '__all__'
+
+
+class MetricaAmbLimitsSerializer(MetricaSerializer):
     limits = serializers.SerializerMethodField()
 
     def esborrar_claudators(self, obj):
@@ -25,6 +31,14 @@ class MetricaSerializer(serializers.ModelSerializer):
         inferior = -1 if obj[-1] == ']' else None
 
         return obj[superior:inferior]
+
+    def custom_json_decoder(self, obj):
+        if obj == "inf":
+            return float('inf')
+        elif obj == "-inf":
+            return float('-inf')
+        else:
+            return obj
 
     def get_limits(self, metrica):
         resultat = []

@@ -7,7 +7,8 @@ from django.utils.translation import gettext_lazy as _
 from django.shortcuts import get_object_or_404
 
 from .models import Model, Entrenament, Metrica
-from .serializers import ModelSerializer, EntrenamentSerializer, MetricaSerializer, EntrenamentAmbResultatSerializer
+from .serializers import ModelSerializer, EntrenamentSerializer, MetricaSerializer, MetricaAmbLimitsSerializer,\
+    EntrenamentAmbResultatSerializer
 from .label_generation import generate_efficency_label
 
 
@@ -53,7 +54,7 @@ class EntrenamentsView(viewsets.ModelViewSet):
 
         # Aconseguir informació de les mètriques (de training i que tinguin pes)
         metriques = Metrica.objects.filter(fase=Metrica.TRAIN).exclude(pes=0)
-        metriques_info = MetricaSerializer(metriques, many=True).data
+        metriques_info = MetricaAmbLimitsSerializer(metriques, many=True).data
 
         boundaries = {}
         for metrica in metriques_info:
