@@ -1,11 +1,10 @@
 import os
-import base64
 import pandas as pd
 import numpy as np
+from io import BytesIO
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.colors import black, white
-from energy_label import assign_energy_label
-import fitz  # PyMuPDF
+from .energy_label import assign_energy_label
 import qrcode
 
 # List of all metrics to be included in the energy label
@@ -82,7 +81,7 @@ ICON_POS = {
 
 
 # Directory of the label design elements
-PARTS_DIR = os.path.join(os.path.dirname(__file__), "label_design", "parts")
+PARTS_DIR = os.path.join(os.path.dirname(__file__), "label_design")
 
 
 def format_co2_sources(summary):
@@ -96,7 +95,8 @@ def format_co2_sources(summary):
         str: Formatted string of CO2 sources.
     """
 
-    sources = f'Sources: {summary["source"]}'
+    result = '' if 'source' not in summary.keys() else  summary['source']
+    sources = f'Sources: {result}'
 
     return sources
 
@@ -156,18 +156,18 @@ def assign_performance_metrics(summary):
     f1, accuracy = summary['performance_metrics']['f1'], summary['performance_metrics']['accuracy']
     if not pd.isnull(accuracy) and not pd.isnull(f1):
         return 'accuracy', 'f1'
-    
+
     if summary['performance_metrics'] is None:
         return None
 
-    other_metrics =  {k: v for k, v in summary['performance_metrics'].items() if not pd.isnull(v) and k not in ['accuracy', 'f1']}
+    other_metrics = {k: v for k, v in summary['performance_metrics'].items() if not pd.isnull(v) and k not in ['accuracy', 'f1']}
 
     metrics = list(other_metrics.items())
 
     if len(metrics) == 0:
         if pd.isnull(accuracy) and pd.isnull(f1):
             return 'NullMetric', 'NullMetric'
-        
+
         return 'accuracy' if accuracy is not None else 'f1', 'NullMetric'
 
     if pd.isnull(accuracy) and not pd.isnull(f1) and len(metrics) > 0:
@@ -181,140 +181,142 @@ def assign_performance_metrics(summary):
             return metrics[0][0], metrics[1][0]
 
 
-class EnergyLabel(fitz.Document):
+#class EnergyLabel(fitz.Document):
     """
     Class for creating an energy label.
     """
 
-    def __init__(self, summary, metrics_ref, boundaries):
-        """
-        Initializes the energy label.
 
-        Args:
-            summary (dict): Summary dictionary containing information about the model.
-            metrics_ref (dict): Reference metrics.
-            boundaries (dict): Boundaries for the metrics.
-        """
-        # Make a copy of the summary
-        summary = summary.copy()
+def generate_efficency_label(summary, metrics_ref, boundaries):
+    """
+    Args:
+        summary (dict): Summary dictionary containing information about the model.
+        metrics_ref (dict): Reference metrics.
+        boundaries (dict): Boundaries for the metrics.
+    """
+    # Make a copy of the summary
+    summary = summary.copy()
 
-        # Get the units from the summary
-        units = summary['units']
+    # Add task_type and datasets to the summary
+    summary['task_type'] = 'Training'
+    #summary['datasets'] = ','.join(summary['datasets'])
 
-        # Add task_type and datasets to the summary
-        summary['task_type'] = 'Training'
-        summary['datasets'] = ','.join(summary['datasets'])
+    # Create a new canvas for the PDF
+    buffer = BytesIO()
+    canvas = Canvas(buffer, pagesize=C_SIZE)
 
-        # Create a new canvas for the PDF
-        canvas = Canvas("result.pdf", pagesize=C_SIZE)
+    # Get the keys from the performance metrics
+    keys_to_delete = list(summary['performance_metrics'].keys())
 
-        # Get the keys from the performance metrics
-        keys_to_delete = list(summary['performance_metrics'].keys())
+    # Remove keys from POS_TEXT to avoid overlapping text
+    for key in keys_to_delete:
+        if key in POS_TEXT:
+            del POS_TEXT[key]
 
-        # Remove keys from POS_TEXT to avoid overlapping text
-        for key in keys_to_delete:
-            if key in POS_TEXT:
-                del POS_TEXT[key]
+    # Get the metrics that are in COMPOUND_METRIC
 
-        # Get the metrics that are in COMPOUND_METRIC
-        metrics = {key:value for key,value in summary.items() if key in COMPOUND_METRIC}
-
-        # Assign energy labels and performance metrics
-        frate, metric_to_rating = assign_energy_label(metrics, metrics_ref, boundaries, 'ABCDE', 'mean')
-        metric1, metric2 = assign_performance_metrics(summary)
-
-        # Add separator between metrics
-        separator = ' / ' if metric1 != 'NullMetric' and metric2 != 'NullMetric' else ''
-        POS_TEXT[metric1] = ('drawRightString', 68, '-Bold', top_x+0.1, top_y-0.025, '{}' + separator)
-        POS_TEXT[metric2] = ('drawRightString', 68, '-Bold', top_x+0.185, top_y-0.025, '{}')
-
-        # Add metrics to the METRIC list
-        METRIC.extend([metric1, metric2])
-
-        # Merge performance_metrics with the summary
-        summary = {**summary, **summary.pop('performance_metrics')}
-
-        # Draw the background and the pictograms for the metrics
-        # Ratings are converted to images and drawn on the canvas
-        # If the rating is null, a "nan" image is drawn
-        canvas.drawInlineImage(os.path.join(PARTS_DIR, f"bg_new_logo.png"), 0, 0)
-        for icon, (posx, posy) in ICON_POS.items():
-            metric = ICON_NAME_TO_METRIC[icon]
-            rating = metric_to_rating[metric]
-            if pd.isnull(rating):
-                canvas.drawInlineImage(os.path.join(PARTS_DIR, f"nan.png"), posx+50, posy)
-            else:
-                canvas.drawInlineImage(os.path.join(PARTS_DIR, f"{icon}_{rating}.png"), posx, posy)
-
-        # Draw the final rating and a QR code
-        if frate is None:
-            canvas.drawInlineImage(os.path.join(PARTS_DIR, f"nan.png"), POS_RATINGS['C'][0] * C_SIZE[0], POS_RATINGS['C'][1] * C_SIZE[1])
+    """metrics = {}
+    for key in COMPOUND_METRIC:
+        if key in summary.keys():
+            value = summary[key]
         else:
-            canvas.drawInlineImage(os.path.join(PARTS_DIR, f"Rating_{frate}.png"), POS_RATINGS[frate][0] * C_SIZE[0], POS_RATINGS[frate][1] * C_SIZE[1])
-        qr = create_qr()
-        draw_qr(canvas, qr, 0.825 * C_SIZE[0], 0.894 * C_SIZE[1], 200)
+            value = None
+        metrics[key] = value"""
 
-        # Text parts are created and added to the canvas
-        # If the metric is not available, it is represented as 'n.a.'
-        canvas.setFillColor(black)
-        canvas.setLineWidth(3)
-        canvas.setStrokeColor(black)
-        text=canvas.beginText()
-        text.setTextRenderMode(2)
-        canvas._code.append(text.getCode())
+    metrics = {key:value for key,value in summary.items() if key in COMPOUND_METRIC}
 
-        # Continue adding text to the canvas
-        for key, (draw_method, fsize, style, x, y, fmt) in POS_TEXT.items():
-            draw_method = getattr(canvas, draw_method)
-            canvas.setFont('Helvetica' + style, fsize)
+    # Assign energy labels and performance metrics
+    frate, metric_to_rating = assign_energy_label(metrics, metrics_ref, boundaries, 'ABCDE', 'mean')
+    metric1, metric2 = 'f1', 'Accuracy'   # assign_performance_metrics(summary)
 
-            if key in globals() and callable(globals()[key]):
-                text = globals()[key](summary)
+    # Add separator between metrics
+    separator = ' / ' if metric1 != 'NullMetric' and metric2 != 'NullMetric' else ''
+    POS_TEXT[metric1] = ('drawRightString', 68, '-Bold', top_x+0.1, top_y-0.025, '{}' + separator)
+    POS_TEXT[metric2] = ('drawRightString', 68, '-Bold', top_x+0.185, top_y-0.025, '{}')
 
-            elif key.startswith(f"format_metrics"): # Manual format for the performance metrics
-                if metric1 != 'NullMetric' and metric2 != 'NullMetric':
-                    text = f'{metric1} / {metric2}'
-                elif metric1 == 'NullMetric' and metric2 == 'NullMetric':
-                    text = '  No Performance'
-                elif metric1 != 'NullMetric' or metric2 != 'NullMetric':
-                    if metric1 != 'NullMetric':
-                        text = metric1.replace('NullMetric', '').replace(' ', '').replace('/', '')
-                    else:
-                        text = metric2.replace('NullMetric', '').replace(' ', '').replace('/', '')
-                      
-                if metric1 == 'accuracy' and metric2 == 'f1':
-                    text += '  [%]'
-            elif key.startswith(f"$"): # Static text on label depending on the task type
-                text = key.replace(f"$", "")
-            elif key in summary: # Dynamic text that receives content from summary
-                if key in METRIC:
-                    text = 'n.a.' if summary[key] is None else f'{summary[key]:4.2f}'
-                    if text.endswith('.'):
-                        text = text[:-1]
+    # Add metrics to the METRIC list
+    METRIC.extend([metric1, metric2])
+
+    # Merge performance_metrics with the summary
+    summary = {**summary, **summary.pop('performance_metrics')}
+
+    # Draw the background and the pictograms for the metrics
+    # Ratings are converted to images and drawn on the canvas
+    # If the rating is null, a "nan" image is drawn
+    canvas.drawInlineImage(os.path.join(PARTS_DIR, f"bg_new_logo.png"), 0, 0)
+    for icon, (posx, posy) in ICON_POS.items():
+        metric = ICON_NAME_TO_METRIC[icon]
+        rating = metric_to_rating[metric]
+        if pd.isnull(rating):
+            canvas.drawInlineImage(os.path.join(PARTS_DIR, f"nan.png"), posx+50, posy)
+        else:
+            canvas.drawInlineImage(os.path.join(PARTS_DIR, f"{icon}_{rating}.png"), posx, posy)
+
+    # Draw the final rating and a QR code
+    if frate is None:
+        canvas.drawInlineImage(os.path.join(PARTS_DIR, f"nan.png"), POS_RATINGS['C'][0] * C_SIZE[0], POS_RATINGS['C'][1] * C_SIZE[1])
+    else:
+        canvas.drawInlineImage(os.path.join(PARTS_DIR, f"Rating_{frate}.png"), POS_RATINGS[frate][0] * C_SIZE[0], POS_RATINGS[frate][1] * C_SIZE[1])
+    qr = create_qr()
+    draw_qr(canvas, qr, 0.825 * C_SIZE[0], 0.894 * C_SIZE[1], 200)
+
+    # Text parts are created and added to the canvas
+    # If the metric is not available, it is represented as 'n.a.'
+    canvas.setFillColor(black)
+    canvas.setLineWidth(3)
+    canvas.setStrokeColor(black)
+    text=canvas.beginText()
+    text.setTextRenderMode(2)
+    canvas._code.append(text.getCode())
+
+    # Continue adding text to the canvas
+    for key, (draw_method, fsize, style, x, y, fmt) in POS_TEXT.items():
+        draw_method = getattr(canvas, draw_method)
+        canvas.setFont('Helvetica' + style, fsize)
+
+        if key in globals() and callable(globals()[key]):
+            text = globals()[key](summary)
+
+        elif key.startswith(f"format_metrics"): # Manual format for the performance metrics
+            if metric1 != 'NullMetric' and metric2 != 'NullMetric':
+                text = f'{metric1} / {metric2}'
+            elif metric1 == 'NullMetric' and metric2 == 'NullMetric':
+                text = '  No Performance'
+            elif metric1 != 'NullMetric' or metric2 != 'NullMetric':
+                if metric1 != 'NullMetric':
+                    text = metric1.replace('NullMetric', '').replace(' ', '').replace('/', '')
                 else:
-                    text = summary[key]
+                    text = metric2.replace('NullMetric', '').replace(' ', '').replace('/', '')
+
+            if metric1 == 'accuracy' and metric2 == 'f1':
+                text += '  [%]'
+        elif key.startswith(f"$"): # Static text on label depending on the task type
+            text = key.replace(f"$", "")
+        elif key in summary: # Dynamic text that receives content from summary
+            if key in METRIC:
+                text = 'n.a.' if summary[key] is None else f'{summary[key]:4.2f}'
+                if text.endswith('.'):
+                    text = text[:-1]
             else:
-                text = None
-            if text is not None: # Draw the text on the canvas
-                if fmt is not None:
-                    if key in units:
-                        match units[key]: # Convert units
-                            case 'kg' | 'kB': 
-                                text = round(float(summary[key]) / 1000,2)
-                            case 't' | 'MB':
-                                text = round(float(summary[key]) / 1000000,2)
-                            case 'GB':
-                                text = round(float(summary[key]) / 1000000000,2)
-                        text = f'{text} {units[key]}'
-                    else:
-                        text = fmt.format(text)
+                text = summary[key]
+        else:
+            text = None
+        if text is not None: # Draw the text on the canvas
+            if fmt is not None:
+                """if key in units:
+                    match units[key]: # Convert units
+                        case 'kg' | 'kB': 
+                            text = round(float(summary[key]) / 1000,2)
+                        case 't' | 'MB':
+                            text = round(float(summary[key]) / 1000000,2)
+                        case 'GB':
+                            text = round(float(summary[key]) / 1000000000,2)
+                    text = f'{text} {units[key]}'
+                else:"""
+                text = fmt.format(text)
 
-                draw_method(int(C_SIZE[0] * x), int(C_SIZE[1] * y), text)
-        super().__init__(stream=canvas.getpdfdata(), filetype='pdf')
+            draw_method(int(C_SIZE[0] * x), int(C_SIZE[1] * y), text)
 
-
-    def to_encoded_image(self):
-        label_bytes = self.load_page(0).get_pixmap().tobytes()
-        base64_enc = base64.b64encode(label_bytes).decode('ascii')
-        return 'data:image/png;base64,{}'.format(base64_enc)
-
+    canvas.save()
+    pdf = buffer.getvalue()
+    return pdf

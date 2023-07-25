@@ -60,9 +60,9 @@ def assign_rating(index, boundaries):
         return np.nan
 
     for i, (upper, lower) in enumerate(boundaries):
-        if index <= upper and index > lower:
+        if upper >= index > lower:
             return i
-    return 4 # worst rating if index does not fall in boundaries
+    return 4    # worst rating if index does not fall in boundaries
 
 
 def calculate_compound_rating(ratings, weights=None, meanings='ABCDE', mode='mean'):
