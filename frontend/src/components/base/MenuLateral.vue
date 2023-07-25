@@ -1,15 +1,12 @@
 <template>
-    <el-radio-group v-model="isCollapse" style="margin-bottom: 20px">
-        <el-radio-button :label="false">expand</el-radio-button>
-        <el-radio-button :label="true">collapse</el-radio-button>
-    </el-radio-group>
     <el-menu
         default-active="0"
         class="el-menu-vertical"
-        :collapse="isCollapse"
+        :collapse="collapsed"
         active-text-color="#548334"
         @open="handleOpen"
         @close="handleClose"
+        style="margin-left: 13px; margin-right: 10px"
     >
         <el-menu-item index="0">
             <font-awesome-icon :icon="['fas', 'house']" class="icon"/>
@@ -46,11 +43,6 @@ export default {
     name: "MenuLateral",
     props: {
         collapsed: {required: false, type: Boolean, default: false}
-    },
-    data() {
-        return {
-            isCollapse: this.collapsed
-        }
     },
     methods: {
         handleOpen(key, keyPath) {

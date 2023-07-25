@@ -1,12 +1,18 @@
 <template>
     <div class="common-layout">
         <el-container>
-            <el-header>
-                <BarraSuperior/>
+            <el-header style="display: flex; align-items: center">
+                <BarraSuperior
+                    :collapsed = collapse
+                    @collapse = "collapse=true;console.log(collapse)"
+                    @expand =  "collapse=false"
+                />
             </el-header>
             <el-container>
-                <el-aside width="200px">
-                    <MenuLateral/>
+                <el-aside width="60">
+                    <MenuLateral
+                        :collapsed = collapse
+                    />
                 </el-aside>
                 <el-main>
                     <RouterView />
@@ -16,11 +22,21 @@
     </div>
 </template>
 
-<script setup>
+<script>
 import 'element-plus/theme-chalk/index.css'
 import { RouterView } from 'vue-router'
 import MenuLateral from "@/components/base/MenuLateral.vue";
 import BarraSuperior from "@/components/base/BarraSuperior.vue";
+
+export default {
+    name: "App",
+    components: {RouterView, MenuLateral, BarraSuperior},
+    data() {
+        return {
+            collapse: false
+        }
+    }
+}
 </script>
 
 <style scoped>
