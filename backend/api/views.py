@@ -1,9 +1,14 @@
-from rest_framework import viewsets
+import base64
 
+from rest_framework import viewsets
+from rest_framework.response import Response
+
+from django.utils.translation import gettext_lazy as _
 from django.shortcuts import get_object_or_404
 
 from .models import Model, Entrenament, Metrica
 from .serializers import ModelSerializer, EntrenamentSerializer, MetricaSerializer, EntrenamentAmbResultatSerializer
+from .label_generation import generate_efficency_label
 
 
 class ModelsView(viewsets.ModelViewSet):
@@ -29,6 +34,39 @@ class EntrenamentsView(viewsets.ModelViewSet):
         if self.action == 'retrieve':
             return EntrenamentAmbResultatSerializer
         return self.serializer_class
+
+    def retrieve(self, request, *args, **kwargs):
+        # Aconseguir valors de l'entrenament a generar la EL
+        entrenament = self.get_object()
+        entrenament_data = self.get_serializer(entrenament).data
+        resultats = entrenament_data['resultats']
+        resultats['task_type'] = _('Training')
+        resultats['performance_metrics'] = {}
+
+        # Aconseguir valors de l'entrenament que es fa servir de referència
+        metriques_ref = {'co2_eq_emissions': 149200.0,
+                         'size_efficency': 2364.837238605898,
+                         'datasets_size_efficency': 266551.5743699732,
+                         'downloads': 1172830,
+                         'performance_score': 0.8232786885245902
+                         }
+
+        # Aconseguir informació de les mètriques (de training i que tinguin pes)
+        metriques = Metrica.objects.filter(fase=Metrica.TRAIN).exclude(pes=0)
+        metriques_info = MetricaSerializer(metriques, many=True).data
+
+        boundaries = {}
+        for metrica in metriques_info:
+            boundaries[metrica['id']] = metrica['limits']
+
+        label = generate_efficency_label(resultats, metriques_ref, boundaries)
+        print(label)
+
+        response_data = {
+            'energy_label': base64.b64encode(label).decode(),
+        }
+        response_data.update(entrenament_data)
+        return Response(response_data)
 
 
 class MetriquesView(viewsets.ModelViewSet):
