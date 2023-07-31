@@ -65,14 +65,14 @@ def assign_rating(index, boundaries):
     return 4    # worst rating if index does not fall in boundaries
 
 
-def calculate_compound_rating(ratings, weights=None, meanings='ABCDE', mode='mean'):
+def calculate_compound_rating(ratings, weights, meanings, mode='mean'):
     """
     Calculates a compound rating based on individual ratings and their weights.
 
     Args:
     ratings : list of individual ratings
     weights : list of weights corresponding to the ratings
-    meanings : string representing different ratings, default is 'ABCDE'
+    meanings : array representing different ratings
     mode : method to calculate compound rating, default is 'mean'
 
     Returns:
@@ -117,7 +117,7 @@ def assign_energy_label(metrics, metrics_ref, boundaries, meanings, rating_mode,
     metrics : dictionary of metrics
     metrics_ref : reference metrics for normalization
     boundaries : boundary intervals for each metric
-    meanings : string representing different ratings
+    meanings : array representing different ratings
     rating_mode : method to calculate compound rating
     index : if True, convert metric values to indices before assigning label
 

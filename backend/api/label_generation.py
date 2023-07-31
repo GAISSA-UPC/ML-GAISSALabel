@@ -57,9 +57,6 @@ POS_TEXT = {
 }
 
 
-# Position of the rating labels (A, B, C, D, E)
-POS_RATINGS = { char: (.66, y) for char, y in zip('ABCDE', reversed(np.linspace(.461, .727, 5))) }
-
 # Mapping of icon names to their associated metrics
 ICON_NAME_TO_METRIC = {
     'CO2': 'co2_eq_emissions',
@@ -187,12 +184,13 @@ def assign_performance_metrics(summary):
     """
 
 
-def generate_efficency_label(summary, metrics_ref, boundaries):
+def generate_efficency_label(summary, metrics_ref, boundaries, meanings):
     """
     Args:
         summary (dict): Summary dictionary containing information about the model.
         metrics_ref (dict): Reference metrics.
         boundaries (dict): Boundaries for the metrics.
+        meanings (array): Possible result's ratings.
     """
     # Make a copy of the summary
     summary = summary.copy()
@@ -226,7 +224,7 @@ def generate_efficency_label(summary, metrics_ref, boundaries):
     metrics = {key:value for key,value in summary.items() if key in COMPOUND_METRIC}
 
     # Assign energy labels and performance metrics
-    frate, metric_to_rating = assign_energy_label(metrics, metrics_ref, boundaries, 'ABCDE', 'mean')
+    frate, metric_to_rating = assign_energy_label(metrics, metrics_ref, boundaries, meanings, 'mean')
     metric1, metric2 = 'f1', 'Accuracy'   # assign_performance_metrics(summary)
 
     # Add separator between metrics
@@ -251,6 +249,9 @@ def generate_efficency_label(summary, metrics_ref, boundaries):
             canvas.drawInlineImage(os.path.join(PARTS_DIR, f"nan.png"), posx+50, posy)
         else:
             canvas.drawInlineImage(os.path.join(PARTS_DIR, f"{icon}_{rating}.png"), posx, posy)
+
+    # Position of the rating labels
+    POS_RATINGS = {char: (.66, y) for char, y in zip(meanings, reversed(np.linspace(.461, .727, 5)))}
 
     # Draw the final rating and a QR code
     if frate is None:
