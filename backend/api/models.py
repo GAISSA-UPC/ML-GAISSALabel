@@ -35,9 +35,9 @@ class Metrica(models.Model):
     nom = models.CharField(max_length=100, null=False, blank=False, verbose_name=_('Nom'))
     fase = models.CharField(choices=TFASE, null=False, blank=False, max_length=5, verbose_name=_('Fase'))
     pes = models.FloatField(null=True, blank=True, verbose_name=_('Pes'))
+    unitat = models.CharField(max_length=5, null=True, blank=True, verbose_name=_('Unitat'))
     influencia = models.CharField(choices=TINFLUENCIA, null=False, blank=False, max_length=5, verbose_name=_('Influència'))
     descripcio = models.CharField(max_length=1000, null=True, blank=True, verbose_name=_('Descripcio'))
-    limits = models.CharField(max_length=1000, null=True, blank=True, verbose_name=_('Límits'))
 
     class Meta:
         verbose_name_plural = _('Mètriques')
@@ -47,6 +47,7 @@ class Qualificacio(models.Model):
     id = models.CharField(primary_key=True, max_length=100, verbose_name=_('Identificador'))
     # Color codificat en hexadecimal ('#' + 6 valors hexa)
     color = models.CharField(max_length=7, validators=[RegexValidator(r'^#([A-Fa-f0-9]{6})$')], verbose_name=_('Color'))
+    ordre = models.IntegerField(null=False, blank=False, verbose_name=_('Ordre'))
 
     class Meta:
         verbose_name_plural = _('Qualificacions')

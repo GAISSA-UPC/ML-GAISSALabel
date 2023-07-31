@@ -2,7 +2,7 @@ import json
 
 from rest_framework import serializers
 
-from .models import Model, Entrenament, Metrica, ResultatEntrenament
+from .models import Model, Entrenament, Metrica, Qualificacio, Interval, ResultatEntrenament
 
 
 class ModelSerializer(serializers.ModelSerializer):
@@ -24,36 +24,41 @@ class MetricaSerializer(serializers.ModelSerializer):
 
 
 class MetricaAmbLimitsSerializer(MetricaSerializer):
-    limits = serializers.SerializerMethodField()
-
-    def esborrar_claudators(self, obj):
-        superior = 1 if obj[0] == '[' else 0
-        inferior = -1 if obj[-1] == ']' else None
-
-        return obj[superior:inferior]
-
-    def custom_json_decoder(self, obj):
-        if obj == "inf":
-            return float('inf')
-        elif obj == "-inf":
-            return float('-inf')
-        else:
-            return obj
-
-    def get_limits(self, metrica):
-        resultat = []
-        limits = self.esborrar_claudators(metrica.limits)
-        for limit in limits.split('], '):
-            limit = self.esborrar_claudators(limit)
-            limit_splitted = limit.split(', ')
-            parcial = []
-            parcial.append(float(limit_splitted[0]))
-            parcial.append(float(limit_splitted[1]))
-            resultat.append(parcial)
-        return resultat
 
     class Meta:
         model = Metrica
+        fields = '__all__'
+
+
+class QualificacioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Qualificacio
+        fields = '__all__'
+
+
+class IntervalSerializer(serializers.ModelSerializer):
+    limitSuperior = serializers.SerializerMethodField(read_only=True)
+    limitInferior = serializers.SerializerMethodField(read_only=True)
+
+    def esInfinit(self, valor):
+        threshold = 1e20
+        return abs(valor) >= threshold
+
+    def get_limitSuperior(self, interval):
+        if self.esInfinit(interval.limitSuperior):
+            return float('inf')
+        else:
+            return interval.limitSuperior
+
+    def get_limitInferior(self, interval):
+        if self.esInfinit(interval.limitInferior):
+            return float('-inf')
+        else:
+            return interval.limitInferior
+
+
+    class Meta:
+        model = Interval
         fields = '__all__'
 
 

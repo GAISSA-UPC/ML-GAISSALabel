@@ -6,9 +6,9 @@ from rest_framework.response import Response
 from django.utils.translation import gettext_lazy as _
 from django.shortcuts import get_object_or_404
 
-from .models import Model, Entrenament, Metrica
+from .models import Model, Entrenament, Metrica, Qualificacio, Interval
 from .serializers import ModelSerializer, EntrenamentSerializer, MetricaSerializer, MetricaAmbLimitsSerializer,\
-    EntrenamentAmbResultatSerializer
+    QualificacioSerializer, IntervalSerializer, EntrenamentAmbResultatSerializer
 from .label_generation import generate_efficency_label
 
 
@@ -58,7 +58,13 @@ class EntrenamentsView(viewsets.ModelViewSet):
 
         boundaries = {}
         for metrica in metriques_info:
-            boundaries[metrica['id']] = metrica['limits']
+            id_metrica = metrica['id']
+            intervals = Interval.objects.filter(metrica_id=id_metrica).order_by('qualificacio__ordre')
+            intervals_info = IntervalSerializer(intervals, many=True).data
+            boundaries[id_metrica] = [
+                [interval['limitSuperior'], interval['limitInferior']]
+                for interval in intervals_info
+            ]
 
         label = generate_efficency_label(resultats, metriques_ref, boundaries)
 
