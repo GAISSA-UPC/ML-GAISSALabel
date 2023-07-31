@@ -66,7 +66,14 @@ class EntrenamentsView(viewsets.ModelViewSet):
                 for interval in intervals_info
             ]
 
-        label = generate_efficency_label(resultats, metriques_ref, boundaries)
+        # Aconseguir les possibles qualificacions
+        qualificacions = Qualificacio.objects.order_by('ordre')
+        qualificacions_info = QualificacioSerializer(qualificacions, many=True).data
+        qualificacions_valor = [
+            qualificacio['id'] for qualificacio in qualificacions_info
+        ]
+
+        label = generate_efficency_label(resultats, metriques_ref, boundaries, qualificacions_valor)
 
         response_data = {
             'energy_label': base64.b64encode(label).decode(),
