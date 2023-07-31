@@ -3,7 +3,6 @@
         default-active="0"
         class="el-menu-vertical"
         :collapse="collapsed"
-        active-text-color="#548334"
         @open="handleOpen"
         @close="handleClose"
         style="margin-left: 13px; margin-right: 10px"
@@ -59,6 +58,9 @@ export default {
 .el-menu-vertical:not(.el-menu--collapse) {
     width: 200px;
     min-height: 90%;
+}
+.el-menu-item.is-active {
+    color: var(--gaissa_green)
 }
 .icon {
     width: 20px;

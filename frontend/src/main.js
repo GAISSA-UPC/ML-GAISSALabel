@@ -1,4 +1,5 @@
 import '@/assets/base.css'
+import '@/assets/common.scss'
 
 import { createApp } from 'vue'
 import elementplus from 'element-plus'
