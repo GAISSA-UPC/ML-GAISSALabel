@@ -1,7 +1,7 @@
 <template>
     <span style="width: 100%; display: flex; justify-content: space-between">
         <div style="display: flex; align-items: center">
-            <el-button @click="canviCollapse">
+            <el-button @click="canviCollapse" class="menu">
                 <font-awesome-icon :icon="['fas', 'bars']" />
             </el-button>
             <el-image
@@ -12,7 +12,7 @@
             <span class="text-large font-600 mr-3"> Tool's name :) </span>
         </div>
         <div>
-            <el-button type="primary" class="ml-2">{{ $t('Admin') }}</el-button>
+            <el-button color="var(--gaissa_green)" class="ml-2">{{ $t('Admin') }}</el-button>
         </div>
     </span>
 </template>
@@ -28,17 +28,25 @@ export default {
         obrirLink() {
             window.open('https://gaissa.upc.edu/en', '_blank');
         },
-        canviCollapse() {
+        canviCollapse(event) {
             if (this.collapsed) {
                 this.$emit('expand')
             } else {
                 this.$emit('collapse')
             }
+            event.target.blur()
         }
     }
 }
 </script>
 
 <style scoped>
-
+.menu:hover, .menu:focus {
+    color: white;
+    background-color: var(--gaissa_green)
+}
+button:hover, button:focus {
+    color: var(--gaissa_green);
+    background-color: white;
+}
 </style>
