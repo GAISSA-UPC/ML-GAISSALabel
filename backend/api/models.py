@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import RegexValidator
 from django.db import models
 
 
@@ -40,6 +41,24 @@ class Metrica(models.Model):
 
     class Meta:
         verbose_name_plural = _('Mètriques')
+
+
+class Qualificacio(models.Model):
+    id = models.CharField(primary_key=True, max_length=100, verbose_name=_('Identificador'))
+    # Color codificat en hexadecimal ('#' + 6 valors hexa)
+    color = models.CharField(max_length=7, validators=[RegexValidator(r'^#([A-Fa-f0-9]{6})$')], verbose_name=_('Color'))
+
+    class Meta:
+        verbose_name_plural = _('Qualificacions')
+
+
+class Interval(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name=_('Identificador'))
+    metrica = models.ForeignKey(Metrica, related_name='intervals', null=False, on_delete=models.CASCADE, verbose_name=_('Mètrica'))
+    qualificacio = models.ForeignKey(Qualificacio, related_name='intervals', null=False, on_delete=models.CASCADE, verbose_name=_('Qualificació'))
+    limitSuperior = models.FloatField(null=False, blank=False, verbose_name=_('Límit superior'))
+    limitInferior = models.FloatField(null=False, blank=False, verbose_name=_('Límit inferior'))
+    imatge = models.ImageField(null=True, blank=True, verbose_name=_('Imatge'))
 
 
 class ResultatEntrenament(models.Model):

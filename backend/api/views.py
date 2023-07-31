@@ -61,7 +61,6 @@ class EntrenamentsView(viewsets.ModelViewSet):
             boundaries[metrica['id']] = metrica['limits']
 
         label = generate_efficency_label(resultats, metriques_ref, boundaries)
-        print(label)
 
         response_data = {
             'energy_label': base64.b64encode(label).decode(),
