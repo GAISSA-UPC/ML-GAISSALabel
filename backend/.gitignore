@@ -5,5 +5,4 @@ venv/
 *.pyc
 *.DS_Store
 db.sqlite3
-/mails/
-/files/
+*.png
