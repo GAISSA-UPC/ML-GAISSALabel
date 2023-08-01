@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <iframe :src="pdfURL" type="application/pdf" width="100%" height="600px" />
+        <iframe :src="pdfURL" type="application/pdf" width="100%" height="900px" />
     </div>
 </template>
 
@@ -17,7 +17,9 @@ export default {
     methods: {
         async aconseguirPDF() {
             // Aconseguim PDF en base64 de l'API
-            const pdfBase64 = await trainings.retrieve(1, 1).data
+            const response = await trainings.retrieve(1, 1)
+            const pdfBase64 = response.data['energy_label']
+            console.log("pdfBase64")
             console.log(pdfBase64)
 
             // Convertim base64 a binari
