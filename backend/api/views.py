@@ -41,8 +41,7 @@ class EntrenamentsView(viewsets.ModelViewSet):
         entrenament = self.get_object()
         entrenament_data = self.get_serializer(entrenament).data
         resultats = entrenament_data['resultats']
-        resultats['task_type'] = _('Training')
-        resultats['performance_metrics'] = {}
+        resultats['task_type'] = 'Training'
 
         # Aconseguir valors de l'entrenament que es fa servir de referència
         metriques_ref = {'co2_eq_emissions': 149200.0,
@@ -72,6 +71,8 @@ class EntrenamentsView(viewsets.ModelViewSet):
         qualificacions_valor = [
             qualificacio['id'] for qualificacio in qualificacions_info
         ]
+
+        resultats['units'] = {'co2_eq_emissions': 'g', 'size_efficency': 'B', 'datasets_size_efficency': 'B'}
 
         label = generate_efficency_label(resultats, metriques_ref, boundaries, qualificacions_valor)
 
