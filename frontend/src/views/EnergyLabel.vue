@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <embed :src="pdfURL" type="application/pdf" width="100%" height="600px" />
+        <iframe :src="pdfURL" type="application/pdf" width="100%" height="600px" />
     </div>
 </template>
 
@@ -17,7 +17,8 @@ export default {
     methods: {
         async aconseguirPDF() {
             // Aconseguim PDF en base64 de l'API
-            const pdfBase64 = await trainings.retrieve(1, 1)
+            const pdfBase64 = await trainings.retrieve(1, 1).data
+            console.log(pdfBase64)
 
             // Convertim base64 a binari
             const binaryData = atob(pdfBase64);
@@ -27,6 +28,8 @@ export default {
 
             // Creem una URL pel Blob
             this.pdfURL = URL.createObjectURL(blob);
+            console.log(this.pdfURL)
+            console.log("hola")
         }
     },
     async mounted() {
