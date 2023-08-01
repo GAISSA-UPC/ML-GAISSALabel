@@ -19,8 +19,6 @@ export default {
             // Aconseguim PDF en base64 de l'API
             const response = await trainings.retrieve(1, 1)
             const pdfBase64 = response.data['energy_label']
-            console.log("pdfBase64")
-            console.log(pdfBase64)
 
             // Convertim base64 a binari
             const binaryData = atob(pdfBase64);
@@ -30,8 +28,6 @@ export default {
 
             // Creem una URL pel Blob
             this.pdfURL = URL.createObjectURL(blob);
-            console.log(this.pdfURL)
-            console.log("hola")
         }
     },
     async mounted() {
