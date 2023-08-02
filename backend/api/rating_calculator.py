@@ -1,23 +1,6 @@
 import pandas as pd
 import numpy as np
 
-# Weightage of different metrics for energy efficiency computation
-METRIC_WEIGHTS = {
-    'co2_eq_emissions': 0.4,
-    'size_efficency': 0.15,
-    'datasets_size_efficency': 0.15,
-    'downloads': 0.2,
-    'performance_score': 0.2
-}
-
-# Metrics where a higher value is better
-HIGHER_BETTER = [
-    'performance_score',
-    'size_efficency',
-    'datasets_size_efficency',
-    'downloads'
-]
-
 
 def weighted_mean(ratings, weights):
     """
@@ -62,7 +45,8 @@ def assign_rating(index, boundaries):
     for i, (upper, lower) in enumerate(boundaries):
         if upper >= index > lower:
             return i
-    return 4  # worst rating if index does not fall in boundaries
+
+    return len(boundaries) - 1  # worst rating if index does not fall in boundaries
 
 
 def calculate_compound_rating(ratings, weights, meanings, mode='mean'):
@@ -86,7 +70,7 @@ def calculate_compound_rating(ratings, weights, meanings, mode='mean'):
         return meanings[weighted_mean(ratings, weights)]
 
 
-def value_to_index(value, ref, metric):
+def value_to_index(value, ref, high_better):
     """
     Convert a value to an index by normalizing it with a reference value.
     If the metric is higher better, index is value divided by reference value,
@@ -96,6 +80,7 @@ def value_to_index(value, ref, metric):
     value : value to be converted
     ref : reference value for normalization
     metric : name of the metric
+    high_better: whether a higher value is better or not for the metric
 
     Returns:
     index
@@ -104,12 +89,12 @@ def value_to_index(value, ref, metric):
         return None
 
     try:
-        return value / ref if metric in HIGHER_BETTER else ref / value
+        return value / ref if high_better else ref / value
     except:
         return 0
 
 
-def assign_energy_label(metrics, metrics_ref, boundaries, pesos, positius, meanings, rating_mode='mean', index=True):
+def assign_energy_label(metrics, metrics_ref, boundaries, weights, higher_better, meanings, rating_mode='mean', index=True):
     """
     Assigns an energy efficiency label based on the metrics.
 
@@ -117,6 +102,8 @@ def assign_energy_label(metrics, metrics_ref, boundaries, pesos, positius, meani
     metrics : dictionary of metrics
     metrics_ref : reference metrics for normalization
     boundaries : boundary intervals for each metric
+    weights: weights for each metric
+    higher_better: which of the metrics are better if they have a higher value
     meanings : array representing different ratings
     rating_mode : method to calculate compound rating
     index : if True, convert metric values to indices before assigning label
@@ -124,9 +111,9 @@ def assign_energy_label(metrics, metrics_ref, boundaries, pesos, positius, meani
     Returns:
     compound rating and dictionary of individual ratings
     """
-    weights = list(METRIC_WEIGHTS.values())
+    weights = list(weights.values())
     if index:
-        metrics = {metric: value_to_index(value, metrics_ref[metric], metric) for metric, value in metrics.items()}
+        metrics = {metric: value_to_index(value, metrics_ref[metric], metric in higher_better) for metric, value in metrics.items()}
 
     metrics_to_rating = (
         {metric:

@@ -8,8 +8,8 @@ from django.shortcuts import get_object_or_404
 from .models import Model, Entrenament, Metrica, Qualificacio, Interval
 from .serializers import ModelSerializer, EntrenamentSerializer, MetricaSerializer, MetricaAmbLimitsSerializer,\
     QualificacioSerializer, IntervalSerializer, EntrenamentAmbResultatSerializer
-from .energy_label import assign_energy_label
-from .label_generation import generate_efficency_label
+from .rating_calculator import assign_energy_label
+from .label_generator import generate_efficency_label
 
 
 class ModelsView(viewsets.ModelViewSet):
@@ -43,7 +43,7 @@ class EntrenamentsView(viewsets.ModelViewSet):
         resultats = entrenament_data['resultats']
         resultats['task_type'] = 'Training'
 
-        # Aconseguir valors de l'entrenament que es fa servir de referència
+        # Aconseguir valors de l'entrenament que es fa servir de referència (per normalitzar)
         metriques_ref = {'co2_eq_emissions': 149200.0,
                          'size_efficency': 2364.837238605898,
                          'datasets_size_efficency': 266551.5743699732,
@@ -55,10 +55,11 @@ class EntrenamentsView(viewsets.ModelViewSet):
         metriques = Metrica.objects.filter(fase=Metrica.TRAIN).exclude(pes=0)
         metriques_info = MetricaAmbLimitsSerializer(metriques, many=True).data
 
-        boundaries = {}
-        pesos = {}
+        boundaries = {}         # Intervals de les diferents mètriques
+        pesos = {}              # Pesos de les mètriques
         resultats_utils = {}    # Resultats que corresponen a mètriques amb pes != 0
-        positius = []
+        positius = []           # Quines mètriques tenen impacte positiu en el càlcul
+        unitats = {}            # Unitats de les mètriques que en tenen
         for metrica in metriques_info:
             id_metrica = metrica['id']
 
@@ -81,6 +82,10 @@ class EntrenamentsView(viewsets.ModelViewSet):
             if metrica['influencia'] == Metrica.POSITIVA:
                 positius.append(id_metrica)
 
+            # Guardem la seva unitat (si en té)
+            if metrica['unitat']:
+                unitats[id_metrica] = metrica['unitat']
+
         # Aconseguir les possibles qualificacions
         qualificacions = Qualificacio.objects.order_by('ordre')
         qualificacions_info = QualificacioSerializer(qualificacions, many=True).data
@@ -88,7 +93,8 @@ class EntrenamentsView(viewsets.ModelViewSet):
             qualificacio['id'] for qualificacio in qualificacions_info
         ]
 
-        resultats['units'] = {'co2_eq_emissions': 'g', 'size_efficency': 'B', 'datasets_size_efficency': 'B'}
+        # Anotar les unitats
+        resultats['units'] = unitats
 
         qualifFinal, qualifMetriques = assign_energy_label(resultats_utils, metriques_ref, boundaries, pesos, positius, qualificacions_valor)
 
