@@ -4,7 +4,6 @@ import numpy as np
 from io import BytesIO
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.colors import black, white
-from .energy_label import assign_energy_label
 import qrcode
 
 # List of all metrics to be included in the energy label
@@ -121,7 +120,7 @@ def draw_qr(canvas, qr, x, y, width):
         canvas.rect(x + (i * width), y + int(width * qr_pix.shape[0]) - ((j + 1) * width), width, width, fill=1, stroke=0)
 
 
-def generate_efficency_label(summary, metrics_ref, boundaries, meanings):
+def generate_efficency_label(summary, meanings, frate, metric_to_rating):
     """
     Args:
         summary (dict): Summary dictionary containing information about the model.
@@ -129,17 +128,9 @@ def generate_efficency_label(summary, metrics_ref, boundaries, meanings):
         boundaries (dict): Boundaries for the metrics.
         meanings (array): Possible result's ratings.
     """
-    # Make a copy of the summary
-    summary = summary.copy()
-
     # Create a new canvas for the PDF
     buffer = BytesIO()
     canvas = Canvas(buffer, pagesize=C_SIZE)
-
-    metrics = {key: value for key, value in summary.items() if key in COMPOUND_METRIC}
-
-    # Assign energy labels
-    frate, metric_to_rating = assign_energy_label(metrics, metrics_ref, boundaries, meanings, 'mean')
 
     # Draw the background and the pictograms for the metrics
     # Ratings are converted to images and drawn on the canvas

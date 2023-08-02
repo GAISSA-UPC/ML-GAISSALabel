@@ -34,13 +34,13 @@ def weighted_mean(ratings, weights):
     not_nan_indices = np.isfinite(ratings)
     ratings_clean = np.array(ratings)[not_nan_indices]
     weights_clean = np.array(weights)[not_nan_indices]
-    
+
     # Renormalize the weights
     weights_clean = weights_clean / np.sum(weights_clean)
 
     # Compute the weighted mean
     mean = np.sum(ratings_clean * weights_clean)
-    
+
     return int(round(mean))
 
 
@@ -62,7 +62,7 @@ def assign_rating(index, boundaries):
     for i, (upper, lower) in enumerate(boundaries):
         if upper >= index > lower:
             return i
-    return 4    # worst rating if index does not fall in boundaries
+    return 4  # worst rating if index does not fall in boundaries
 
 
 def calculate_compound_rating(ratings, weights, meanings, mode='mean'):
@@ -109,7 +109,7 @@ def value_to_index(value, ref, metric):
         return 0
 
 
-def assign_energy_label(metrics, metrics_ref, boundaries, meanings, rating_mode, index=True):
+def assign_energy_label(metrics, metrics_ref, boundaries, pesos, positius, meanings, rating_mode='mean', index=True):
     """
     Assigns an energy efficiency label based on the metrics.
 
@@ -130,8 +130,14 @@ def assign_energy_label(metrics, metrics_ref, boundaries, meanings, rating_mode,
 
     metrics_to_rating = (
         {metric:
-          assign_rating(value, boundaries[metric])
-          for metric, value in metrics.items()})
-    
+            assign_rating(value, boundaries[metric])
+            for metric, value in metrics.items()}
+    )
+
     ratings = list(metrics_to_rating.values())
+
+    # Transforma els ratings de les mètriques (0, 1, ...) al valor real del resultat (A, B, ...)
+    metrics_to_rating = (
+        {metric: meanings[value] for metric, value in metrics_to_rating.items()}
+    )
     return calculate_compound_rating(ratings, weights, meanings, rating_mode), metrics_to_rating
