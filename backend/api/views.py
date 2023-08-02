@@ -3,12 +3,12 @@ import base64
 from rest_framework import viewsets
 from rest_framework.response import Response
 
-from django.utils.translation import gettext_lazy as _
 from django.shortcuts import get_object_or_404
 
 from .models import Model, Entrenament, Metrica, Qualificacio, Interval
 from .serializers import ModelSerializer, EntrenamentSerializer, MetricaSerializer, MetricaAmbLimitsSerializer,\
     QualificacioSerializer, IntervalSerializer, EntrenamentAmbResultatSerializer
+from .energy_label import assign_energy_label
 from .label_generation import generate_efficency_label
 
 
@@ -56,14 +56,30 @@ class EntrenamentsView(viewsets.ModelViewSet):
         metriques_info = MetricaAmbLimitsSerializer(metriques, many=True).data
 
         boundaries = {}
+        pesos = {}
+        resultats_utils = {}    # Resultats que corresponen a mètriques amb pes != 0
+        positius = []
         for metrica in metriques_info:
             id_metrica = metrica['id']
+
+            # Càlcul dels intervals
             intervals = Interval.objects.filter(metrica_id=id_metrica).order_by('qualificacio__ordre')
             intervals_info = IntervalSerializer(intervals, many=True).data
             boundaries[id_metrica] = [
                 [interval['limitSuperior'], interval['limitInferior']]
                 for interval in intervals_info
             ]
+
+            # Càlcul dels pesos de la mètrica
+            pesos[id_metrica] = metrica['pes']
+
+            # Càlcul de resultats útils
+            if id_metrica in resultats:
+                resultats_utils[id_metrica] = resultats[id_metrica]
+
+            # Veiem si és positiva o no
+            if metrica['influencia'] == Metrica.POSITIVA:
+                positius.append(id_metrica)
 
         # Aconseguir les possibles qualificacions
         qualificacions = Qualificacio.objects.order_by('ordre')
@@ -74,7 +90,9 @@ class EntrenamentsView(viewsets.ModelViewSet):
 
         resultats['units'] = {'co2_eq_emissions': 'g', 'size_efficency': 'B', 'datasets_size_efficency': 'B'}
 
-        label = generate_efficency_label(resultats, metriques_ref, boundaries, qualificacions_valor)
+        qualifFinal, qualifMetriques = assign_energy_label(resultats_utils, metriques_ref, boundaries, pesos, positius, qualificacions_valor)
+
+        label = generate_efficency_label(resultats, qualificacions_valor, qualifFinal, qualifMetriques)
 
         response_data = {
             'energy_label': base64.b64encode(label).decode(),
