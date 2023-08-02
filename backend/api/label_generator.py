@@ -6,23 +6,7 @@ from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.colors import black, white
 import qrcode
 
-# List of all metrics to be included in the energy label
-METRIC = [
-    'co2_eq_emissions',
-    'size_efficency',
-    'downloads',
-    'datasets_size_efficency',
-    'performance_score',
-]
-
-COMPOUND_METRIC = [
-    'co2_eq_emissions',
-    'size_efficency',
-    'datasets_size_efficency',
-    'downloads',
-    'performance_score',
-]
-
+# Canvas size
 C_SIZE = (1560, 2411)
 
 # Positions for specific elements on the label, calculated as ratios of the overall canvas size
@@ -172,7 +156,7 @@ def generate_efficency_label(summary, meanings, frate, metric_to_rating):
         if key.startswith(f"$"): # Static text on label depending on the task type
             text = key.replace(f"$", "")
         elif key in summary: # Dynamic text that receives content from summary
-            if key in METRIC:
+            if key in metric_to_rating.keys():
                 text = 'n.a.' if summary[key] is None else f'{summary[key]:4.2f}'
                 if text.endswith('.'):
                     text = text[:-1]
