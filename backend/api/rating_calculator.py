@@ -94,7 +94,7 @@ def value_to_index(value, ref, high_better):
         return 0
 
 
-def assign_energy_label(metrics, metrics_ref, boundaries, weights, higher_better, meanings, rating_mode='mean', index=True):
+def calculate_ratings(metrics, metrics_ref, boundaries, weights, higher_better, meanings, rating_mode='mean', index=True):
     """
     Assigns an energy efficiency label based on the metrics.
 

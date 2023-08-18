@@ -1,8 +1,6 @@
-import json
-
 from rest_framework import serializers
 
-from .models import Model, Entrenament, Metrica, Qualificacio, Interval, ResultatEntrenament
+from .models import Model, Entrenament, Metrica, Qualificacio, Interval
 
 
 class ModelSerializer(serializers.ModelSerializer):
