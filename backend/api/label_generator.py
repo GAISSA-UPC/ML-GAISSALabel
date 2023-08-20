@@ -11,57 +11,90 @@ from PIL import Image
 # Canvas size
 C_SIZE = (1560, 2411)
 
-# Positions for specific elements on the label, calculated as ratios of the overall canvas size
-top_x, top_y = 260/1560, 650/2411
-co2_x, co2_y = 780/1560, 650/2411
-downloads_x, downloads_y = 1300/1560, 650/2411
-parameters_x, parameters_y = 520/1560, 200/2411
-dataset_x, dataset_y = 1040/1560, 200/2411
-
-
-# Mapping of icon names to their associated metrics
-ICON_NAME_TO_METRIC = {
-    'CO2': 'co2_eq_emissions',
-    'parameters': 'size_efficency',
-    'downloads': 'downloads',
-    'top': 'performance_score',
-    'dataset': 'datasets_size_efficency'
-}
-
-ICON_NAMES = {
-    'size_efficency': 'Size efficiency',
-    'datasets_size_efficency': 'Dataset size efficency',
-    'downloads': 'Descàrregues',
-    'performance_score': 'Performance score',
-    'co2_eq_emissions': 'CO2 emissions'
-}
-
-
-# Positions of the icons on the label, calculated as ratios of the overall canvas size
-ICON_POS = {
-    'downloads': (downloads_x*1560, downloads_y*2411),
-    'top': (top_x*1560, top_y*2411),
-    'CO2': (co2_x*1560, co2_y*2411),
-    'parameters': (parameters_x*1560, parameters_y*2411),
-    'dataset': (dataset_x*1560, dataset_y*2411)
-}
-
-
 # Directory of the label design elements
 PARTS_DIR = os.path.join(os.path.dirname(__file__), "label_design")
 
 
 def get_position(i, total):
-    if i == 0:
-        return 260 / 1560, 650 / 2411
-    elif i == 1:
-        return 780 / 1560, 650 / 2411
-    elif i == 2:
-        return 1300 / 1560, 650 / 2411
-    elif i == 3:
-        return 520 / 1560, 200 / 2411
-    else:
-        return 1040 / 1560, 200 / 2411
+    """
+    Function to calculate the base position of a metric in the canvas.
+
+    Args:
+        i (Integer): Index corresponding to the metric which position is wanted.
+        total (Integer): Amount of metrics that will be shown on the label.
+
+    Returns:
+        Base position of the metric.
+    """
+    if total == 1:
+        x = 780
+        y = 425
+    elif total == 2:
+        y = 425
+        if i == 0:
+            x = 520
+        else:   # i == 1
+            x = 1040
+    elif total == 3:
+        if i == 0:
+            x = 520
+            y = 650
+        elif i == 1:
+            x = 1040
+            y = 650
+        else:   # i == 2
+            x = 780
+            y = 200
+    elif total == 4:
+        if i == 0:
+            x = 520
+            y = 650
+        elif i == 1:
+            x = 1040
+            y = 650
+        elif i == 2:
+            x = 520
+            y = 200
+        else:   # i == 3:
+            x = 1040
+            y = 200
+    elif total == 5:
+        if i == 0:
+            x = 260
+            y = 650
+        elif i == 1:
+            x = 780
+            y = 650
+        elif i == 2:
+            x = 1300
+            y = 650
+        elif i == 3:
+            x = 520
+            y = 200
+        else:   # i == 4
+            x = 1040
+            y = 200
+    else:   # total == 6
+        if i == 0:
+            x = 260
+            y = 650
+        elif i == 1:
+            x = 780
+            y = 650
+        elif i == 2:
+            x = 1300
+            y = 650
+        elif i == 3:
+            x = 260
+            y = 200
+        elif i == 4:
+            x = 780
+            y = 200
+        else:   # i == 5
+            x = 1300
+            y = 200
+
+    return x / C_SIZE[0], y / C_SIZE[1]
 
 
 def create_qr():
@@ -108,10 +141,14 @@ def draw_qr(canvas, qr, x, y, width):
 def generate_efficency_label(results, meanings, frate, model_name, task_type):
     """
     Args:
-        summary (dict): Summary dictionary containing information about the model.
-        metrics_ref (dict): Reference metrics.
-        boundaries (dict): Boundaries for the metrics.
-        meanings (array): Possible result's ratings.
+        results: For each metric to be shown on the energy label, contains its name, value, unit and image.
+        meanings: Possible result's ratings.
+        frate: Final rate (should be one of the meanings)
+        model_name: Name of the model to which the label is generated.
+        task_type: "Training" or "Inference".
+
+    Returns:
+        The energy label generated, in PDF format.
     """
     # Create a new canvas for the PDF
     buffer = BytesIO()
