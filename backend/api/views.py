@@ -97,16 +97,14 @@ class EntrenamentsView(viewsets.ModelViewSet):
 
         qualifFinal, qualifMetriques = calculate_ratings(resultats_utils, metriques_ref, boundaries, pesos, positius, qualificacions_valor)
 
+        # Limitem el nombre de resultats que mostrem a l'EL a 6 màxim (que seran els que tinguis major pes)
         resultats = {
             noms[metrica_id]: {
                 'value': resultats_entrenament[metrica_id],
                 'unit': unitats[metrica_id],
                 'image': Interval.objects.get(metrica__id=metrica_id, qualificacio__id=qualifMetriques[metrica_id]).imatge.read()
-            } for metrica_id, qualificacio in qualifMetriques.items()
+            } for metrica_id, qualificacio in list(qualifMetriques.items())[:6]
         }
-
-        # ToDo: Fer això bé
-        resultats_entrenament['units'] = unitats
 
         label = generate_efficency_label(resultats, qualificacions_valor, qualifFinal, entrenament.model.nom, 'Training')
 
