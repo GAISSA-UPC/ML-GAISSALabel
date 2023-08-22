@@ -71,3 +71,29 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+
+/* Styles for titles */
+
+h1 {
+  font-size: 26px;
+  font-weight: bold;
+  color: var(--gaissa_green)
+}
+
+h2 {
+  font-size: 24px;
+}
+
+
+/* Styles for buttons */
+
+.action-button-light:hover, .action-button-light:focus {
+  color: white !important;
+  background-color: var(--gaissa_green) !important;
+}
+
+button:hover, button:focus {
+  color: var(--gaissa_green) !important;
+  background-color: white !important;
+}

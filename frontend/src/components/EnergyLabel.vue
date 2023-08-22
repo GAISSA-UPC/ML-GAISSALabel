@@ -6,9 +6,11 @@
 </template>
 
 <script>
-import trainings from '@/services/trainings'
 export default {
     name: "EnergyLabel",
+    props: {
+        pdfBase64: {required: true, type: String}
+    },
     data() {
         return {
             pdfURL: ""
@@ -16,12 +18,8 @@ export default {
     },
     methods: {
         async aconseguirPDF() {
-            // Aconseguim PDF en base64 de l'API
-            const response = await trainings.retrieve(1, 1)
-            const pdfBase64 = response.data['energy_label']
-
             // Convertim base64 a binari
-            const binaryData = atob(pdfBase64);
+            const binaryData = atob(this.pdfBase64);
 
             // Creem Blob a partir del binari
             const blob = new Blob([binaryData], { type: "application/pdf" });
@@ -29,6 +27,11 @@ export default {
             // Creem una URL pel Blob
             this.pdfURL = URL.createObjectURL(blob);
         }
+    },
+    watch: {
+        pdfBase64() {
+            this.aconseguirPDF()
+        },
     },
     async mounted() {
         await this.aconseguirPDF();
