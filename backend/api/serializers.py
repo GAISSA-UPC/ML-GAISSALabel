@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
-from .models import Model, Entrenament, Metrica, Qualificacio, Interval
+from django.shortcuts import get_object_or_404
+
+from .models import Model, Entrenament, Metrica, Qualificacio, Interval, ResultatEntrenament
 
 
 class ModelSerializer(serializers.ModelSerializer):
@@ -62,6 +64,7 @@ class IntervalSerializer(serializers.ModelSerializer):
 
 class EntrenamentAmbResultatSerializer(serializers.ModelSerializer):
     resultats = serializers.SerializerMethodField(read_only=True)
+    resultats_info = serializers.JSONField(write_only=True)
 
     def get_resultats(self, entrenament):
         resultats = {}
@@ -69,6 +72,17 @@ class EntrenamentAmbResultatSerializer(serializers.ModelSerializer):
             resultats[resultat.metrica.id] = resultat.valor
         return resultats
 
+    def create(self, validated_data):
+        resultats_data = validated_data.pop('resultats_info', None)
+        entrenament = super().create(validated_data)
+
+        if resultats_data:
+            for metrica, valor in resultats_data.items():
+                metrica = get_object_or_404(Metrica, id=metrica)
+                ResultatEntrenament.objects.create(entrenament=entrenament, metrica=metrica, valor=valor)
+
+        return entrenament
+
     class Meta:
         model = Entrenament
-        fields = ('dataRegistre', 'resultats')
+        fields = ('model', 'id', 'dataRegistre', 'resultats', 'resultats_info')
