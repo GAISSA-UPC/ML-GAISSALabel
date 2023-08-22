@@ -32,7 +32,7 @@ class EntrenamentsView(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         # En cas que sigui retrieve, retornem tota la info, amb el resultat
-        if self.action == 'retrieve':
+        if self.action == 'retrieve' or self.action == 'create':
             return EntrenamentAmbResultatSerializer
         return self.serializer_class
 
