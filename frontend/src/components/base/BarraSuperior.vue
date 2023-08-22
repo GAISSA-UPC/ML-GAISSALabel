@@ -1,7 +1,7 @@
 <template>
     <span style="width: 100%; display: flex; justify-content: space-between">
         <div style="display: flex; align-items: center">
-            <el-button @click="canviCollapse" class="menu">
+            <el-button @click="canviCollapse" class="action-button-light">
                 <font-awesome-icon :icon="['fas', 'bars']" />
             </el-button>
             <el-image
@@ -39,14 +39,3 @@ export default {
     }
 }
 </script>
-
-<style scoped>
-.menu:hover, .menu:focus {
-    color: white;
-    background-color: var(--gaissa_green)
-}
-button:hover, button:focus {
-    color: var(--gaissa_green);
-    background-color: white;
-}
-</style>
