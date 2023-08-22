@@ -21,6 +21,7 @@
             >
                 <el-select
                     v-model="selectedTraining"
+                    @change="canviTraining"
                 >
                     <el-option
                         v-for="(training, i) in trainings" :key="i"
@@ -36,7 +37,11 @@
             >
                 {{ $t('Generate label') }}
             </el-button>
-        </el-form>
+        </el-form><br>
+        <EnergyLabel
+            :pdfBase64="labelBase64"
+            v-show="labelBase64"
+        />
     </div>
 </template>
 
@@ -44,14 +49,17 @@
     import models from '@/services/models'
     import trainings from '@/services/trainings'
     import {formatData} from '@/utils'
+    import EnergyLabel from "@/components/EnergyLabel.vue";
     export default {
         name: "TrainingPreSaved",
+        components: {EnergyLabel},
         data() {
             return {
                 models: null,
                 selectedModel: null,
                 trainings: null,
                 selectedTraining: null,
+                labelBase64: null
             };
         },
         methods: {
@@ -66,9 +74,14 @@
             async canviModel() {
                 await this.refrescaEntrenaments()
                 this.selectedTraining = null
+                this.labelBase64 = null
+            },
+            async canviTraining() {
+                this.labelBase64 = null
             },
             async generarEtiqueta() {
-
+                const response = await trainings.retrieve(this.selectedModel, this.selectedTraining)
+                this.labelBase64 = response.data['energy_label']
             },
             formatData,
         },

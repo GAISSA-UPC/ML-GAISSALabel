@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
-import EnergyLabel from '@/views/EnergyLabel.vue'
+import EnergyLabel from '@/components/EnergyLabel.vue'
 import TrainingPreSaved from '@/views/TrainingPreSaved.vue'
 
 const router = createRouter({
