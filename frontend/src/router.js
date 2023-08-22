@@ -12,11 +12,6 @@ const router = createRouter({
       component: HomeView
     },
     {
-      path: '/prova',
-      name: 'prova',
-      component: EnergyLabel
-    },
-    {
       path: '/trainingPre',
       name: 'training pre saved',
       component: TrainingPreSaved

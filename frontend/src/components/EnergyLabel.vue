@@ -2,7 +2,6 @@
 
     <div>
         <iframe :src="pdfURL" type="application/pdf" width="100%" height="900px" />
-        <el-button @click="console.log(pdfURL)">hola</el-button>
     </div>
 </template>
 
