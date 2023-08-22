@@ -1,13 +1,13 @@
 <template>
     <el-menu
-        default-active="0"
+        :default-active="activeRoute"
         class="el-menu-vertical"
         :collapse="collapsed"
         @open="handleOpen"
         @close="handleClose"
         style="margin-left: 13px; margin-right: 10px"
     >
-        <el-menu-item index="0">
+        <el-menu-item index="home" @click="$router.push({name: 'home'})">
             <font-awesome-icon :icon="['fas', 'house']" class="icon"/>
             <template #title>{{ $t('Home') }}</template>
         </el-menu-item>
@@ -17,7 +17,9 @@
                 <span>{{ $t('Training') }}</span>
             </template>
             <el-menu-item index="1-1">{{ $t('Form') }}</el-menu-item>
-            <el-menu-item index="1-2">{{ $t('Database') }}</el-menu-item>
+            <el-menu-item index="training pre saved" @click="$router.push({name: 'training pre saved'})">
+                {{ $t('Database') }}
+            </el-menu-item>
             <el-menu-item index="1-3">{{ $t('File') }}</el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="2">
@@ -43,12 +45,22 @@ export default {
     props: {
         collapsed: {required: false, type: Boolean, default: false}
     },
+    data() {
+        return {
+            activeRoute: this.$route.name,
+        };
+    },
     methods: {
         handleOpen(key, keyPath) {
             console.log(key, keyPath)
         },
         handleClose(key, keyPath) {
             console.log(key, keyPath)
+        }
+    },
+    watch: {
+        $route(to) {
+            this.activeRoute = to.name
         }
     }
 }
