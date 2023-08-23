@@ -1,9 +1,11 @@
 import base64
 
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from rest_framework.response import Response
 
 from django.shortcuts import get_object_or_404
+
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Model, Entrenament, Metrica, Qualificacio, Interval
 from .serializers import ModelSerializer, EntrenamentSerializer, MetricaSerializer, MetricaAmbLimitsSerializer,\
@@ -16,6 +18,14 @@ class ModelsView(viewsets.ModelViewSet):
     queryset = Model.objects.all()
     serializer_class = ModelSerializer
     models = Model
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = {
+        'id': ['exact', 'in'],
+        'nom': ['exact', 'in', 'contains'],
+    }
+    search_fields = ['nom']
+    ordering_fields = ['nom', 'dataCreacio']
 
 
 class EntrenamentsView(viewsets.ModelViewSet):
@@ -119,3 +129,14 @@ class MetriquesView(viewsets.ModelViewSet):
     models = Metrica
     serializer_class = MetricaSerializer
     queryset = Metrica.objects.all()
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = {
+        'id': ['exact', 'in'],
+        'nom': ['exact', 'in', 'contains'],
+        'fase': ['exact', 'in'],
+        'pes': ['exact', 'range'],
+        'influencia': ['exact', 'in']
+    }
+    search_fields = ['nom', 'fase']
+    ordering_fields = ['id', 'nom', 'fase', 'pes', 'influencia']
