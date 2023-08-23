@@ -12,6 +12,11 @@ const router = createRouter({
       component: HomeView
     },
     {
+      path: '/trainingForm',
+      name: 'training form',
+      component: TrainingPreSaved
+    },
+    {
       path: '/trainingPre',
       name: 'training pre saved',
       component: TrainingPreSaved
