@@ -16,7 +16,9 @@
                 <font-awesome-icon :icon="['fas', 'dumbbell']" class="icon"/>
                 <span>{{ $t('Training') }}</span>
             </template>
-            <el-menu-item index="1-1">{{ $t('Form') }}</el-menu-item>
+            <el-menu-item index="training form" @click="$router.push({name: 'training form'})">
+                {{ $t('Form') }}
+            </el-menu-item>
             <el-menu-item index="training pre saved" @click="$router.push({name: 'training pre saved'})">
                 {{ $t('Database') }}
             </el-menu-item>
