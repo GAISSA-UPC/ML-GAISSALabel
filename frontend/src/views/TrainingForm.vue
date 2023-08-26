@@ -32,20 +32,27 @@
         >
             {{ $t('Generate label') }}
         </el-button>
-    </el-form>
+    </el-form><br>
+    <EnergyLabel
+        :pdfBase64="labelBase64"
+        v-show="labelBase64"
+    />
 </template>
 
 <script>
     import models from '@/services/models'
     import metriques from '@/services/metriques'
     import trainings from '@/services/trainings'
+    import EnergyLabel from "@/components/EnergyLabel.vue";
     export default {
         name: "TrainingForm",
+        components: {EnergyLabel},
         data() {
             return {
                 models: null,
                 selectedModel: null,
                 metriques: null,
+                labelBase64: null,
             };
         },
         methods: {
@@ -58,7 +65,12 @@
                 this.metriques = response.data
             },
             async generarEtiqueta() {
-                trainings.create(this.selectedModel, this.metriques)
+                const responseCreate = await trainings.create(this.selectedModel, this.metriques)
+                if (responseCreate.status === 201) {
+                    const entrenament_id = responseCreate.data['id']
+                    const responseLabel = await trainings.retrieve(this.selectedModel, entrenament_id)
+                    this.labelBase64 = responseLabel.data['energy_label']
+                }
             },
         },
         async mounted() {

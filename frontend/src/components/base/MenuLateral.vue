@@ -3,8 +3,6 @@
         :default-active="activeRoute"
         class="el-menu-vertical"
         :collapse="collapsed"
-        @open="handleOpen"
-        @close="handleClose"
         style="margin-left: 13px; margin-right: 10px"
     >
         <el-menu-item index="home" @click="$router.push({name: 'home'})">
@@ -51,14 +49,6 @@ export default {
         return {
             activeRoute: this.$route.name,
         };
-    },
-    methods: {
-        handleOpen(key, keyPath) {
-            console.log(key, keyPath)
-        },
-        handleClose(key, keyPath) {
-            console.log(key, keyPath)
-        }
     },
     watch: {
         $route(to) {
