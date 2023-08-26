@@ -6,7 +6,7 @@ from django.db import models
 class Model(models.Model):
     id = models.AutoField(primary_key=True, verbose_name=_('Identificador'))
     nom = models.CharField(max_length=100, null=False, blank=False, verbose_name=_('Nom'))
-    informacio = models.CharField(max_length=1000, null=False, blank=False, verbose_name=_('Informació'))
+    informacio = models.CharField(max_length=1000, null=True, blank=True, verbose_name=_('Informació'))
     dataCreacio = models.DateTimeField(auto_now_add=True, verbose_name=_('Data creació'))
 
 

@@ -3,8 +3,6 @@
         :default-active="activeRoute"
         class="el-menu-vertical"
         :collapse="collapsed"
-        @open="handleOpen"
-        @close="handleClose"
         style="margin-left: 13px; margin-right: 10px"
     >
         <el-menu-item index="home" @click="$router.push({name: 'home'})">
@@ -16,7 +14,9 @@
                 <font-awesome-icon :icon="['fas', 'dumbbell']" class="icon"/>
                 <span>{{ $t('Training') }}</span>
             </template>
-            <el-menu-item index="1-1">{{ $t('Form') }}</el-menu-item>
+            <el-menu-item index="training form" @click="$router.push({name: 'training form'})">
+                {{ $t('Form') }}
+            </el-menu-item>
             <el-menu-item index="training pre saved" @click="$router.push({name: 'training pre saved'})">
                 {{ $t('Database') }}
             </el-menu-item>
@@ -49,14 +49,6 @@ export default {
         return {
             activeRoute: this.$route.name,
         };
-    },
-    methods: {
-        handleOpen(key, keyPath) {
-            console.log(key, keyPath)
-        },
-        handleClose(key, keyPath) {
-            console.log(key, keyPath)
-        }
     },
     watch: {
         $route(to) {
