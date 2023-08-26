@@ -2,6 +2,9 @@
     <h1>{{ $t("Energy label for training") }}</h1><br>
     <h2>{{ $t("Register a new training") }}</h2><br>
 
+    <el-alert v-if="estat === 'modelCreat-ok'" :title="$t('Model registered correctly')" type="success" @close="estat = ''"/>
+    <el-alert v-else-if="estat === 'modelCreat-ko'" :title="$t('There was an error while creating the model')" type="success" @close="estat = ''"/>
+
     <el-form label-position="top">
         <el-form-item :label="$t('Model')">
             <el-select v-model="selectedModel">
@@ -83,6 +86,7 @@
         components: {EnergyLabel},
         data() {
             return {
+                estat: '',
                 models: null,
                 selectedModel: null,
                 newModel: {},
@@ -115,6 +119,7 @@
                     this.selectedModel = this.models.length
                 }
                 this.dialogNewModel = false
+                this.estat = 'modelCreat-ok'
             },
             async closeDialogNewModel() {
                 this.newModel = {}
