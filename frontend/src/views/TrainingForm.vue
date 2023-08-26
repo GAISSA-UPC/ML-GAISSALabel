@@ -1,65 +1,51 @@
 <template>
     <h1>{{ $t("Energy label for training") }}</h1><br>
-    <h2>{{ $t("Create label for dataset model") }}</h2><br>
-    <div>
-        <el-form label-position="top">
-            <el-form-item :label="$t('Model')">
-                <el-select
-                    v-model="selectedModel"
-                    @change="canviModel"
-                >
-                    <el-option
-                        v-for="(model, i) in models" :key="i"
-                        :value="model.id"
-                        :label="model.nom"
-                    />
-                </el-select>
-            </el-form-item>
-            <el-form-item
-                :label="$t('Training')"
-                v-show="selectedModel != null"
-            >
-                <el-select
-                    v-model="selectedTraining"
-                    @change="canviTraining"
-                >
-                    <el-option
-                        v-for="(training, i) in trainings" :key="i"
-                        :value="training.id"
-                        :label="formatData(training.dataRegistre)"
-                    />
-                </el-select>
-            </el-form-item>
-            <el-button
-                @click="generarEtiqueta"
-                class="action-button-light"
-                v-show="selectedTraining != null"
-            >
-                {{ $t('Generate label') }}
-            </el-button>
-        </el-form><br>
-        <EnergyLabel
-            :pdfBase64="labelBase64"
-            v-show="labelBase64"
-        />
-    </div>
+    <h2>{{ $t("Register a new training") }}</h2><br>
+
+    <el-form label-position="top">
+        <el-form-item :label="$t('Model')">
+            <el-select v-model="selectedModel">
+                <el-option
+                    v-for="(model, i) in models" :key="i"
+                    :value="model.id"
+                    :label="model.nom"
+                />
+            </el-select>
+        </el-form-item><br>
+
+        <h3>{{ $t("Metrics") }}</h3><br>
+        <el-form-item
+            v-for="(metrica, i) in metriques" :key="i"
+            :label="metrica.nom"
+        >
+            <el-input-number
+                step="0.01"
+                v-model="metrica.valor"
+                min="0"
+            />
+            <p style="margin-left: 10px">{{ metrica.unitat }}</p>
+        </el-form-item>
+        <br>
+        <el-button
+            @click="generarEtiqueta"
+            class="action-button-light"
+        >
+            {{ $t('Generate label') }}
+        </el-button>
+    </el-form>
 </template>
 
 <script>
     import models from '@/services/models'
+    import metriques from '@/services/metriques'
     import trainings from '@/services/trainings'
-    import {formatData} from '@/utils'
-    import EnergyLabel from "@/components/EnergyLabel.vue";
     export default {
         name: "TrainingForm",
-        components: {EnergyLabel},
         data() {
             return {
                 models: null,
                 selectedModel: null,
-                trainings: null,
-                selectedTraining: null,
-                labelBase64: null
+                metriques: null,
             };
         },
         methods: {
@@ -67,33 +53,18 @@
                 const response = await models.list()
                 this.models = response.data
             },
-            async refrescaEntrenaments() {
-                const response = await trainings.listByModel(this.selectedModel)
-                this.trainings = response.data
-            },
-            async canviModel() {
-                await this.refrescaEntrenaments()
-                this.selectedTraining = null
-                this.labelBase64 = null
-            },
-            async canviTraining() {
-                this.labelBase64 = null
+            async refrescaMetriques() {
+                const response = await metriques.listOrderedFilteredByPhase('T')
+                this.metriques = response.data
             },
             async generarEtiqueta() {
-                const response = await trainings.retrieve(this.selectedModel, this.selectedTraining)
-                this.labelBase64 = response.data['energy_label']
+                trainings.create(this.selectedModel, this.metriques)
             },
-            formatData,
         },
         async mounted() {
             await this.refrescaModels();
+            await this.refrescaMetriques();
         },
-        beforeUnmount() {
-            // Revoke the URL object to free up memory when the component is destroyed
-            if (this.pdfURL) {
-                URL.revokeObjectURL(this.pdfURL);
-            }
-        }
     };
 </script>
 
