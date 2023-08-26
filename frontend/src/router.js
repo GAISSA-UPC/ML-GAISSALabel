@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
-import EnergyLabel from '@/components/EnergyLabel.vue'
+import trainingForm from '@/views/trainingForm.vue'
 import TrainingPreSaved from '@/views/TrainingPreSaved.vue'
 
 const router = createRouter({
@@ -10,6 +10,11 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView
+    },
+    {
+      path: '/trainingForm',
+      name: 'training form',
+      component: trainingForm
     },
     {
       path: '/trainingPre',

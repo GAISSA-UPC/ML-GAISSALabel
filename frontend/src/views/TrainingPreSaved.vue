@@ -88,12 +88,6 @@
         async mounted() {
             await this.refrescaModels();
         },
-        beforeUnmount() {
-            // Revoke the URL object to free up memory when the component is destroyed
-            if (this.pdfURL) {
-                URL.revokeObjectURL(this.pdfURL);
-            }
-        }
     };
 </script>
 
