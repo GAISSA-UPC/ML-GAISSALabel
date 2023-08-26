@@ -1,6 +1,6 @@
 import base64
 
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, status
 from rest_framework.response import Response
 
 from django.shortcuts import get_object_or_404
@@ -123,6 +123,18 @@ class EntrenamentsView(viewsets.ModelViewSet):
         }
         response_data.update(entrenament_data)
         return Response(response_data)
+
+    def create(self, request, model_id=None, *args, **kwargs):
+        # Afegim l'id d'esdeveniment del paràmetre a les dades de la request abans de crear
+        data = request.data.copy()
+        data['model'] = model_id
+
+        # Equivalent super().create, però amb "data"
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class MetriquesView(viewsets.ModelViewSet):
