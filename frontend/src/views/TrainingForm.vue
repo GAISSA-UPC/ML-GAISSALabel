@@ -11,7 +11,15 @@
                     :label="model.nom"
                 />
             </el-select>
-        </el-form-item><br>
+            <el-button
+                style="margin-left: 10px"
+                @click="dialogNewModel = true"
+                class="action-button-light"
+            >
+                <font-awesome-icon :icon="['fas', 'plus']" />
+            </el-button>
+        </el-form-item>
+        <br>
 
         <h3>{{ $t("Metrics") }}</h3><br>
         <el-form-item
@@ -33,6 +41,32 @@
             {{ $t('Generate label') }}
         </el-button>
     </el-form><br>
+
+    <el-dialog v-model="dialogNewModel"
+        :title="$t('Add a new model')"
+               @close="closeDialogNewModel"
+    >
+        <el-form :model="newModel" label-position="top">
+            <el-form-item :label="$t('Name')">
+                <el-input
+                    v-model="newModel.nom"
+                />
+            </el-form-item>
+            <el-form-item :label="$t('Description')">
+                <el-input
+                    v-model="newModel.informacio"
+                    type="textarea"
+                />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="dialogNewModel = false">{{ $t('Cancel') }}</el-button>
+                <el-button type="success" @click="afegirModel">{{ $t('Create') }}</el-button>
+            </span>
+        </template>
+    </el-dialog>
+
     <EnergyLabel
         :pdfBase64="labelBase64"
         v-show="labelBase64"
@@ -51,6 +85,8 @@
             return {
                 models: null,
                 selectedModel: null,
+                newModel: {},
+                dialogNewModel: false,
                 metriques: null,
                 labelBase64: null,
             };
@@ -71,6 +107,18 @@
                     const responseLabel = await trainings.retrieve(this.selectedModel, entrenament_id)
                     this.labelBase64 = responseLabel.data['energy_label']
                 }
+            },
+            async afegirModel() {
+                const response = await models.create(this.newModel)
+                if (response.status === 201) {
+                    this.models.push(response.data)
+                    this.selectedModel = this.models.length
+                }
+                this.dialogNewModel = false
+            },
+            async closeDialogNewModel() {
+                this.newModel = {}
+                this.dialogNewModel = false
             },
         },
         async mounted() {
