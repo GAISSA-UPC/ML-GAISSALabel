@@ -24,7 +24,6 @@ class MetricaSerializer(serializers.ModelSerializer):
 
 
 class MetricaAmbLimitsSerializer(MetricaSerializer):
-
     class Meta:
         model = Metrica
         fields = '__all__'

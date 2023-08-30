@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <iframe :src="pdfURL" type="application/pdf" width="100%" height="900px" />
+        <iframe :src="pdfURL" type="application/pdf" width="100%" height="600px"/>
     </div>
 </template>
 

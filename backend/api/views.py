@@ -118,10 +118,18 @@ class EntrenamentsView(viewsets.ModelViewSet):
 
         label = generate_efficency_label(resultats, qualificacions_valor, qualifFinal, entrenament.model.nom, 'Training')
 
+        resultatsResponse = {
+            nom_metrica: {
+                'value': info['value'],
+                'unit': info['unit'],
+                'image': base64.b64encode(info['image']).decode()
+            } for nom_metrica, info in resultats.items()
+        }
+
         response_data = {
             'energy_label': base64.b64encode(label).decode(),
+            'resultats': resultatsResponse,
         }
-        response_data.update(entrenament_data)
         return Response(response_data)
 
     def create(self, request, model_id=None, *args, **kwargs):
