@@ -39,7 +39,7 @@
         <br>
         <el-button
             @click="generarEtiqueta"
-            class="action-button-light"
+            color="var(--gaissa_green)"
         >
             {{ $t('Generate label') }}
         </el-button>
