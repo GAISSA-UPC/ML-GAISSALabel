@@ -147,7 +147,7 @@ class EntrenamentsView(viewsets.ModelViewSet):
 
 class MetriquesView(viewsets.ModelViewSet):
     models = Metrica
-    serializer_class = MetricaSerializer
+    serializer_class = MetricaAmbLimitsSerializer
     queryset = Metrica.objects.all()
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
