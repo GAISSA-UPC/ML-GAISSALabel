@@ -105,7 +105,7 @@ class EntrenamentsView(viewsets.ModelViewSet):
             qualificacio['id'] for qualificacio in qualificacions_info
         ]
 
-        qualifFinal, qualifMetriques = calculate_ratings(resultats_utils, metriques_ref, boundaries, pesos, positius, qualificacions_valor)
+        qualifFinal, qualifMetriques = calculate_ratings(resultats_utils, boundaries, pesos, positius, qualificacions_valor, metriques_ref)
 
         # Limitem el nombre de resultats que mostrem a l'EL a 6 màxim (que seran els que tinguis major pes)
         resultats = {

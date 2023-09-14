@@ -46,7 +46,7 @@ export default {
     },
     methods: {
         async aconseguirEtiqueta() {
-            const response = await trainings.retrieve(1, 1)
+            const response = await trainings.retrieve(this.$route.params.id_model, this.$route.params.id_training)
             this.labelBase64 = response.data['energy_label']
             this.info = response.data['resultats']
             console.log(this.info)
@@ -61,19 +61,23 @@ export default {
                 const intervals = metrica['intervals']
                 let marks = {0: '',}
                 let last = 0
+                let toAdd = 0
                 intervals.reverse().forEach(interval => {
                     const limSup = interval['limitSuperior']
                     const limInf = interval['limitInferior']
-                    if (limSup !== 100000000000000000000) {
+                    if (limSup === 100000000000000000000) {
+                        toAdd = last/(intervals.length - 1) + last
+                        marks[toAdd] = ''//toAdd.toFixed(2)
+                    }
+                    else {
                         last = interval['limitSuperior']
                         marks[last] = ''//interval['limitSuperior'].toFixed(2)
                     }
                     if (limSup > this.info[metrica.id].value && this.info[metrica.id].value > limInf) {
-                        this.ranges[metrica.id] = [limInf, limSup]
+                        if (limSup === 100000000000000000000) this.ranges[metrica.id] = [limInf, toAdd]
+                        else this.ranges[metrica.id] = [limInf, limSup]
                     }
                 })
-                const toAdd = last/(intervals.length - 1) + last
-                marks[toAdd] = ''//toAdd.toFixed(2)
                 this.marks[metrica.id] = marks
                 this.inf[metrica.id] = toAdd
             })
