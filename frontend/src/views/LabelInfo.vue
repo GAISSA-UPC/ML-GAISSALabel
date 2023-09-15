@@ -1,9 +1,30 @@
 <template>
     <h1>{{ $t("Energy label for training") }}</h1><br>
 
-    <el-row>
-        <el-col :span="14">
-            hola
+    <el-row justify="space-between">
+        <el-col :span="13">
+            <el-descriptions
+                class="margin-top"
+                border
+            >
+                <el-descriptions-item>
+                    <template #label>
+                        <div class="cell-item">
+                            <font-awesome-icon :icon="['fas', 'bars']" />
+                            {{ $t('Model name') }}
+                        </div>
+                    </template>
+                    hola
+                </el-descriptions-item>
+            </el-descriptions>
+            model:
+                id
+                name
+                information
+                data creació
+            training/inference
+                id
+                dataRegistre
         </el-col>
         <el-col :span="10">
             <EnergyLabel
@@ -12,14 +33,20 @@
         </el-col>
     </el-row>
 
-    <div v-for="(info, metrica, i) in info" :key="i" style="margin-bottom: 30px">
-        <el-row justify="space-between" align="middle">
+    <div v-for="(info, metrica, i) in resultats" :key="i" style="margin-bottom: 40px">
+        <el-row align="middle">
             <el-col :span="5">
                 <el-image :src="getImageDecoded(info.image)" :alt="metrica"/>
             </el-col>
-            <el-col :span="18">
-                <p align="justify">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+            <el-col :span="1"/>     <!-- Just to create space -->
+            <el-col :span="15">
+                <h3 style="font-weight: bold;margin-bottom: 6px">{{info.nom}}</h3>
+                <p align="justify">{{ descripcions[metrica] }}</p>
                 <CustomSlider :marks="marks[metrica]" :max="inf[metrica]" :values="ranges[metrica]" :color="info.color"/>
+            </el-col>
+            <el-col :span="3" align="middle">
+                <p class="prova" :style="{ fontSize: '35px', fontWeight: 'bold', color: info.color }">{{ info.qualificacio }}</p>
+                <p style="font-size: 20px">{{ roundIfDecimal(info.value) }} <span v-if="info.unit">{{ info.unit }}</span> </p>
             </el-col>
         </el-row>
     </div>
@@ -36,27 +63,28 @@ export default {
     data() {
         return {
             labelBase64: null,
-            info: null,
+            resultats: null,
             metriques: null,
             marks: {},
             inf: {},
             ranges: {},
-            color: {'co2_eq_emissions': '#f8b830', 'downloads': '#ef7d29'}
+            descripcions: {},
         };
     },
     methods: {
         async aconseguirEtiqueta() {
             const response = await trainings.retrieve(this.$route.params.id_model, this.$route.params.id_training)
             this.labelBase64 = response.data['energy_label']
-            this.info = response.data['resultats']
-            console.log(this.info)
+            this.resultats = response.data['resultats']
+            console.log(this.resultats)
+            console.log(response.data)
         },
         async aconseguirInfoMetriques() {
             const response = await metriques.listOrderedFilteredByPhase('T')
             this.metriques = response.data
             console.log(this.metriques)
         },
-        async calcularMarks() {
+        async calculateVariables() {
             this.metriques.forEach(metrica => {
                 const intervals = metrica['intervals']
                 let marks = {0: '',}
@@ -73,23 +101,27 @@ export default {
                         last = interval['limitSuperior']
                         marks[last] = ''//interval['limitSuperior'].toFixed(2)
                     }
-                    if (limSup > this.info[metrica.id].value && this.info[metrica.id].value > limInf) {
+                    if (limSup > this.resultats[metrica.id].value && this.resultats[metrica.id].value > limInf) {
                         if (limSup === 100000000000000000000) this.ranges[metrica.id] = [limInf, toAdd]
                         else this.ranges[metrica.id] = [limInf, limSup]
                     }
                 })
                 this.marks[metrica.id] = marks
                 this.inf[metrica.id] = toAdd
+                this.descripcions[metrica.id] = metrica.descripcio
             })
         },
         getImageDecoded(img) {
             return `data:image/png;base64,${img}`
         },
+        roundIfDecimal(value) {
+            return Number.isInteger(value) ? value : value.toFixed(2);
+        }
     },
     async mounted() {
         await this.aconseguirEtiqueta()
         await this.aconseguirInfoMetriques()
-        await this.calcularMarks()
+        await this.calculateVariables()
     },
 };
 </script>
