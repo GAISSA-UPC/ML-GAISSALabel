@@ -106,12 +106,13 @@ class EntrenamentsView(viewsets.ModelViewSet):
         ]
 
         qualifFinal, qualifMetriques = calculate_ratings(resultats_utils, boundaries, pesos, positius, qualificacions_valor, metriques_ref)
-
+        print(qualifMetriques)
         # Limitem el nombre de resultats que mostrem a l'EL a 6 màxim (que seran els que tinguis major pes)
         resultats = {
             noms[metrica_id]: {
                 'id': metrica_id,
                 'value': resultats_entrenament[metrica_id],
+                'qualificacio': qualifMetriques[metrica_id],
                 'unit': unitats[metrica_id],
                 'image': Interval.objects.get(metrica__id=metrica_id, qualificacio__id=qualifMetriques[metrica_id]).imatge.read(),
                 'color': Qualificacio.objects.get(id=qualifMetriques[metrica_id]).color,
@@ -124,6 +125,7 @@ class EntrenamentsView(viewsets.ModelViewSet):
             info['id']: {
                 'nom': nom_metrica,
                 'value': info['value'],
+                'qualificacio': info['qualificacio'],
                 'unit': info['unit'],
                 'image': base64.b64encode(info['image']).decode(),
                 'color': info['color'],
@@ -133,6 +135,7 @@ class EntrenamentsView(viewsets.ModelViewSet):
         response_data = {
             'energy_label': base64.b64encode(label).decode(),
             'resultats': resultatsResponse,
+            'infoEntrenament': entrenament_data
         }
         return Response(response_data)
 

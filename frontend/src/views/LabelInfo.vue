@@ -6,25 +6,55 @@
             <el-descriptions
                 class="margin-top"
                 border
+                :column="1"
+                v-if="model"
             >
                 <el-descriptions-item>
                     <template #label>
                         <div class="cell-item">
-                            <font-awesome-icon :icon="['fas', 'bars']" />
+                            <font-awesome-icon :icon="['fas', 'id-card-clip']" />
                             {{ $t('Model name') }}
                         </div>
                     </template>
-                    hola
+                    {{ model.nom }}
+                </el-descriptions-item>
+                <el-descriptions-item>
+                    <template #label>
+                        <div class="cell-item">
+                            <font-awesome-icon :icon="['fas', 'circle-info']" />
+                            {{ $t('Model information') }}
+                        </div>
+                    </template>
+                    {{ model.informacio }}
+                </el-descriptions-item>
+                <el-descriptions-item>
+                    <template #label>
+                        <div class="cell-item">
+                            <font-awesome-icon :icon="['fas', 'calendar-days']" />
+                            {{ $t('Model creation date') }}
+                        </div>
+                    </template>
+                    {{ formatData(model.dataCreacio) }}
+                </el-descriptions-item>
+                <el-descriptions-item>
+                    <template #label>
+                        <div class="cell-item">
+                            <font-awesome-icon :icon="['fas', 'dumbbell']" />
+                            {{ $t('Training identifier') }}
+                        </div>
+                    </template>
+                    {{ info.id }}
+                </el-descriptions-item>
+                <el-descriptions-item>
+                    <template #label>
+                        <div class="cell-item">
+                            <font-awesome-icon :icon="['fas', 'calendar-days']" />
+                            {{ $t('Training registration date') }}
+                        </div>
+                    </template>
+                    {{ formatData(info.dataRegistre) }}
                 </el-descriptions-item>
             </el-descriptions>
-            model:
-                id
-                name
-                information
-                data creació
-            training/inference
-                id
-                dataRegistre
         </el-col>
         <el-col :span="10">
             <EnergyLabel
@@ -55,8 +85,10 @@
 <script>
 import trainings from '@/services/trainings'
 import metriques from "@/services/metriques";
+import models from '@/services/models'
 import EnergyLabel from "@/components/EnergyLabel.vue";
 import CustomSlider from "@/components/CustomSlider.vue";
+import {formatData} from '@/utils'
 export default {
     name: "LabelInfo",
     components: {CustomSlider, EnergyLabel},
@@ -64,6 +96,8 @@ export default {
         return {
             labelBase64: null,
             resultats: null,
+            info: null,
+            model: null,
             metriques: null,
             marks: {},
             inf: {},
@@ -72,17 +106,23 @@ export default {
         };
     },
     methods: {
-        async aconseguirEtiqueta() {
+        async refrescaDadesEntrenament() {
             const response = await trainings.retrieve(this.$route.params.id_model, this.$route.params.id_training)
             this.labelBase64 = response.data['energy_label']
             this.resultats = response.data['resultats']
+            this.info = response.data['infoEntrenament']
             console.log(this.resultats)
             console.log(response.data)
         },
-        async aconseguirInfoMetriques() {
+        async refrescaInfoMetriques() {
             const response = await metriques.listOrderedFilteredByPhase('T')
             this.metriques = response.data
             console.log(this.metriques)
+        },
+        async refrescaInfoModel() {
+            const response = await models.retrieve(this.$route.params.id_model)
+            this.model = response.data
+            console.log(this.model)
         },
         async calculateVariables() {
             this.metriques.forEach(metrica => {
@@ -116,11 +156,13 @@ export default {
         },
         roundIfDecimal(value) {
             return Number.isInteger(value) ? value : value.toFixed(2);
-        }
+        },
+        formatData,
     },
     async mounted() {
-        await this.aconseguirEtiqueta()
-        await this.aconseguirInfoMetriques()
+        await this.refrescaDadesEntrenament()
+        await this.refrescaInfoMetriques()
+        await this.refrescaInfoModel()
         await this.calculateVariables()
     },
 };
