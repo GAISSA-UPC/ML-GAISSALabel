@@ -74,7 +74,7 @@ class EntrenamentAmbResultatSerializer(serializers.ModelSerializer):
 
     def get_resultats(self, entrenament):
         resultats = {}
-        for resultat in entrenament.resultats.all():
+        for resultat in entrenament.resultatsEntrenament.all():
             resultats[resultat.metrica.id] = resultat.valor
         return resultats
 
