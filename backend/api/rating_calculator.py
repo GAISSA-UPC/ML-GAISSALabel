@@ -94,17 +94,17 @@ def value_to_index(value, ref, high_better):
         return 0
 
 
-def calculate_ratings(metrics, metrics_ref, boundaries, weights, higher_better, meanings, rating_mode='mean', index=True):
+def calculate_ratings(metrics, boundaries, weights, higher_better, meanings, metrics_ref=None, rating_mode='mean', index=False):
     """
     Assigns an energy efficiency label based on the metrics.
 
     Args:
     metrics : dictionary of metrics
-    metrics_ref : reference metrics for normalization
     boundaries : boundary intervals for each metric
     weights: weights for each metric
     higher_better: which of the metrics are better if they have a higher value
     meanings : array representing different ratings
+    metrics_ref : reference metrics for normalization, only needed if index == True
     rating_mode : method to calculate compound rating
     index : if True, convert metric values to indices before assigning label
 

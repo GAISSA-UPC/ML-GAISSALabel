@@ -61,7 +61,9 @@ export default {
 <style>
 .el-menu-vertical:not(.el-menu--collapse) {
     width: 200px;
-    min-height: 90%;
+}
+.el-menu-vertical {
+    min-height: 95%;
 }
 .el-menu-item.is-active {
     color: var(--gaissa_green)
