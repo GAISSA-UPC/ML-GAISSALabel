@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from django.shortcuts import get_object_or_404
 
-from .models import Model, Entrenament, Metrica, Qualificacio, Interval, ResultatEntrenament
+from .models import Model, Entrenament, Inferencia, Metrica, Qualificacio, Interval, ResultatEntrenament, ResultatInferencia
 
 
 class ModelSerializer(serializers.ModelSerializer):
@@ -14,6 +14,12 @@ class ModelSerializer(serializers.ModelSerializer):
 class EntrenamentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Entrenament
+        fields = '__all__'
+
+
+class InferenciaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Inferencia
         fields = '__all__'
 
 
@@ -91,4 +97,30 @@ class EntrenamentAmbResultatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Entrenament
+        fields = ('model', 'id', 'dataRegistre', 'resultats', 'resultats_info')
+
+
+class InferenciaAmbResultatSerializer(serializers.ModelSerializer):
+    resultats = serializers.SerializerMethodField(read_only=True)
+    resultats_info = serializers.JSONField(write_only=True)
+
+    def get_resultats(self, inferencia):
+        resultats = {}
+        for resultat in inferencia.resultatsInferencia.all():
+            resultats[resultat.metrica.id] = resultat.valor
+        return resultats
+
+    def create(self, validated_data):
+        resultats_data = validated_data.pop('resultats_info', None)
+        inferencia = super().create(validated_data)
+
+        if resultats_data:
+            for metrica, valor in resultats_data.items():
+                metrica = get_object_or_404(Metrica, id=metrica)
+                ResultatInferencia.objects.create(inferencia=inferencia, metrica=metrica, valor=valor)
+
+        return inferencia
+
+    class Meta:
+        model = Inferencia
         fields = ('model', 'id', 'dataRegistre', 'resultats', 'resultats_info')
