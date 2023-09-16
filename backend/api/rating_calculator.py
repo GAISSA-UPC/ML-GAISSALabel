@@ -70,31 +70,7 @@ def calculate_compound_rating(ratings, weights, meanings, mode='mean'):
         return meanings[weighted_mean(ratings, weights)]
 
 
-def value_to_index(value, ref, high_better):
-    """
-    Convert a value to an index by normalizing it with a reference value.
-    If the metric is higher better, index is value divided by reference value,
-    otherwise index is reference value divided by value.
-
-    Args:
-    value : value to be converted
-    ref : reference value for normalization
-    metric : name of the metric
-    high_better: whether a higher value is better or not for the metric
-
-    Returns:
-    index
-    """
-    if pd.isnull(value) or value is None:
-        return None
-
-    try:
-        return value / ref if high_better else ref / value
-    except:
-        return 0
-
-
-def calculate_ratings(metrics, boundaries, weights, higher_better, meanings, metrics_ref=None, rating_mode='mean', index=False):
+def calculate_ratings(metrics, boundaries, weights, meanings, rating_mode='mean'):
     """
     Assigns an energy efficiency label based on the metrics.
 
@@ -102,18 +78,13 @@ def calculate_ratings(metrics, boundaries, weights, higher_better, meanings, met
     metrics : dictionary of metrics
     boundaries : boundary intervals for each metric
     weights: weights for each metric
-    higher_better: which of the metrics are better if they have a higher value
     meanings : array representing different ratings
-    metrics_ref : reference metrics for normalization, only needed if index == True
     rating_mode : method to calculate compound rating
-    index : if True, convert metric values to indices before assigning label
 
     Returns:
     compound rating and dictionary of individual ratings
     """
     weights = list(weights.values())
-    if index:
-        metrics = {metric: value_to_index(value, metrics_ref[metric], metric in higher_better) for metric, value in metrics.items()}
 
     metrics_to_rating = (
         {metric:
