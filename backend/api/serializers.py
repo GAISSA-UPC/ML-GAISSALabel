@@ -23,20 +23,19 @@ class MetricaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class MetricaAmbLimitsSerializer(MetricaSerializer):
-
-    class Meta:
-        model = Metrica
-        fields = '__all__'
-
-
 class QualificacioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Qualificacio
         fields = '__all__'
 
 
-class IntervalSerializer(serializers.ModelSerializer):
+class IntervalBasicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Interval
+        fields = ('qualificacio', 'limitSuperior', 'limitInferior')
+
+
+class IntervalSerializer(IntervalBasicSerializer):
     limitSuperior = serializers.SerializerMethodField(read_only=True)
     limitInferior = serializers.SerializerMethodField(read_only=True)
 
@@ -56,9 +55,16 @@ class IntervalSerializer(serializers.ModelSerializer):
         else:
             return interval.limitInferior
 
-
     class Meta:
         model = Interval
+        fields = '__all__'
+
+
+class MetricaAmbLimitsSerializer(MetricaSerializer):
+    intervals = IntervalBasicSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Metrica
         fields = '__all__'
 
 

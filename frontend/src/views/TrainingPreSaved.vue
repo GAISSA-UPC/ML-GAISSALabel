@@ -32,7 +32,7 @@
             </el-form-item>
             <el-button
                 @click="generarEtiqueta"
-                class="action-button-light"
+                color="var(--gaissa_green)"
                 v-show="selectedTraining != null"
             >
                 {{ $t('Generate label') }}

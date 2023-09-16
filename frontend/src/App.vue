@@ -14,7 +14,7 @@
                         :collapsed = collapse
                     />
                 </el-aside>
-                <el-main>
+                <el-main style="margin-right: 75px">
                     <RouterView />
                 </el-main>
             </el-container>
