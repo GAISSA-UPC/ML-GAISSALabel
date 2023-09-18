@@ -79,6 +79,7 @@
 <script>
 import models from '@/services/models'
 import metriques from '@/services/metriques'
+import inferencies from '@/services/inferencies'
 import trainings from '@/services/trainings'
 import EnergyLabel from "@/components/EnergyLabel.vue";
 export default {
@@ -104,18 +105,25 @@ export default {
             this.models = response.data
         },
         async refrescaMetriques() {
-            const response = await metriques.listOrderedFilteredByPhase('T')
+            let faseAbr = null
+            if (this.fase === this.$t('Training')) faseAbr = 'T'
+            else faseAbr = 'I'
+            const response = await metriques.listOrderedFilteredByPhase(faseAbr)
             this.metriques = response.data
         },
         async generarEtiqueta() {
             let responseCreate = null
             if (this.fase === this.$t('Training'))
                 responseCreate = await trainings.create(this.selectedModel, this.metriques)
+            else
+                responseCreate = await inferencies.create(this.selectedModel, this.metriques)
             if (responseCreate.status === 201) {
-                const entrenament_id = responseCreate.data['id']
+                const experiment_id = responseCreate.data['id']
                 let responseLabel = null
                 if (this.fase === this.$t('Training'))
-                    responseLabel = await trainings.retrieve(this.selectedModel, entrenament_id)
+                    responseLabel = await trainings.retrieve(this.selectedModel, experiment_id)
+                else
+                    responseLabel = await inferencies.retrieve(this.selectedModel, experiment_id)
                 this.labelBase64 = responseLabel.data['energy_label']
             }
         },
