@@ -16,6 +16,15 @@ class Entrenament(models.Model):
     model = models.ForeignKey(Model, related_name='entrenaments', null=False, on_delete=models.CASCADE, verbose_name=_('Model'))
 
 
+class Inferencia(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name=_('Identificador'))
+    dataRegistre = models.DateTimeField(auto_now_add=True, verbose_name=_('Data registre'))
+    model = models.ForeignKey(Model, related_name='inferencies', null=False, on_delete=models.CASCADE, verbose_name=_('Model'))
+
+    class Meta:
+        verbose_name_plural = _('Inferències')
+
+
 class Metrica(models.Model):
     TRAIN = 'T'
     INF = 'I'
@@ -64,5 +73,14 @@ class Interval(models.Model):
 
 class ResultatEntrenament(models.Model):
     valor = models.FloatField(null=False, blank=False, verbose_name=_('Valor'))
-    entrenament = models.ForeignKey(Entrenament, related_name='resultats', null=False, on_delete=models.CASCADE, verbose_name=_('Entrenament'))
-    metrica = models.ForeignKey(Metrica, related_name='resultats', null=False, on_delete=models.CASCADE, verbose_name=_('Mètrica'))
+    entrenament = models.ForeignKey(Entrenament, related_name='resultatsEntrenament', null=False, on_delete=models.CASCADE, verbose_name=_('Entrenament'))
+    metrica = models.ForeignKey(Metrica, related_name='resultatsEntrenament', null=False, on_delete=models.CASCADE, verbose_name=_('Mètrica'))
+
+
+class ResultatInferencia(models.Model):
+    valor = models.FloatField(null=False, blank=False, verbose_name=_('Valor'))
+    inferencia = models.ForeignKey(Inferencia, related_name='resultatsInferencia', null=False, on_delete=models.CASCADE, verbose_name=_('Inferència'))
+    metrica = models.ForeignKey(Metrica, related_name='resultatsInferencia', null=False, on_delete=models.CASCADE, verbose_name=_('Mètrica'))
+
+    class Meta:
+        verbose_name_plural = _('Resultat Inferències')

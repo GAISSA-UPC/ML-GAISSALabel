@@ -7,8 +7,9 @@ from django.shortcuts import get_object_or_404
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Model, Entrenament, Metrica
-from .serializers import ModelSerializer, EntrenamentSerializer, MetricaAmbLimitsSerializer, EntrenamentAmbResultatSerializer
+from .models import Model, Entrenament, Inferencia, Metrica
+from .serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
+    EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer
 
 from .rating_calculator_adapter import calculateRating
 from .label_generator_adapter import generateLabel
@@ -80,6 +81,48 @@ class EntrenamentsView(viewsets.ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class InferenciesView(viewsets.ModelViewSet):
+    models = Inferencia
+    serializer_class = InferenciaSerializer
+
+    def get_queryset(self):
+        # Aconseguim el model que ens arriba del paràmetre
+        model_id = self.kwargs['model_id']
+        model = get_object_or_404(Model, id=model_id)
+
+        # Filtrem per obtenir la inferència corresponent
+        return Inferencia.objects.select_related('model').all().filter(model=model)
+
+    def get_serializer_class(self):
+        # En cas que sigui retrieve, retornem tota la info, amb el resultat
+        if self.action == 'retrieve' or self.action == 'create':
+            return InferenciaAmbResultatSerializer
+        return self.serializer_class
+
+    def retrieve(self, request, *args, **kwargs):
+        # Aconseguir valors de la inferència a generar la EL
+        inferencia = self.get_object()
+        inference_data = self.get_serializer(inferencia).data
+        resultats_inferencia = inference_data['resultats']
+
+        # Aconseguir informació de les mètriques (de inferència i que tinguin pes)
+        metriques = Metrica.objects.filter(fase=Metrica.INF).order_by('-pes').exclude(pes=0)
+
+        # Calcular ratings (amb adaptador)
+        qualifFinal, qualifMetriques = calculateRating(resultats_inferencia, metriques)
+
+        # Generar etiqueta i resultats (amb adaptador)
+        label, resultatsResponse = generateLabel(qualifFinal, qualifMetriques, resultats_inferencia, inferencia.model, 'Inference')
+
+        # Preparar les dades que es responen al client
+        response_data = {
+            'energy_label': base64.b64encode(label).decode(),
+            'resultats': resultatsResponse,
+            'infoInferència': inference_data
+        }
+        return Response(response_data)
 
 
 class MetriquesView(viewsets.ModelViewSet):
