@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import trainingForm from '@/views/trainingForm.vue'
 import TrainingPreSaved from '@/views/TrainingPreSaved.vue'
+import InferencePreSaved from '@/views/InferencePreSaved.vue'
 import LabelInfo from "@/views/LabelInfo.vue";
 
 const router = createRouter({
@@ -21,6 +22,11 @@ const router = createRouter({
       path: '/trainingPre',
       name: 'training pre saved',
       component: TrainingPreSaved
+    },
+    {
+      path: '/InferencePre',
+      name: 'inference pre saved',
+      component: InferencePreSaved
     },
     {
       path: '/models/:id_model/trainings/:id_training',
