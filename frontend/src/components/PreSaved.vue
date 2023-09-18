@@ -48,6 +48,7 @@
 <script>
 import models from '@/services/models'
 import trainings from '@/services/trainings'
+import inferencies from '@/services/inferencies'
 import {formatData} from '@/utils'
 import EnergyLabel from "@/components/EnergyLabel.vue";
 export default {
@@ -73,6 +74,7 @@ export default {
         async refrescaExperiments() {
             let response = null
             if (this.fase === this.$t('Training')) response = await trainings.listByModel(this.selectedModel)
+            else response = await inferencies.listByModel(this.selectedModel)
             this.experiments = response.data
         },
         async canviModel() {
@@ -87,6 +89,8 @@ export default {
             let response = null
             if (this.fase === this.$t('Training'))
                 response = await trainings.retrieve(this.selectedModel, this.selectedExperiment)
+            else
+                response = await inferencies.retrieve(this.selectedModel, this.selectedExperiment)
             this.labelBase64 = response.data['energy_label']
         },
         formatData,
