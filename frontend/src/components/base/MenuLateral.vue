@@ -28,7 +28,9 @@
                 <span>{{ $t('Inference') }}</span>
             </template>
             <el-menu-item index="2-1">{{ $t('Form') }}</el-menu-item>
-            <el-menu-item index="2-2">{{ $t('Database') }}</el-menu-item>
+            <el-menu-item index="inference pre saved" @click="$router.push({name: 'inference pre saved'})">
+                {{ $t('Database') }}
+            </el-menu-item>
             <el-menu-item index="2-3">{{ $t('File') }}</el-menu-item>
             <el-menu-item index="2-4">{{ $t('Deployment') }}</el-menu-item>
         </el-sub-menu>
