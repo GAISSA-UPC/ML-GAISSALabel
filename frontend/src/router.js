@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import trainingForm from '@/views/trainingForm.vue'
 import TrainingPreSaved from '@/views/TrainingPreSaved.vue'
+import InferenceForm from '@/views/InferenceForm.vue'
 import InferencePreSaved from '@/views/InferencePreSaved.vue'
 import LabelInfo from "@/views/LabelInfo.vue";
 
@@ -22,6 +23,11 @@ const router = createRouter({
       path: '/trainingPre',
       name: 'training pre saved',
       component: TrainingPreSaved
+    },
+    {
+      path: '/inferenceForm',
+      name: 'inference form',
+      component: InferenceForm
     },
     {
       path: '/InferencePre',
