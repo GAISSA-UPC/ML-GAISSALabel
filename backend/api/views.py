@@ -124,6 +124,18 @@ class InferenciesView(viewsets.ModelViewSet):
         }
         return Response(response_data)
 
+    def create(self, request, model_id=None, *args, **kwargs):
+        # Afegim l'id de la inferència del paràmetre a les dades de la request abans de crear
+        data = request.data.copy()
+        data['model'] = model_id
+
+        # Equivalent super().create, però amb "data"
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 class MetriquesView(viewsets.ModelViewSet):
     models = Metrica
