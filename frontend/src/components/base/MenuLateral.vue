@@ -27,7 +27,9 @@
                 <font-awesome-icon :icon="['fas', 'bullseye']" class="icon"/>
                 <span>{{ $t('Inference') }}</span>
             </template>
-            <el-menu-item index="2-1">{{ $t('Form') }}</el-menu-item>
+            <el-menu-item index="inference form" @click="$router.push({name: 'inference form'})">
+                {{ $t('Form') }}
+            </el-menu-item>
             <el-menu-item index="inference pre saved" @click="$router.push({name: 'inference pre saved'})">
                 {{ $t('Database') }}
             </el-menu-item>
