@@ -1,5 +1,5 @@
 <template>
-    <h1>{{ $t("Energy label for training") }}</h1><br>
+    <h1>{{ $t("Energy label for") }} {{ fase }}</h1><br>
 
     <el-row justify="space-between">
         <el-col :span="13">
@@ -40,7 +40,7 @@
                     <template #label>
                         <div class="cell-item">
                             <font-awesome-icon :icon="['fas', 'dumbbell']" />
-                            {{ $t('Training identifier') }}
+                            {{ fase }} {{ $t('identifier') }}
                         </div>
                     </template>
                     {{ info.id }}
@@ -49,7 +49,7 @@
                     <template #label>
                         <div class="cell-item">
                             <font-awesome-icon :icon="['fas', 'calendar-days']" />
-                            {{ $t('Training registration date') }}
+                            {{ fase }} {{ $t('registration date') }}
                         </div>
                     </template>
                     {{ formatData(info.dataRegistre) }}
@@ -84,6 +84,7 @@
 
 <script>
 import trainings from '@/services/trainings'
+import inferencies from '@/services/inferencies'
 import metriques from "@/services/metriques";
 import models from '@/services/models'
 import EnergyLabel from "@/components/EnergyLabel.vue";
@@ -92,6 +93,9 @@ import {formatData} from '@/utils'
 export default {
     name: "LabelInfo",
     components: {CustomSlider, EnergyLabel},
+    props: {
+        fase: {required: true, type: String}
+    },
     data() {
         return {
             labelBase64: null,
@@ -106,23 +110,27 @@ export default {
         };
     },
     methods: {
-        async refrescaDadesEntrenament() {
-            const response = await trainings.retrieve(this.$route.params.id_model, this.$route.params.id_training)
+        async refrescaDadesExperiment() {
+            let response = null
+            if (this.fase === this.$t('Training')) {
+                response = await trainings.retrieve(this.$route.params.id_model, this.$route.params.id_training)
+                this.info = response.data['infoEntrenament']
+            }
+            else {
+                response = await inferencies.retrieve(this.$route.params.id_model, this.$route.params.id_inference)
+                this.info = response.data['infoInferencia']
+            }
             this.labelBase64 = response.data['energy_label']
             this.resultats = response.data['resultats']
-            this.info = response.data['infoEntrenament']
-            console.log(this.resultats)
-            console.log(response.data)
         },
         async refrescaInfoMetriques() {
-            const response = await metriques.listOrderedFilteredByPhase('T')
+            const faseAbr = (this.fase === 'Training') ? 'T' : 'I'
+            const response = await metriques.listOrderedFilteredByPhase(faseAbr)
             this.metriques = response.data
-            console.log(this.metriques)
         },
         async refrescaInfoModel() {
             const response = await models.retrieve(this.$route.params.id_model)
             this.model = response.data
-            console.log(this.model)
         },
         async calculateVariables() {
             this.metriques.forEach(metrica => {
@@ -160,7 +168,7 @@ export default {
         formatData,
     },
     async mounted() {
-        await this.refrescaDadesEntrenament()
+        await this.refrescaDadesExperiment()
         await this.refrescaInfoMetriques()
         await this.refrescaInfoModel()
         await this.calculateVariables()
