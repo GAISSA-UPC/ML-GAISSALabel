@@ -4,7 +4,7 @@ import trainingForm from '@/views/trainingForm.vue'
 import TrainingPreSaved from '@/views/TrainingPreSaved.vue'
 import InferenceForm from '@/views/InferenceForm.vue'
 import InferencePreSaved from '@/views/InferencePreSaved.vue'
-import LabelInfo from "@/views/LabelInfo.vue";
+import TrainingLabelInfo from "@/views/TrainingLabelInfo.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,7 +37,7 @@ const router = createRouter({
     {
       path: '/models/:id_model/trainings/:id_training',
       name: 'Label info for training',
-      component: LabelInfo
+      component: TrainingLabelInfo
     },
   ]
 })
