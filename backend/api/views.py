@@ -120,7 +120,7 @@ class InferenciesView(viewsets.ModelViewSet):
         response_data = {
             'energy_label': base64.b64encode(label).decode(),
             'resultats': resultatsResponse,
-            'infoInferència': inference_data
+            'infoInferencia': inference_data
         }
         return Response(response_data)
 
