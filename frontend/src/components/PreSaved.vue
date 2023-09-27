@@ -21,7 +21,6 @@
             >
                 <el-select
                     v-model="selectedExperiment"
-                    @change="canviExperiment"
                 >
                     <el-option
                         v-for="(experiment, i) in experiments" :key="i"
@@ -31,17 +30,13 @@
                 </el-select>
             </el-form-item>
             <el-button
-                @click="generarEtiqueta"
+                @click="mostrarEtiqueta"
                 color="var(--gaissa_green)"
                 v-show="selectedExperiment != null"
             >
                 {{ $t('Generate label') }}
             </el-button>
         </el-form><br>
-        <EnergyLabel
-            :pdfBase64="labelBase64"
-            v-show="labelBase64"
-        />
     </div>
 </template>
 
@@ -50,10 +45,8 @@ import models from '@/services/models'
 import trainings from '@/services/trainings'
 import inferencies from '@/services/inferencies'
 import {formatData} from '@/utils'
-import EnergyLabel from "@/components/EnergyLabel.vue";
 export default {
     name: "PreSaved",
-    components: {EnergyLabel},
     props: {
         fase: {required: true, type: String}
     },
@@ -63,7 +56,6 @@ export default {
             selectedModel: null,
             experiments: null,
             selectedExperiment: null,
-            labelBase64: null
         };
     },
     methods: {
@@ -80,18 +72,19 @@ export default {
         async canviModel() {
             await this.refrescaExperiments()
             this.selectedExperiment = null
-            this.labelBase64 = null
         },
-        async canviExperiment() {
-            this.labelBase64 = null
-        },
-        async generarEtiqueta() {
-            let response = null
+        async mostrarEtiqueta() {
             if (this.fase === this.$t('Training'))
-                response = await trainings.retrieve(this.selectedModel, this.selectedExperiment)
+                this.$router.push({
+                    name: 'Label info for training',
+                    params: {id_model: this.selectedModel, id_training: this.selectedExperiment}
+                })
             else
-                response = await inferencies.retrieve(this.selectedModel, this.selectedExperiment)
-            this.labelBase64 = response.data['energy_label']
+                this.$router.push({
+                    name: 'Label info for inference',
+                    params: {id_model: this.selectedModel, id_inference: this.selectedExperiment}
+                })
+
         },
         formatData,
     },
