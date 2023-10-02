@@ -1,12 +1,12 @@
 <template>
-    <File :fase="$t('Inference')"/>
+    <FileNewExperiment :fase="$t('Inference')"/>
 </template>
 
 <script>
-import File from "@/components/File.vue";
+import FileNewExperiment from "@/components/FileNewExperiment.vue";
 export default {
     name: "InferenceFile",
-    components: {File}
+    components: {FileNewExperiment}
 };
 </script>
 
