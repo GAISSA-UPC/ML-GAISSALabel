@@ -16,23 +16,25 @@
                 </el-select>
             </el-form-item>
             <el-form-item
-                :label="fase"
-                v-show="selectedModel != null"
+                :label="$t('Files')"
             >
-                <el-select
-                    v-model="selectedExperiment"
+                <el-upload
+                    v-model:file-list="fileList"
+                    multiple
+                    drag
+                    style="width: 100%"
+                    :auto-upload="false"
                 >
-                    <el-option
-                        v-for="(experiment, i) in experiments" :key="i"
-                        :value="experiment.id"
-                        :label="formatData(experiment.dataRegistre)"
-                    />
-                </el-select>
+                    <font-awesome-icon :icon="['fas', 'cloud-arrow-up']" />
+                    <div class="el-upload__text">
+                        {{ $t('Drop file here or') }} <em>{{ $t('click to upload') }}</em>
+                    </div>
+                </el-upload>
             </el-form-item>
             <el-button
                 @click="mostrarEtiqueta"
                 color="var(--gaissa_green)"
-                v-show="selectedExperiment != null"
+                v-show="fileList.length !== 0"
             >
                 {{ $t('Generate label') }}
             </el-button>
@@ -46,7 +48,7 @@ import trainings from '@/services/trainings'
 import inferencies from '@/services/inferencies'
 import {formatData} from '@/utils'
 export default {
-    name: "File",
+    name: "FileNewExperiment",
     props: {
         fase: {required: true, type: String}
     },
@@ -54,8 +56,7 @@ export default {
         return {
             models: null,
             selectedModel: null,
-            experiments: null,
-            selectedExperiment: null,
+            fileList: [],
         };
     },
     methods: {
@@ -77,12 +78,12 @@ export default {
             if (this.fase === this.$t('Training'))
                 this.$router.push({
                     name: 'Label info for training',
-                    params: {id_model: this.selectedModel, id_training: this.selectedExperiment}
+                    params: {id_model: this.selectedModel, id_training: 1}
                 })
             else
                 this.$router.push({
                     name: 'Label info for inference',
-                    params: {id_model: this.selectedModel, id_inference: this.selectedExperiment}
+                    params: {id_model: this.selectedModel, id_inference: 1}
                 })
 
         },
