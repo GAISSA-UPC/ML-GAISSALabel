@@ -2,8 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import trainingForm from '@/views/trainingForm.vue'
 import TrainingPreSaved from '@/views/TrainingPreSaved.vue'
+import TrainingFile from '@/views/TrainingFile.vue'
 import InferenceForm from '@/views/InferenceForm.vue'
 import InferencePreSaved from '@/views/InferencePreSaved.vue'
+import InferenceFile from '@/views/InferenceFile.vue'
 import TrainingLabelInfo from "@/views/TrainingLabelInfo.vue";
 import InferenceLabelInfo from "@/views/InferenceLabelInfo.vue";
 
@@ -26,6 +28,11 @@ const router = createRouter({
       component: TrainingPreSaved
     },
     {
+      path: '/trainingFile',
+      name: 'training file',
+      component: TrainingFile
+    },
+    {
       path: '/inferenceForm',
       name: 'inference form',
       component: InferenceForm
@@ -34,6 +41,11 @@ const router = createRouter({
       path: '/InferencePre',
       name: 'inference pre saved',
       component: InferencePreSaved
+    },
+    {
+      path: '/InferenceFile',
+      name: 'inference file',
+      component: InferenceFile
     },
     {
       path: '/models/:id_model/trainings/:id_training',
