@@ -20,7 +20,9 @@
             <el-menu-item index="training pre saved" @click="$router.push({name: 'training pre saved'})">
                 {{ $t('Database') }}
             </el-menu-item>
-            <el-menu-item index="1-3">{{ $t('File') }}</el-menu-item>
+            <el-menu-item index="training file" @click="$router.push({name: 'training file'})">
+                {{ $t('File') }}
+            </el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="2">
             <template #title>
@@ -33,7 +35,9 @@
             <el-menu-item index="inference pre saved" @click="$router.push({name: 'inference pre saved'})">
                 {{ $t('Database') }}
             </el-menu-item>
-            <el-menu-item index="2-3">{{ $t('File') }}</el-menu-item>
+            <el-menu-item index="inference file" @click="$router.push({name: 'inference file'})">
+                {{ $t('File') }}
+            </el-menu-item>
             <el-menu-item index="2-4">{{ $t('Deployment') }}</el-menu-item>
         </el-sub-menu>
         <el-menu-item index="3">
