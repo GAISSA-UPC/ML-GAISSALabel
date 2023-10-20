@@ -47,9 +47,6 @@ export default {
             this.$emit('cancel')
         },
     },
-    async mounted() {
-        console.log("hola")
-    }
 }
 </script>
 
