@@ -1,6 +1,10 @@
 <template>
     <h1>{{ $t("Energy label for") }} {{ fase }}</h1><br>
     <h2>{{ $t("Register a new") }} {{ fase }}</h2><br>
+
+    <el-alert v-if="estat === 'modelCreat-ok'" :title="$t('Model registered correctly')" type="success" @close="estat = ''"/>
+    <el-alert v-else-if="estat === 'modelCreat-ko'" :title="$t('There was an error while creating the model')" type="success" @close="estat = ''"/>
+
     <div>
         <el-form label-position="top">
             <el-form-item :label="$t('Model')">
@@ -14,6 +18,13 @@
                         :label="model.nom"
                     />
                 </el-select>
+                <el-button
+                    style="margin-left: 10px"
+                    @click="dialogNewModel = true"
+                    class="action-button-light"
+                >
+                    <font-awesome-icon :icon="['fas', 'plus']" />
+                </el-button>
             </el-form-item>
             <el-form-item
                 :label="$t('Files')"
@@ -40,6 +51,13 @@
             </el-button>
         </el-form><br>
     </div>
+
+    <DialogNewModel v-model="dialogNewModel"
+                    @cancel="dialogNewModel = false"
+                    @model-creat-ok="modelCreat()"
+                    @model-creat-ko="dialogNewModel = false; estat = 'modelCreat-ko'"
+    />
+
 </template>
 
 <script>
@@ -47,16 +65,20 @@ import models from '@/services/models'
 import trainings from '@/services/trainings'
 import inferencies from '@/services/inferencies'
 import {formatData} from '@/utils'
+import DialogNewModel from "@/components/DialogNewModel.vue";
 export default {
     name: "FileNewExperiment",
     props: {
         fase: {required: true, type: String}
     },
+    components: {DialogNewModel},
     data() {
         return {
+            estat: '',
             models: null,
             selectedModel: null,
             fileList: [],
+            dialogNewModel: false,
         };
     },
     methods: {
@@ -87,7 +109,12 @@ export default {
                 })
 
         },
-        formatData,
+        async modelCreat() {
+            await this.refrescaModels()
+            this.dialogNewModel = false
+            this.selectedModel = this.models.length
+            this.estat = 'modelCreat-ok'
+        }
     },
     async mounted() {
         await this.refrescaModels();

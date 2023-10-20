@@ -45,30 +45,12 @@
         </el-button>
     </el-form><br>
 
-    <el-dialog v-model="dialogNewModel"
-               :title="$t('Add a new model')"
-               @close="closeDialogNewModel"
-    >
-        <el-form :model="newModel" label-position="top">
-            <el-form-item :label="$t('Name')">
-                <el-input
-                    v-model="newModel.nom"
-                />
-            </el-form-item>
-            <el-form-item :label="$t('Description')">
-                <el-input
-                    v-model="newModel.informacio"
-                    type="textarea"
-                />
-            </el-form-item>
-        </el-form>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="dialogNewModel = false">{{ $t('Cancel') }}</el-button>
-                <el-button type="success" @click="afegirModel">{{ $t('Create') }}</el-button>
-            </span>
-        </template>
-    </el-dialog>
+    <DialogNewModel v-model="dialogNewModel"
+                    @cancel="dialogNewModel = false"
+                    @model-creat-ok="dialogNewModel = false;selectedModel = models.length; estat = 'modelCreat-ok'"
+                    @model-creat-ko="dialogNewModel = false; estat = 'modelCreat-ko'"
+    />
+
 </template>
 
 <script>
@@ -76,8 +58,10 @@ import models from '@/services/models'
 import metriques from '@/services/metriques'
 import inferencies from '@/services/inferencies'
 import trainings from '@/services/trainings'
+import DialogNewModel from "@/components/DialogNewModel.vue";
 export default {
     name: "FormNewExperiment",
+    components: {DialogNewModel},
     props: {
         fase: {required: true, type: String}
     },
@@ -122,19 +106,6 @@ export default {
                         params: {id_model: this.selectedModel, id_inference: experiment_id}
                     })
             }
-        },
-        async afegirModel() {
-            const response = await models.create(this.newModel)
-            if (response.status === 201) {
-                this.models.push(response.data)
-                this.selectedModel = this.models.length
-            }
-            this.dialogNewModel = false
-            this.estat = 'modelCreat-ok'
-        },
-        async closeDialogNewModel() {
-            this.newModel = {}
-            this.dialogNewModel = false
         },
     },
     async mounted() {
