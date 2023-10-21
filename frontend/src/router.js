@@ -23,6 +23,11 @@ const router = createRouter({
       component: trainingForm
     },
     {
+      path: '/trainingForm/:dadesInicials',
+      name: 'training form dades inicials',
+      component: trainingForm
+    },
+    {
       path: '/trainingPre',
       name: 'training pre saved',
       component: TrainingPreSaved

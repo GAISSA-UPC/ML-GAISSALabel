@@ -63,7 +63,8 @@ export default {
     name: "FormNewExperiment",
     components: {DialogNewModel},
     props: {
-        fase: {required: true, type: String}
+        fase: {required: true, type: String},
+        dadesInicials: {required: false, type: Object, default: null},
     },
     data() {
         return {
@@ -86,6 +87,13 @@ export default {
             else faseAbr = 'I'
             const response = await metriques.listOrderedFilteredByPhase(faseAbr)
             this.metriques = response.data
+        },
+        async inicialitzarMetriques() {
+            this.metriques.forEach((metrica) => {
+                if (metrica.id in this.dadesInicials) {
+                    metrica.valor = this.dadesInicials[metrica.id]
+                }
+            })
         },
         async mostrarEtiqueta() {
             let responseCreate = null
@@ -111,6 +119,7 @@ export default {
     async mounted() {
         await this.refrescaModels();
         await this.refrescaMetriques();
+        if (this.dadesInicials) await this.inicialitzarMetriques();
     },
 };
 </script>
