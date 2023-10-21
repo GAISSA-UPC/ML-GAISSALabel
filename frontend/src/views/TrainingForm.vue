@@ -9,7 +9,7 @@
         components: {FormNewExperiment},
         computed: {
             dadesInicials() {
-                const dades = this.$route.params.dadesInicials
+                const dades = this.$route.query.dadesInicials
                 return (dades) ? JSON.parse(dades) : null;
             },
         }
