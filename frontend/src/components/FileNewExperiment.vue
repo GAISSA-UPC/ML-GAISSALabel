@@ -43,7 +43,7 @@
                 </el-upload>
             </el-form-item>
             <el-button
-                @click="mostrarEtiqueta"
+                @click="gestioFitxers"
                 color="var(--gaissa_green)"
                 v-show="fileList.length !== 0"
             >
@@ -64,8 +64,8 @@
 import models from '@/services/models'
 import trainings from '@/services/trainings'
 import inferencies from '@/services/inferencies'
-import {formatData} from '@/utils'
 import DialogNewModel from "@/components/DialogNewModel.vue";
+import * as XLSX from "xlsx";
 export default {
     name: "FileNewExperiment",
     props: {
@@ -96,18 +96,39 @@ export default {
             await this.refrescaExperiments()
             this.selectedExperiment = null
         },
-        async mostrarEtiqueta() {
-            if (this.fase === this.$t('Training'))
-                this.$router.push({
-                    name: 'Label info for training',
-                    params: {id_model: this.selectedModel, id_training: 1}
-                })
-            else
-                this.$router.push({
-                    name: 'Label info for inference',
-                    params: {id_model: this.selectedModel, id_inference: 1}
-                })
+        async gestioFitxers() {
+            const info = await this.carregarFitxers()
 
+        },
+        // Funció per carregar fitxers i reestructurar tota la info en un sol JSON.
+        async carregarFitxers() {
+            // Creem una promesa x cada fitxers, perquè es faci paral·lelament
+            const promises = Array.from(this.fileList).map((file) => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const contingut = event.target.result;
+                        // Agafem només la info de la primera fila
+                        const contingutFormatted = this.parseExcelJSON(contingut)[0];
+                        resolve(contingutFormatted);
+                    };
+                    reader.onerror = reject;
+                    reader.readAsBinaryString(file.raw);
+                });
+            });
+            try {
+                // Recollim totes les promeses i les ajuntem en un sol JSON (info)
+                const info = await Promise.all(promises);
+                return info.reduce((acc, data) => ({ ...acc, ...data }), {});
+            } catch (error) {
+                console.error("Error carregant els fitxers:", error);
+            }
+        },
+        parseExcelJSON(contingut) {
+            const data = XLSX.read(contingut, { type: 'binary' });
+            const camps = data.Sheets[data.SheetNames[0]];
+            const jsonData = XLSX.utils.sheet_to_json(camps);
+            return jsonData;
         },
         async modelCreat() {
             await this.refrescaModels()
