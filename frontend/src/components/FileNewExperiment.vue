@@ -98,7 +98,10 @@ export default {
         },
         async gestioFitxers() {
             const info = await this.carregarFitxers()
-
+            this.$router.push({
+                name: 'training form dades inicials',
+                params: {dadesInicials: JSON.stringify(info)}
+            })
         },
         // Funció per carregar fitxers i reestructurar tota la info en un sol JSON.
         async carregarFitxers() {
