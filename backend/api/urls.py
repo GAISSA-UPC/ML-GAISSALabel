@@ -7,6 +7,7 @@ router.register(r'models', views.ModelsView, basename='models')
 router.register(r'models/(?P<model_id>\d+)/entrenaments', views.EntrenamentsView, basename='entrenaments')
 router.register(r'models/(?P<model_id>\d+)/inferencies', views.InferenciesView, basename='inferencies')
 router.register(r'metriques', views.MetriquesView, basename='metriques')
+router.register(r'informacions', views.InfoAddicionalsView, basename='informacions addicionals')
 
 urlpatterns = [
     path('', include(router.urls)),

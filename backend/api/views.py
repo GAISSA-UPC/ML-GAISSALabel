@@ -7,9 +7,9 @@ from django.shortcuts import get_object_or_404
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Model, Entrenament, Inferencia, Metrica
+from .models import Model, Entrenament, Inferencia, Metrica, InfoAddicional
 from .serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
-    EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer
+    EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer
 
 from .rating_calculator_adapter import calculateRating
 from .label_generator_adapter import generateLabel
@@ -152,3 +152,18 @@ class MetriquesView(viewsets.ModelViewSet):
     }
     search_fields = ['nom', 'fase']
     ordering_fields = ['id', 'nom', 'fase', 'pes', 'influencia']
+
+
+class InfoAddicionalsView(viewsets.ModelViewSet):
+    model = InfoAddicional
+    serializer_class = InfoAddicionalSerializer
+    queryset = InfoAddicional.objects.all()
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = {
+        'id': ['exact', 'in'],
+        'nom': ['exact', 'in', 'contains'],
+        'fase': ['exact', 'in'],
+    }
+    search_fields = ['nom', 'fase']
+    ordering_fields = ['id', 'nom', 'fase']
