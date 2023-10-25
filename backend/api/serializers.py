@@ -128,6 +128,14 @@ class InferenciaAmbResultatSerializer(serializers.ModelSerializer):
 
 
 class InfoAddicionalSerializer(serializers.ModelSerializer):
+    opcions_list = serializers.SerializerMethodField(read_only=True)
+
+    def get_opcions_list(self, infoAdd):
+        if infoAdd.opcions:
+            return infoAdd.opcions.split(';')
+        else:
+            return None
+
     class Meta:
         model = InfoAddicional
         fields = '__all__'
