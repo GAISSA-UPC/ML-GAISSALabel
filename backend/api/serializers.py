@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 
 from .models import Model, Entrenament, Inferencia, Metrica, Qualificacio, Interval, ResultatEntrenament, \
-    ResultatInferencia, InfoAddicional
+    ResultatInferencia, InfoAddicional, ValorInfoEntrenament
 
 
 class ModelSerializer(serializers.ModelSerializer):
@@ -78,6 +78,8 @@ class MetricaAmbLimitsSerializer(MetricaSerializer):
 class EntrenamentAmbResultatSerializer(serializers.ModelSerializer):
     resultats = serializers.SerializerMethodField(read_only=True)
     resultats_info = serializers.JSONField(write_only=True)
+    infoAddicional = serializers.SerializerMethodField(read_only=True)
+    infoAddicional_valors = serializers.JSONField(write_only=True)
 
     def get_resultats(self, entrenament):
         resultats = {}
@@ -85,20 +87,34 @@ class EntrenamentAmbResultatSerializer(serializers.ModelSerializer):
             resultats[resultat.metrica.id] = resultat.valor
         return resultats
 
+    def get_infoAddicional(self, entrenament):
+        valors = {}
+        for valor in entrenament.informacionsEntrenament.all():
+            valors[valor.infoAddicional.id] = valor.valor
+        return valors
+
     def create(self, validated_data):
         resultats_data = validated_data.pop('resultats_info', None)
+        infos_data = validated_data.pop('infoAddicional_valors', None)
         entrenament = super().create(validated_data)
 
+        # Afegim les info de les mètriques
         if resultats_data:
             for metrica, valor in resultats_data.items():
                 metrica = get_object_or_404(Metrica, id=metrica)
                 ResultatEntrenament.objects.create(entrenament=entrenament, metrica=metrica, valor=valor)
 
+        # Afegim els valors de les informacions addicionals
+        if infos_data:
+            for info, valor in infos_data.items():
+                infoAdd = get_object_or_404(InfoAddicional, id=info)
+                ValorInfoEntrenament.objects.create(entrenament=entrenament, infoAddicional=infoAdd, valor=valor)
+
         return entrenament
 
     class Meta:
         model = Entrenament
-        fields = ('model', 'id', 'dataRegistre', 'resultats', 'resultats_info')
+        fields = ('model', 'id', 'dataRegistre', 'resultats', 'resultats_info', 'infoAddicional', 'infoAddicional_valors')
 
 
 class InferenciaAmbResultatSerializer(serializers.ModelSerializer):
