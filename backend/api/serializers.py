@@ -2,7 +2,8 @@ from rest_framework import serializers
 
 from django.shortcuts import get_object_or_404
 
-from .models import Model, Entrenament, Inferencia, Metrica, Qualificacio, Interval, ResultatEntrenament, ResultatInferencia
+from .models import Model, Entrenament, Inferencia, Metrica, Qualificacio, Interval, ResultatEntrenament, \
+    ResultatInferencia, InfoAddicional
 
 
 class ModelSerializer(serializers.ModelSerializer):
@@ -124,3 +125,9 @@ class InferenciaAmbResultatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Inferencia
         fields = ('model', 'id', 'dataRegistre', 'resultats', 'resultats_info')
+
+
+class InfoAddicionalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InfoAddicional
+        fields = '__all__'
