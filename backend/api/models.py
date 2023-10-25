@@ -106,3 +106,12 @@ class ValorInfoEntrenament(models.Model):
     valor = models.CharField(max_length=10000, null=False, blank=False, verbose_name=_('Valor'))
     entrenament = models.ForeignKey(Entrenament, related_name='informacionsEntrenament', null=False, on_delete=models.CASCADE, verbose_name=_('Entrenament'))
     infoAddicional = models.ForeignKey(InfoAddicional, related_name='informacionsEntrenament', null=False, on_delete=models.CASCADE, verbose_name=_('Informació'))
+
+
+class ValorInfoInferencia(models.Model):
+    class Meta:
+        verbose_name_plural = _('Valor info inferències')
+
+    valor = models.CharField(max_length=10000, null=False, blank=False, verbose_name=_('Valor'))
+    inferencia = models.ForeignKey(Inferencia, related_name='informacionsInferencia', null=False, on_delete=models.CASCADE, verbose_name=_('Inferència'))
+    infoAddicional = models.ForeignKey(InfoAddicional, related_name='informacionsInferencia', null=False, on_delete=models.CASCADE, verbose_name=_('Informació'))
