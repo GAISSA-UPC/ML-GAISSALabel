@@ -23,7 +23,7 @@ export default {
             'resultats_info': results_adapted,
             'infoAddicional_valors': informacions_adapted,
         }
-        console.log(training)
+
         const responseTraining = await axios.post(`/api/models/${model_id}/entrenaments.json`, training)
         return responseTraining
     },
