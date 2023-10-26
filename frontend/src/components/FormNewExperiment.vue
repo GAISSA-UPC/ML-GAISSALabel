@@ -37,6 +37,30 @@
             <p style="margin-left: 10px">{{ metrica.unitat }}</p>
         </el-form-item>
         <br>
+
+        <h3>{{ $t("Additional information") }}</h3><br>
+        <el-form-item
+            v-for="(infoAdd, i) in informacions" :key="i"
+            :label="infoAdd.nom"
+        >
+            <el-select
+                v-if="infoAdd.opcions_list"
+                v-model="infoAdd.valor"
+                clearable
+            >
+                <el-option
+                    v-for="(opcio, i) in infoAdd.opcions_list" :key="i"
+                    :value="opcio"
+                    :label="opcio"
+                />
+            </el-select>
+            <el-input
+                style="max-width: 195px"
+                v-else
+                v-model="infoAdd.valor"
+            />
+        </el-form-item>
+        <br>
         <el-button
             @click="mostrarEtiqueta"
             color="var(--gaissa_green)"
@@ -56,6 +80,7 @@
 <script>
 import models from '@/services/models'
 import metriques from '@/services/metriques'
+import informacions from "@/services/informacions";
 import inferencies from '@/services/inferencies'
 import trainings from '@/services/trainings'
 import DialogNewModel from "@/components/DialogNewModel.vue";
@@ -74,6 +99,7 @@ export default {
             newModel: {},
             dialogNewModel: false,
             metriques: null,
+            informacions: null,
         };
     },
     methods: {
@@ -82,11 +108,14 @@ export default {
             this.models = response.data
         },
         async refrescaMetriques() {
-            let faseAbr = null
-            if (this.fase === this.$t('Training')) faseAbr = 'T'
-            else faseAbr = 'I'
+            const faseAbr = (this.fase === this.$t('Training'))? 'T' : 'I'
             const response = await metriques.listOrderedFilteredByPhase(faseAbr)
             this.metriques = response.data
+        },
+        async refrescaInformacions() {
+            const faseAbr = (this.fase === this.$t('Training'))? 'T' : 'I'
+            const response = await informacions.listFilteredByPhase(faseAbr)
+            this.informacions = response.data
         },
         async inicialitzarMetriques() {
             this.metriques.forEach((metrica) => {
@@ -98,9 +127,9 @@ export default {
         async mostrarEtiqueta() {
             let responseCreate = null
             if (this.fase === this.$t('Training'))
-                responseCreate = await trainings.create(this.selectedModel, this.metriques)
+                responseCreate = await trainings.create(this.selectedModel, this.metriques, this.informacions)
             else
-                responseCreate = await inferencies.create(this.selectedModel, this.metriques)
+                responseCreate = await inferencies.create(this.selectedModel, this.metriques, this.informacions)
             if (responseCreate.status === 201) {
                 const experiment_id = responseCreate.data['id']
                 if (this.fase === this.$t('Training'))
@@ -119,6 +148,7 @@ export default {
     async mounted() {
         await this.refrescaModels();
         await this.refrescaMetriques();
+        await this.refrescaInformacions();
         if (this.dadesInicials) await this.inicialitzarMetriques();
     },
 };

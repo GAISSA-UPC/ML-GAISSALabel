@@ -54,6 +54,15 @@
                     </template>
                     {{ formatData(info.dataRegistre) }}
                 </el-descriptions-item>
+                <el-descriptions-item v-for="(camps, infoAdd, i) in infoAddicional" :key="i">
+                    <template #label>
+                        <div class="cell-item">
+                            <font-awesome-icon :icon="['fas', 'circle-info']" />
+                            {{ camps.nom }}
+                        </div>
+                    </template>
+                    {{ camps.valor }}
+                </el-descriptions-item>
             </el-descriptions>
         </el-col>
         <el-col :span="10">
@@ -100,6 +109,7 @@ export default {
         return {
             labelBase64: null,
             resultats: null,
+            infoAddicional: null,
             info: null,
             model: null,
             metriques: null,
@@ -122,6 +132,7 @@ export default {
             }
             this.labelBase64 = response.data['energy_label']
             this.resultats = response.data['resultats']
+            this.infoAddicional = this.info['infoAddicional']
         },
         async refrescaInfoMetriques() {
             const faseAbr = (this.fase === 'Training') ? 'T' : 'I'
