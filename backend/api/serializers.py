@@ -155,10 +155,6 @@ class InferenciaAmbResultatSerializer(serializers.ModelSerializer):
                 ResultatInferencia.objects.create(inferencia=inferencia, metrica=metrica, valor=valor)
 
         # Afegim els valors de les informacions addicionals
-        if infos_data:
-            for info, valor in infos_data.items():
-                infoAdd = get_object_or_404(InfoAddicional, id=info)
-                ValorInfoInferencia.objects.create(inferencia=inferencia, infoAddicional=infoAdd, valor=valor)
 
         return inferencia
 
