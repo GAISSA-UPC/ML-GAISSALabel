@@ -90,7 +90,11 @@ class EntrenamentAmbResultatSerializer(serializers.ModelSerializer):
     def get_infoAddicional(self, entrenament):
         valors = {}
         for valor in entrenament.informacionsEntrenament.all():
-            valors[valor.infoAddicional.id] = valor.valor
+            valors[valor.infoAddicional.id] = {
+                "nom": valor.infoAddicional.nom,
+                "descripcio": valor.infoAddicional.descripcio,
+                "valor": valor.valor,
+            }
         return valors
 
     def create(self, validated_data):
@@ -132,7 +136,11 @@ class InferenciaAmbResultatSerializer(serializers.ModelSerializer):
     def get_infoAddicional(self, inferencia):
         valors = {}
         for valor in inferencia.informacionsInferencia.all():
-            valors[valor.infoAddicional.id] = valor.valor
+            valors[valor.infoAddicional.id] = {
+                "nom": valor.infoAddicional.nom,
+                "descripcio": valor.infoAddicional.descripcio,
+                "valor": valor.valor,
+            }
         return valors
 
     def create(self, validated_data):
