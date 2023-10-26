@@ -9,15 +9,21 @@ export default {
         const responseTraining = await axios.get(`/api/models/${model_id}/entrenaments/${training_id}.json`)
         return responseTraining
     },
-    async create(model_id, results) {
+    async create(model_id, results, informacions) {
         let results_adapted = {}
         results.forEach(result => {
             results_adapted[result.id] = (!result.valor) ? null : result.valor
         })
+        let informacions_adapted = {}
+        informacions.forEach(info => {
+            if (info.valor) informacions_adapted[info.id] = info.valor
+        })
 
         const training = {
             'resultats_info': results_adapted,
+            'infoAddicional_valors': informacions_adapted,
         }
+        console.log(training)
         const responseTraining = await axios.post(`/api/models/${model_id}/entrenaments.json`, training)
         return responseTraining
     },
