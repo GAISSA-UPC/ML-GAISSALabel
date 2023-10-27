@@ -124,6 +124,13 @@ export default {
                 }
             })
         },
+        async inicialitzarInformacions() {
+            this.informacions.forEach((informacio) => {
+                if (informacio.id in this.dadesInicials) {
+                    informacio.valor = this.dadesInicials[informacio.id]
+                }
+            })
+        },
         async mostrarEtiqueta() {
             let responseCreate = null
             if (this.fase === this.$t('Training'))
@@ -149,7 +156,10 @@ export default {
         await this.refrescaModels();
         await this.refrescaMetriques();
         await this.refrescaInformacions();
-        if (this.dadesInicials) await this.inicialitzarMetriques();
+        if (this.dadesInicials) {
+            await this.inicialitzarMetriques();
+            await this.inicialitzarInformacions();
+        }
     },
 };
 </script>
