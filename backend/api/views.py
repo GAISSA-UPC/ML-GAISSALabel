@@ -1,6 +1,6 @@
 import base64
 
-from rest_framework import viewsets, filters, status
+from rest_framework import viewsets, filters, status, mixins
 from rest_framework.response import Response
 
 from django.shortcuts import get_object_or_404
@@ -13,6 +13,7 @@ from .serializers import ModelSerializer, EntrenamentSerializer, InferenciaSeria
 
 from .rating_calculator_adapter import calculateRating
 from .label_generator_adapter import generateLabel
+from .efficiency_calculator_adapter import calculateEfficiency
 
 
 class ModelsView(viewsets.ModelViewSet):
@@ -167,3 +168,16 @@ class InfoAddicionalsView(viewsets.ModelViewSet):
     }
     search_fields = ['nom', 'fase']
     ordering_fields = ['id', 'nom', 'fase']
+
+
+class CalculadorInferenciaView(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    def get_serializer_class(self):
+        pass
+
+    def create(self, request, *args, **kwargs):
+        endpoint = request.data.get('endpoint')
+        data = request.data.get('input')
+        if not endpoint or not data:
+            return Response("Cal donar els atributs endpoint i input!", status=status.HTTP_400_BAD_REQUEST)
+        resultats = calculateEfficiency(endpoint, data)
+        return Response(resultats, status=status.HTTP_201_CREATED)
