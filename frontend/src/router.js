@@ -6,6 +6,7 @@ import TrainingFile from '@/views/TrainingFile.vue'
 import InferenceForm from '@/views/InferenceForm.vue'
 import InferencePreSaved from '@/views/InferencePreSaved.vue'
 import InferenceFile from '@/views/InferenceFile.vue'
+import InferenceDeploy from '@/views/InferenceDeploy.vue'
 import TrainingLabelInfo from "@/views/TrainingLabelInfo.vue"
 import InferenceLabelInfo from "@/views/InferenceLabelInfo.vue"
 import AdminMetriquesInfo from "@/views/AdminMetriquesInfo.vue"
@@ -47,6 +48,11 @@ const router = createRouter({
       path: '/InferenceFile',
       name: 'inference file',
       component: InferenceFile
+    },
+    {
+      path: '/InferenceDeploy',
+      name: 'inference deploy',
+      component: InferenceDeploy
     },
     {
       path: '/models/:id_model/trainings/:id_training',
