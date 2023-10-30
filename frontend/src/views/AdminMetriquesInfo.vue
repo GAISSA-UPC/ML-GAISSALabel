@@ -1,7 +1,20 @@
 <template>
     <h1>{{ $t("Metrics and additional information") }}</h1><br>
     <h2 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Training") }}</h2><br>
-    <h3>{{ $t("Metrics") }}</h3><br>
+    <el-row justify="space-between">
+        <el-col :span="6">
+            <h3>{{ $t("Metrics") }}</h3><br>
+        </el-col>
+        <el-col :span="2">
+            <el-button
+                style="margin-left: 10px"
+                @click="dialogAfegir = true"
+                class="action-button-light"
+            >
+                <font-awesome-icon :icon="['fas', 'plus']" />
+            </el-button>
+        </el-col>
+    </el-row>
     <el-table :data="tableTrainingMetriques" style="width: 100%">
         <el-table-column :label="$t('Name')" prop="nom" />
         <el-table-column :label="$t('Weight')" prop="pes" />
@@ -12,6 +25,7 @@
             <template #default="scope">
                 <el-button
                     size="small"
+                    class="action-button-light"
                     @click="handleEdit(scope.$index, scope.row)"
                 >
                     <font-awesome-icon :icon="['fas', 'pen-to-square']" />
@@ -27,7 +41,20 @@
         </el-table-column>
     </el-table><br><br>
 
-    <h3>{{ $t("Additional information") }}</h3><br>
+    <el-row justify="space-between">
+        <el-col :span="6">
+            <h3>{{ $t("Additional information") }}</h3><br>
+        </el-col>
+        <el-col :span="2">
+            <el-button
+                style="margin-left: 10px"
+                @click="dialogAfegir = true"
+                class="action-button-light"
+            >
+                <font-awesome-icon :icon="['fas', 'plus']" />
+            </el-button>
+        </el-col>
+    </el-row>
     <el-table :data="tableTrainingInformacions" style="width: 100%">
         <el-table-column :label="$t('Name')" prop="nom" />
         <el-table-column label="" />
@@ -38,6 +65,7 @@
             <template #default="scope">
                 <el-button
                     size="small"
+                    class="action-button-light"
                     @click="handleEdit(scope.$index, scope.row)"
                 >
                     <font-awesome-icon :icon="['fas', 'pen-to-square']" />
@@ -55,7 +83,20 @@
 
 
     <h2 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Inference") }}</h2><br>
-    <h3>{{ $t("Metrics") }}</h3><br>
+    <el-row justify="space-between">
+        <el-col :span="6">
+            <h3>{{ $t("Metrics") }}</h3><br>
+        </el-col>
+        <el-col :span="2">
+            <el-button
+                style="margin-left: 10px"
+                @click="dialogAfegir = true"
+                class="action-button-light"
+            >
+                <font-awesome-icon :icon="['fas', 'plus']" />
+            </el-button>
+        </el-col>
+    </el-row>
     <el-table :data="tableInferenceMetriques" style="width: 100%">
         <el-table-column :label="$t('Name')" prop="nom" />
         <el-table-column :label="$t('Weight')" prop="pes" />
@@ -66,6 +107,7 @@
             <template #default="scope">
                 <el-button
                     size="small"
+                    class="action-button-light"
                     @click="handleEdit(scope.$index, scope.row)"
                 >
                     <font-awesome-icon :icon="['fas', 'pen-to-square']" />
@@ -81,7 +123,20 @@
         </el-table-column>
     </el-table><br><br>
 
-    <h3>{{ $t("Additional information") }}</h3><br>
+    <el-row justify="space-between">
+        <el-col :span="6">
+            <h3>{{ $t("Additional information") }}</h3><br>
+        </el-col>
+        <el-col :span="2">
+            <el-button
+                style="margin-left: 10px"
+                @click="dialogAfegir = true"
+                class="action-button-light"
+            >
+                <font-awesome-icon :icon="['fas', 'plus']" />
+            </el-button>
+        </el-col>
+    </el-row>
     <el-table :data="tableInferenceInformacions" style="width: 100%">
         <el-table-column :label="$t('Name')" prop="nom" />
         <el-table-column label="" />
@@ -92,6 +147,7 @@
             <template #default="scope">
                 <el-button
                     size="small"
+                    class="action-button-light"
                     @click="handleEdit(scope.$index, scope.row)"
                 >
                     <font-awesome-icon :icon="['fas', 'pen-to-square']" />
@@ -160,6 +216,7 @@ export default {
             itemEsborrar: null,
             itemEsborrarType: "",
             dialogEsborrar: false,
+            dialogAfegir: false,
         }
     },
     methods: {
