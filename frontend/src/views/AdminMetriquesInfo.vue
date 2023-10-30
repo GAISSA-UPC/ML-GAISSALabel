@@ -19,7 +19,7 @@
                 <el-button
                     size="small"
                     type="danger"
-                    @click="handleDelete(scope.$index, scope.row)"
+                    @click="handleDelete(scope.$index, scope.row, 'metric')"
                 >
                     <font-awesome-icon :icon="['fas', 'trash']" />
                 </el-button>
@@ -45,7 +45,7 @@
                 <el-button
                     size="small"
                     type="danger"
-                    @click="handleDelete(scope.$index, scope.row)"
+                    @click="handleDelete(scope.$index, scope.row, 'additional information')"
                 >
                     <font-awesome-icon :icon="['fas', 'trash']" />
                 </el-button>
@@ -73,7 +73,7 @@
                 <el-button
                     size="small"
                     type="danger"
-                    @click="handleDelete(scope.$index, scope.row)"
+                    @click="handleDelete(scope.$index, scope.row, 'metric')"
                 >
                     <font-awesome-icon :icon="['fas', 'trash']" />
                 </el-button>
@@ -99,13 +99,28 @@
                 <el-button
                     size="small"
                     type="danger"
-                    @click="handleDelete(scope.$index, scope.row)"
+                    @click="handleDelete(scope.$index, scope.row, 'additional information')"
                 >
                     <font-awesome-icon :icon="['fas', 'trash']" />
                 </el-button>
             </template>
         </el-table-column>
     </el-table><br><br><br>
+
+    <el-dialog v-model="dialogEsborrar"
+               :title="titleDelete"
+    >
+        <span>
+            <p>{{ $t("Are you sure you want to delete ") }} <span style="font-weight: bold">{{ itemEsborrar.nom }}</span>?</p>
+            <p>{{ $t("Be aware that if you do so, the generation of the labels will automatically change, and the application will lose the values recollected about this") }} {{ itemEsborrarType }} {{ $t("for all the models that have been registered") }}.</p>
+        </span>
+        <template #footer>
+                        <span class="dialog-footer">
+                            <el-button @click="dialogEsborrar = false">{{ $t('Cancel') }}</el-button>
+                            <el-button type="danger" @click="deleteItem(itemEsborrar, itemEsborrarType)">{{ $t('Delete') }}</el-button>
+                        </span>
+        </template>
+    </el-dialog>
 </template>
 
 
@@ -127,6 +142,9 @@ export default {
         },
         tableInferenceInformacions() {
             return this.filterData(this.informacionsInference, this.searchInformacionsInference)
+        },
+        titleDelete() {
+            return this.$t("Delete") + " " + this.itemEsborrarType
         }
     },
     data() {
@@ -139,6 +157,9 @@ export default {
             metriquesInference: [],
             informacionsTraining: [],
             informacionsInference: [],
+            itemEsborrar: null,
+            itemEsborrarType: "",
+            dialogEsborrar: false,
         }
     },
     methods: {
@@ -160,8 +181,21 @@ export default {
         handleEdit(index, row) {
             console.log(index, row)
         },
-        handleDelete(index, row) {
-            console.log(index, row)
+        handleDelete(index, row, type) {
+            this.itemEsborrar = row
+            this.itemEsborrarType = type
+            this.dialogEsborrar = true
+        },
+        async deleteItem(item, type) {
+            if (type === 'metric') {
+                await metriques.delete(item.id)
+                await this.refrescaMetriques()
+            }
+            else {      // type === 'additional information'
+                await informacions.delete(item.id)
+                await this.refrescaInformacions()
+            }
+            this.dialogEsborrar = false
         }
     },
     async mounted() {
