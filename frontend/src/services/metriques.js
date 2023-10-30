@@ -8,5 +8,9 @@ export default {
     async listOrderedFilteredByPhase(phase) {
         const responseMetriques = await axios.get(`/api/metriques/?fase=${phase}&ordering=-pes.json`)
         return responseMetriques
+    },
+    async delete(id) {
+        const reponseMetrica = await axios.delete(`/api/metriques/${id}.json`)
+        return reponseMetrica
     }
 }
