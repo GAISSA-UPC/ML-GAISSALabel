@@ -13,6 +13,12 @@ export default {
         const responseMetrica = await axios.get(`/api/metriques/${id}.json`)
         return responseMetrica
     },
+    async update(data) {
+        const responseMetrica = await axios.put(`/api/metriques/${data.id}/`, data, {
+            responseType: 'json'
+        })
+        return responseMetrica
+    },
     async delete(id) {
         const reponseMetrica = await axios.delete(`/api/metriques/${id}.json`)
         return reponseMetrica
