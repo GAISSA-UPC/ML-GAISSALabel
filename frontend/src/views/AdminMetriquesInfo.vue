@@ -12,7 +12,7 @@
             <template #default="scope">
                 <el-button
                     size="small"
-                    @click="handleEdit(scope.$index, scope.row)"
+                    @click="handleEdit(scope.$index, scope.row, 'metric')"
                 >
                     <font-awesome-icon :icon="['fas', 'pen-to-square']" />
                 </el-button>
@@ -38,7 +38,7 @@
             <template #default="scope">
                 <el-button
                     size="small"
-                    @click="handleEdit(scope.$index, scope.row)"
+                    @click="handleEdit(scope.$index, scope.row, 'additional information')"
                 >
                     <font-awesome-icon :icon="['fas', 'pen-to-square']" />
                 </el-button>
@@ -66,7 +66,7 @@
             <template #default="scope">
                 <el-button
                     size="small"
-                    @click="handleEdit(scope.$index, scope.row)"
+                    @click="handleEdit(scope.$index, scope.row, 'metric')"
                 >
                     <font-awesome-icon :icon="['fas', 'pen-to-square']" />
                 </el-button>
@@ -92,7 +92,7 @@
             <template #default="scope">
                 <el-button
                     size="small"
-                    @click="handleEdit(scope.$index, scope.row)"
+                    @click="handleEdit(scope.$index, scope.row, 'additional information')"
                 >
                     <font-awesome-icon :icon="['fas', 'pen-to-square']" />
                 </el-button>
@@ -178,8 +178,16 @@ export default {
                 (data) => !filter || data.nom.toLowerCase().includes(filter.toLowerCase())
             )
         },
-        handleEdit(index, row) {
-            console.log(index, row)
+        handleEdit(index, row, type) {
+            if (type === 'metric') {
+                this.$router.push({
+                    name: 'Admin mètrica edit',
+                    params: {id_metrica: row.id}
+                })
+            }
+            else {      // type === 'additional information'
+                // ToDo: Link a admin de informacions addicionals
+            }
         },
         handleDelete(index, row, type) {
             this.itemEsborrar = row
