@@ -13,6 +13,14 @@ export default {
         const responseMetrica = await axios.get(`/api/metriques/${id}.json`)
         return responseMetrica
     },
+    async listQualificacions() {
+        /*
+        Si les qualificacions es poguessin modificar, potser seria més adequat crear un servei qualificacions.js
+        Per ara, com que només necessitem aquesta operació, ho posem aquí.
+         */
+        const responseQualificacions = await axios.get(`/api/qualificacions.json`)
+        return responseQualificacions
+    },
     async update(data) {
         const responseMetrica = await axios.put(`/api/metriques/${data.id}/`, data, {
             responseType: 'json'
