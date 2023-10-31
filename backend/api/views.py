@@ -143,6 +143,9 @@ class QualificacionsView(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = QualificacioSerializer
     queryset = Qualificacio.objects.all()
 
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    ordering_fields = ['ordre']
+
 
 class MetriquesView(viewsets.ModelViewSet):
     models = Metrica
