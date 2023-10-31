@@ -9,6 +9,7 @@ import InferenceFile from '@/views/InferenceFile.vue'
 import TrainingLabelInfo from "@/views/TrainingLabelInfo.vue"
 import InferenceLabelInfo from "@/views/InferenceLabelInfo.vue"
 import AdminMetriquesInfo from "@/views/AdminMetriquesInfo.vue"
+import AdminMetrica from "@/views/AdminMetrica.vue"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -62,6 +63,11 @@ const router = createRouter({
       path: '/admin/metriquesinfo',
       name: 'Admin mètriques i informacions',
       component: AdminMetriquesInfo
+    },
+    {
+      path: '/admin/metriques/:id_metrica',
+      name: 'Admin mètrica edit',
+      component: AdminMetrica
     },
   ]
 })

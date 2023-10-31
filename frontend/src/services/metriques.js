@@ -9,6 +9,10 @@ export default {
         const responseMetriques = await axios.get(`/api/metriques/?fase=${phase}&ordering=-pes.json`)
         return responseMetriques
     },
+    async getById(id) {
+        const responseMetrica = await axios.get(`/api/metriques/${id}.json`)
+        return responseMetrica
+    },
     async delete(id) {
         const reponseMetrica = await axios.delete(`/api/metriques/${id}.json`)
         return reponseMetrica
