@@ -7,9 +7,9 @@ from django.shortcuts import get_object_or_404
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Model, Entrenament, Inferencia, Metrica, InfoAddicional
+from .models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio
 from .serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
-    EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer
+    EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer
 
 from .rating_calculator_adapter import calculateRating
 from .label_generator_adapter import generateLabel
@@ -136,6 +136,12 @@ class InferenciesView(viewsets.ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class QualificacionsView(mixins.ListModelMixin, viewsets.GenericViewSet):
+    models = Qualificacio
+    serializer_class = QualificacioSerializer
+    queryset = Qualificacio.objects.all()
 
 
 class MetriquesView(viewsets.ModelViewSet):
