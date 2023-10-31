@@ -39,7 +39,8 @@
         </el-form-item>
         <br>
 
-        <!--<h3>{{ $t('Intervals') }}</h3>-->
+        <h3>{{ $t('Intervals') }}</h3><br>
+
 
         <br><br>
         <el-button
