@@ -7,9 +7,10 @@ from django.shortcuts import get_object_or_404
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio
+from .models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, Interval
 from .serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
-    EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer
+    EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer, \
+    IntervalBasicSerializer
 
 from .rating_calculator_adapter import calculateRating
 from .label_generator_adapter import generateLabel
@@ -162,6 +163,26 @@ class MetriquesView(viewsets.ModelViewSet):
     }
     search_fields = ['nom', 'fase']
     ordering_fields = ['id', 'nom', 'fase', 'pes', 'influencia']
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        metrica = self.get_object()
+        data = request.data.copy()
+
+        # Actualitzem els intervals (recuperem la instància i la modifiquem amb els valors donats)
+        intervals = data.pop('intervals')
+        for intervalJSON in intervals:
+            interval = Interval.objects.get(metrica=metrica, qualificacio__id=intervalJSON['qualificacio'])
+            serializer = IntervalBasicSerializer(interval, data=intervalJSON, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+        # Actualitzem la mètrica (equivalent a super.update() amb petites modificacions)
+        serializer = self.get_serializer(metrica, data=data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
 
 
 class InfoAddicionalsView(viewsets.ModelViewSet):
