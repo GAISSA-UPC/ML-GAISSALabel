@@ -69,6 +69,11 @@ const router = createRouter({
       name: 'Admin mètrica edit',
       component: AdminMetrica
     },
+    {
+      path: '/admin/metriques',
+      name: 'Admin mètrica new',
+      component: AdminMetrica
+    },
   ]
 })
 
