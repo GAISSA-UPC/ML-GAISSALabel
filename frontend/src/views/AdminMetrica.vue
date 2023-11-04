@@ -41,14 +41,22 @@
 
         <h3>{{ $t('Intervals') }}</h3><br>
         <el-row v-for="(qualif, i) in qualificacions" :key="i" align="bottom">
-            <el-form-item :label="getLabel1">
-                <el-input-number step="0.1" min="0" max="100000000000000000000" v-model="intervals[i]" style="width: 200px"/>
+            <el-form-item :label="$t('Lower boundary')">
+                <el-input-number
+                    step="0.1" min="0" max="100000000000000000000"
+                    v-model="metrica.intervals.find(interval => interval.qualificacio === qualif.id).limitInferior"
+                    style="width: 200px"
+                />
             </el-form-item>
             <p :style="{ fontSize: '40px', fontWeight: 'bold', color: qualif.color, width: '30px', marginRight: '20px', marginLeft:'20px'}">
                 {{ qualif.id }}
             </p>
-            <el-form-item :label="getLabel2">
-                <el-input-number step="0.1" min="0" max="100000000000000000000" v-model="intervals[i + 1]" style="width: 200px"/>
+            <el-form-item :label="$t('Upper boundary')">
+                <el-input-number
+                    step="0.1" min="0" max="100000000000000000000"
+                    v-model="metrica.intervals.find(interval => interval.qualificacio === qualif.id).limitSuperior"
+                    style="width: 200px"
+                />
             </el-form-item>
         </el-row>
 
@@ -76,46 +84,24 @@ export default {
             metrica: {
                 'pes': 0,
                 'influencia': 'N',
+                'intervals': {'qualificacio': 'A'},
             },
             qualificacions: null,
-            intervals: [],
         };
     },
     computed: {
         getFase() {
             return (this.metrica.fase === 'T') ? this.$t('training') : this.$t('inference')
         },
-        getLabel1() {
-            if (this.metrica.influencia === 'P') return this.$t('Upper boundary')
-            else return this.$t('Lower boundary')
-        },
-        getLabel2() {
-            if (this.metrica.influencia === 'P') return this.$t('Lower boundary')
-            else return this.$t('Upper boundary')
-        }
     },
     methods: {
         async refrescaMetrica() {
             const response = await metriques.getById(this.$route.params.id_metrica)
             this.metrica = response.data
-            console.log(this.metrica)
         },
         async refrescaQualificacions() {
             const response = await metriques.listQualificacionsOrdre()
             this.qualificacions = response.data
-            console.log(this.qualificacions)
-        },
-        async refrescaIntervals() {
-            let interval = null
-            for (let qualificacio of this.qualificacions) {
-                interval = this.metrica.intervals.find(interv => interv.qualificacio === qualificacio.id)
-                if (this.metrica.influencia === 'P') this.intervals.push(interval.limitSuperior)
-                else this.intervals.push(interval.limitInferior)
-                console.log(qualificacio)
-                console.log(this.intervals)
-            }
-            if (this.metrica.influencia === 'P') this.intervals.push(interval.limitInferior)
-            else this.intervals.push(interval.limitSuperior)
         },
         async updateMetrica() {
             const response = await metriques.update(this.metrica)
@@ -133,7 +119,6 @@ export default {
             await this.refrescaMetrica()
         }
         await this.refrescaQualificacions()
-        await this.refrescaIntervals()
     }
 }
 </script>
