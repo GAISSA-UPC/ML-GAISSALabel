@@ -97,7 +97,7 @@ def get_position(i, total):
     return x / C_SIZE[0], y / C_SIZE[1]
 
 
-def create_qr():
+def create_qr(url):
     """
     Creates a QR code containing a specified URL.
 
@@ -105,7 +105,6 @@ def create_qr():
         Image: A QR code image.
     """
 
-    url = 'https://gaissa.upc.edu/en'
     qr = qrcode.QRCode(
         version=1, box_size=1, border=0,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -138,7 +137,7 @@ def draw_qr(canvas, qr, x, y, width):
         canvas.rect(x + (i * width), y + int(width * qr_pix.shape[0]) - ((j + 1) * width), width, width, fill=1, stroke=0)
 
 
-def generate_efficency_label(results, meanings, frate, model_name, task_type):
+def generate_efficency_label(results, meanings, frate, model_name, task_type, url):
     """
     Args:
         results: For each metric to be shown on the energy label, contains its name, value, unit and image.
@@ -146,6 +145,7 @@ def generate_efficency_label(results, meanings, frate, model_name, task_type):
         frate: Final rate (should be one of the meanings)
         model_name: Name of the model to which the label is generated.
         task_type: "Training" or "Inference".
+        url: URL to be represented by the QR of the label.
 
     Returns:
         The energy label generated, in PDF format.
@@ -218,7 +218,7 @@ def generate_efficency_label(results, meanings, frate, model_name, task_type):
     else:
         canvas.drawInlineImage(os.path.join(PARTS_DIR, f"Rating_{frate}.png"), POS_RATINGS[frate][0] * C_SIZE[0],
                                POS_RATINGS[frate][1] * C_SIZE[1])
-    qr = create_qr()
+    qr = create_qr(url)
     draw_qr(canvas, qr, 0.825 * C_SIZE[0], 0.894 * C_SIZE[1], 200)
 
     # ToDo: -----------------------------------------------------------------------------------------------------------
