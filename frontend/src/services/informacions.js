@@ -13,6 +13,12 @@ export default {
         const responseInformacio = await axios.get(`/api/informacions/${id}.json`)
         return responseInformacio
     },
+    async create(data) {
+        const responseInformacio = await axios.post(`/api/informacions/`, data, {
+            responseType: 'json'
+        })
+        return responseInformacio
+    },
     async update(data) {
         const responseInformacio = await axios.put(`/api/informacions/${data.id}/`, data, {
             responseType: 'json'
