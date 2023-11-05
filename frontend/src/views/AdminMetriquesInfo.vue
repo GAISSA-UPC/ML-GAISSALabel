@@ -8,7 +8,7 @@
         <el-col :span="2">
             <el-button
                 style="margin-left: 10px"
-                @click="dialogAfegir = true"
+                @click="handleAfegir('metric', 'T')"
                 class="action-button-light"
             >
                 <font-awesome-icon :icon="['fas', 'plus']" />
@@ -26,7 +26,7 @@
                 <el-button
                     size="small"
                     class="action-button-light"
-                    @click="handleEdit(scope.$index, scope.row)"
+                    @click="handleEdit(scope.$index, scope.row, 'metric')"
                 >
                     <font-awesome-icon :icon="['fas', 'pen-to-square']" />
                 </el-button>
@@ -48,7 +48,7 @@
         <el-col :span="2">
             <el-button
                 style="margin-left: 10px"
-                @click="dialogAfegir = true"
+                @click="handleAfegir('additional information', 'T')"
                 class="action-button-light"
             >
                 <font-awesome-icon :icon="['fas', 'plus']" />
@@ -66,7 +66,7 @@
                 <el-button
                     size="small"
                     class="action-button-light"
-                    @click="handleEdit(scope.$index, scope.row)"
+                    @click="handleEdit(scope.$index, scope.row, 'additional information')"
                 >
                     <font-awesome-icon :icon="['fas', 'pen-to-square']" />
                 </el-button>
@@ -90,7 +90,7 @@
         <el-col :span="2">
             <el-button
                 style="margin-left: 10px"
-                @click="dialogAfegir = true"
+                @click="handleAfegir('metric', 'I')"
                 class="action-button-light"
             >
                 <font-awesome-icon :icon="['fas', 'plus']" />
@@ -108,7 +108,7 @@
                 <el-button
                     size="small"
                     class="action-button-light"
-                    @click="handleEdit(scope.$index, scope.row)"
+                    @click="handleEdit(scope.$index, scope.row, 'metric')"
                 >
                     <font-awesome-icon :icon="['fas', 'pen-to-square']" />
                 </el-button>
@@ -130,7 +130,7 @@
         <el-col :span="2">
             <el-button
                 style="margin-left: 10px"
-                @click="dialogAfegir = true"
+                @click="handleAfegir('additional information', 'I')"
                 class="action-button-light"
             >
                 <font-awesome-icon :icon="['fas', 'plus']" />
@@ -148,7 +148,7 @@
                 <el-button
                     size="small"
                     class="action-button-light"
-                    @click="handleEdit(scope.$index, scope.row)"
+                    @click="handleEdit(scope.$index, scope.row, 'additional information')"
                 >
                     <font-awesome-icon :icon="['fas', 'pen-to-square']" />
                 </el-button>
@@ -216,7 +216,6 @@ export default {
             itemEsborrar: null,
             itemEsborrarType: "",
             dialogEsborrar: false,
-            dialogAfegir: false,
         }
     },
     methods: {
@@ -235,13 +234,32 @@ export default {
                 (data) => !filter || data.nom.toLowerCase().includes(filter.toLowerCase())
             )
         },
-        handleEdit(index, row) {
-            console.log(index, row)
+        handleEdit(index, row, type) {
+            if (type === 'metric') {
+                this.$router.push({
+                    name: 'Admin mètrica edit',
+                    params: {id_metrica: row.id}
+                })
+            }
+            else {      // type === 'additional information'
+                // ToDo: Link a admin de informacions addicionals
+            }
         },
         handleDelete(index, row, type) {
             this.itemEsborrar = row
             this.itemEsborrarType = type
             this.dialogEsborrar = true
+        },
+        handleAfegir(type, fase) {
+            if (type === 'metric') {
+                this.$router.push({
+                    name: 'Admin mètrica new',
+                    query: {'fase': fase}
+                })
+            }
+            else {      // type === 'additional information'
+                // ToDo: Link a admin de informacions addicionals
+            }
         },
         async deleteItem(item, type) {
             if (type === 'metric') {

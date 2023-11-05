@@ -84,7 +84,7 @@
                 <CustomSlider :marks="marks[metrica]" :max="inf[metrica]" :values="ranges[metrica]" :color="info.color"/>
             </el-col>
             <el-col :span="3" align="middle">
-                <p class="prova" :style="{ fontSize: '35px', fontWeight: 'bold', color: info.color }">{{ info.qualificacio }}</p>
+                <p :style="{ fontSize: '35px', fontWeight: 'bold', color: info.color }">{{ info.qualificacio }}</p>
                 <p style="font-size: 20px">{{ roundIfDecimal(info.value) }} <span v-if="info.unit">{{ info.unit }}</span> </p>
             </el-col>
         </el-row>

@@ -25,9 +25,22 @@ class InferenciaSerializer(serializers.ModelSerializer):
 
 
 class MetricaSerializer(serializers.ModelSerializer):
+    intervals = serializers.ListField(write_only=True)
+
+    def create(self, validated_data):
+        intervals_data = validated_data.pop('intervals', None)
+        metrica = super().create(validated_data)
+
+        if intervals_data:
+            for interval_data in intervals_data:
+                qualificacio = interval_data.pop('qualificacio')
+                Interval.objects.create(metrica=metrica, qualificacio_id=qualificacio, **interval_data)
+
+        return metrica
+
     class Meta:
         model = Metrica
-        fields = '__all__'
+        fields = ('id', 'nom', 'fase', 'pes', 'unitat', 'influencia', 'descripcio', 'intervals')
 
 
 class QualificacioSerializer(serializers.ModelSerializer):
