@@ -39,7 +39,8 @@
                 <el-descriptions-item>
                     <template #label>
                         <div class="cell-item">
-                            <font-awesome-icon :icon="['fas', 'dumbbell']" />
+                            <font-awesome-icon :icon="['fas', 'dumbbell']" v-if="fase === $t('Training')" />
+                            <font-awesome-icon :icon="['fas', 'bullseye']" v-else />
                             {{ fase }} {{ $t('identifier') }}
                         </div>
                     </template>
