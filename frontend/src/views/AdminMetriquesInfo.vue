@@ -1,7 +1,20 @@
 <template>
     <h1>{{ $t("Metrics and additional information") }}</h1><br>
     <h2 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Training") }}</h2><br>
-    <h3>{{ $t("Metrics") }}</h3><br>
+    <el-row justify="space-between">
+        <el-col :span="6">
+            <h3>{{ $t("Metrics") }}</h3><br>
+        </el-col>
+        <el-col :span="2">
+            <el-button
+                style="margin-left: 10px"
+                @click="handleAfegir('metric', 'T')"
+                class="action-button-light"
+            >
+                <font-awesome-icon :icon="['fas', 'plus']" />
+            </el-button>
+        </el-col>
+    </el-row>
     <el-table :data="tableTrainingMetriques" style="width: 100%">
         <el-table-column :label="$t('Name')" prop="nom" />
         <el-table-column :label="$t('Weight')" prop="pes" />
@@ -12,7 +25,8 @@
             <template #default="scope">
                 <el-button
                     size="small"
-                    @click="handleEdit(scope.$index, scope.row)"
+                    class="action-button-light"
+                    @click="handleEdit(scope.$index, scope.row, 'metric')"
                 >
                     <font-awesome-icon :icon="['fas', 'pen-to-square']" />
                 </el-button>
@@ -27,7 +41,20 @@
         </el-table-column>
     </el-table><br><br>
 
-    <h3>{{ $t("Additional information") }}</h3><br>
+    <el-row justify="space-between">
+        <el-col :span="6">
+            <h3>{{ $t("Additional information") }}</h3><br>
+        </el-col>
+        <el-col :span="2">
+            <el-button
+                style="margin-left: 10px"
+                @click="handleAfegir('additional information', 'T')"
+                class="action-button-light"
+            >
+                <font-awesome-icon :icon="['fas', 'plus']" />
+            </el-button>
+        </el-col>
+    </el-row>
     <el-table :data="tableTrainingInformacions" style="width: 100%">
         <el-table-column :label="$t('Name')" prop="nom" />
         <el-table-column label="" />
@@ -38,7 +65,8 @@
             <template #default="scope">
                 <el-button
                     size="small"
-                    @click="handleEdit(scope.$index, scope.row)"
+                    class="action-button-light"
+                    @click="handleEdit(scope.$index, scope.row, 'additional information')"
                 >
                     <font-awesome-icon :icon="['fas', 'pen-to-square']" />
                 </el-button>
@@ -55,7 +83,20 @@
 
 
     <h2 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Inference") }}</h2><br>
-    <h3>{{ $t("Metrics") }}</h3><br>
+    <el-row justify="space-between">
+        <el-col :span="6">
+            <h3>{{ $t("Metrics") }}</h3><br>
+        </el-col>
+        <el-col :span="2">
+            <el-button
+                style="margin-left: 10px"
+                @click="handleAfegir('metric', 'I')"
+                class="action-button-light"
+            >
+                <font-awesome-icon :icon="['fas', 'plus']" />
+            </el-button>
+        </el-col>
+    </el-row>
     <el-table :data="tableInferenceMetriques" style="width: 100%">
         <el-table-column :label="$t('Name')" prop="nom" />
         <el-table-column :label="$t('Weight')" prop="pes" />
@@ -66,7 +107,8 @@
             <template #default="scope">
                 <el-button
                     size="small"
-                    @click="handleEdit(scope.$index, scope.row)"
+                    class="action-button-light"
+                    @click="handleEdit(scope.$index, scope.row, 'metric')"
                 >
                     <font-awesome-icon :icon="['fas', 'pen-to-square']" />
                 </el-button>
@@ -81,7 +123,20 @@
         </el-table-column>
     </el-table><br><br>
 
-    <h3>{{ $t("Additional information") }}</h3><br>
+    <el-row justify="space-between">
+        <el-col :span="6">
+            <h3>{{ $t("Additional information") }}</h3><br>
+        </el-col>
+        <el-col :span="2">
+            <el-button
+                style="margin-left: 10px"
+                @click="handleAfegir('additional information', 'I')"
+                class="action-button-light"
+            >
+                <font-awesome-icon :icon="['fas', 'plus']" />
+            </el-button>
+        </el-col>
+    </el-row>
     <el-table :data="tableInferenceInformacions" style="width: 100%">
         <el-table-column :label="$t('Name')" prop="nom" />
         <el-table-column label="" />
@@ -92,7 +147,8 @@
             <template #default="scope">
                 <el-button
                     size="small"
-                    @click="handleEdit(scope.$index, scope.row)"
+                    class="action-button-light"
+                    @click="handleEdit(scope.$index, scope.row, 'additional information')"
                 >
                     <font-awesome-icon :icon="['fas', 'pen-to-square']" />
                 </el-button>
@@ -178,13 +234,32 @@ export default {
                 (data) => !filter || data.nom.toLowerCase().includes(filter.toLowerCase())
             )
         },
-        handleEdit(index, row) {
-            console.log(index, row)
+        handleEdit(index, row, type) {
+            if (type === 'metric') {
+                this.$router.push({
+                    name: 'Admin mètrica edit',
+                    params: {id_metrica: row.id}
+                })
+            }
+            else {      // type === 'additional information'
+                // ToDo: Link a admin de informacions addicionals
+            }
         },
         handleDelete(index, row, type) {
             this.itemEsborrar = row
             this.itemEsborrarType = type
             this.dialogEsborrar = true
+        },
+        handleAfegir(type, fase) {
+            if (type === 'metric') {
+                this.$router.push({
+                    name: 'Admin mètrica new',
+                    query: {'fase': fase}
+                })
+            }
+            else {      // type === 'additional information'
+                // ToDo: Link a admin de informacions addicionals
+            }
         },
         async deleteItem(item, type) {
             if (type === 'metric') {
