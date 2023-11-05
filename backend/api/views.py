@@ -62,7 +62,7 @@ class EntrenamentsView(viewsets.ModelViewSet):
         qualifFinal, qualifMetriques = calculateRating(resultats_entrenament, metriques)
 
         # Generar etiqueta i resultats (amb adaptador)
-        label, resultatsResponse = generateLabel(qualifFinal, qualifMetriques, resultats_entrenament, entrenament.model, 'Training')
+        label, resultatsResponse = generateLabel(qualifFinal, qualifMetriques, resultats_entrenament, entrenament.model, entrenament.id, 'Training')
 
         # Preparar les dades que es responen al client
         response_data = {
@@ -116,7 +116,7 @@ class InferenciesView(viewsets.ModelViewSet):
         qualifFinal, qualifMetriques = calculateRating(resultats_inferencia, metriques)
 
         # Generar etiqueta i resultats (amb adaptador)
-        label, resultatsResponse = generateLabel(qualifFinal, qualifMetriques, resultats_inferencia, inferencia.model, 'Inference')
+        label, resultatsResponse = generateLabel(qualifFinal, qualifMetriques, resultats_inferencia, inferencia.model, inferencia.id, 'Inference')
 
         # Preparar les dades que es responen al client
         response_data = {
