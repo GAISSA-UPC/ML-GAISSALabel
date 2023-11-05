@@ -31,14 +31,15 @@
         </el-form-item>
         <br>
 
-        <!--<el-button
+        <el-button
             @click="crearInformacio"
             color="var(--gaissa_green)"
             v-if="creacio"
         >
-            {{ $t('Register metric') }}
-        </el-button>-->
+            {{ $t('Register additional information') }}
+        </el-button>
         <el-button
+            v-else
             @click="updateInformacio"
             color="var(--gaissa_green)"
         >
@@ -68,26 +69,26 @@ export default {
         },
     },
     methods: {
-        async refrescaInformacio() {
-            const response = await informacions.getById(this.$route.params.id_informacio)
+        async refrescaInformacio(id=this.$route.params.id_informacio) {
+            const response = await informacions.getById(id)
             this.informacio = response.data
         },
-        /*async crearInformacio() {
-            const id = this.metrica.nom.toLowerCase().replace(/\s+/g, '_')
-            this.metrica.id = id
-            const response = await metriques.create(this.metrica)
+        async crearInformacio() {
+            const id = this.informacio.nom.toLowerCase().replace(/\s+/g, '_')
+            this.informacio.id = id
+            const response = await informacions.create(this.informacio)
             window.scrollTo({top:0})
             if (response.status === 201) {
                 this.creacio = false
                 this.$router.push({
-                    name: "Admin mètrica edit",
-                    params: {id_metrica: this.metrica.id},
-                    query: {status: 'metrica-creada-ok'}
+                    name: "Admin informació edit",
+                    params: {id_informacio: this.informacio.id},
+                    query: {status: 'informacio-creada-ok'}
                 })
-                this.estat = 'metrica-creada-ok'
-                await this.refrescaMetrica()
-            } else this.estat = 'metrica-creada-ko'
-        },*/
+                this.estat = 'informacio-creada-ok'
+                await this.refrescaInformacio(this.informacio.id)
+            } else this.estat = 'informacio-creada-ko'
+        },
         async updateInformacio() {
             const response = await informacions.update(this.informacio)
             if (response.status === 200) {

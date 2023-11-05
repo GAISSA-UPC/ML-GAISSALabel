@@ -121,8 +121,8 @@ export default {
             const response = await metriques.listQualificacionsOrdre()
             this.qualificacions = response.data
         },
-        async refrescaMetrica() {
-            const response = await metriques.getById(this.$route.params.id_metrica)
+        async refrescaMetrica(id=this.$route.params.id_metrica) {
+            const response = await metriques.getById(id)
             this.metrica = response.data
         },
         async inicialitzaMetrica() {
@@ -146,7 +146,7 @@ export default {
                     query: {status: 'metrica-creada-ok'}
                 })
                 this.estat = 'metrica-creada-ok'
-                await this.refrescaMetrica()
+                await this.refrescaMetrica(this.metrica.id)
             } else this.estat = 'metrica-creada-ko'
         },
         async updateMetrica() {
