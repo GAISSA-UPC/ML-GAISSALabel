@@ -23,6 +23,12 @@ export default {
         })
         return responseQualificacions
     },
+    async create(data) {
+        const responseMetrica = await axios.post(`/api/metriques/`, data, {
+            responseType: 'json'
+        })
+        return responseMetrica
+    },
     async update(data) {
         const responseMetrica = await axios.put(`/api/metriques/${data.id}/`, data, {
             responseType: 'json'
