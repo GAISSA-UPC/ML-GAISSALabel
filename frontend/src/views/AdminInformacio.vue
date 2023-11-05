@@ -26,7 +26,7 @@
                 type="textarea"
             />
         </el-form-item>
-        <el-form-item :label="$t('Options')">
+        <el-form-item :label="$t('Options (separated by ;)')">
             <el-input v-model="informacio.opcions" style="max-width: 300px"/>
         </el-form-item>
         <br>
