@@ -242,7 +242,10 @@ export default {
                 })
             }
             else {      // type === 'additional information'
-                // ToDo: Link a admin de informacions addicionals
+                this.$router.push({
+                    name: 'Admin informació edit',
+                    params: {id_informacio: row.id}
+                })
             }
         },
         handleDelete(index, row, type) {
@@ -258,7 +261,10 @@ export default {
                 })
             }
             else {      // type === 'additional information'
-                // ToDo: Link a admin de informacions addicionals
+                this.$router.push({
+                    name: 'Admin informació new',
+                    query: {'fase': fase}
+                })
             }
         },
         async deleteItem(item, type) {

@@ -11,6 +11,7 @@ import TrainingLabelInfo from "@/views/TrainingLabelInfo.vue"
 import InferenceLabelInfo from "@/views/InferenceLabelInfo.vue"
 import AdminMetriquesInfo from "@/views/AdminMetriquesInfo.vue"
 import AdminMetrica from "@/views/AdminMetrica.vue"
+import AdminInformacio from "@/views/AdminInformacio.vue"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -79,6 +80,16 @@ const router = createRouter({
       path: '/admin/metriques',
       name: 'Admin mètrica new',
       component: AdminMetrica
+    },
+    {
+      path: '/admin/informacions/:id_informacio',
+      name: 'Admin informació edit',
+      component: AdminInformacio
+    },
+    {
+      path: '/admin/informacions',
+      name: 'Admin informació new',
+      component: AdminInformacio
     },
   ]
 })
