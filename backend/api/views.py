@@ -1,18 +1,20 @@
 import base64
 
-from rest_framework import viewsets, filters, status
+from rest_framework import viewsets, filters, status, mixins
 from rest_framework.response import Response
 
 from django.shortcuts import get_object_or_404
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Model, Entrenament, Inferencia, Metrica
+from .models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, Interval
 from .serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
-    EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer
+    EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer, \
+    IntervalBasicSerializer, MetricaSerializer
 
 from .rating_calculator_adapter import calculateRating
 from .label_generator_adapter import generateLabel
+from .efficiency_calculator_adapter import calculateEfficiency
 
 
 class ModelsView(viewsets.ModelViewSet):
@@ -60,7 +62,7 @@ class EntrenamentsView(viewsets.ModelViewSet):
         qualifFinal, qualifMetriques = calculateRating(resultats_entrenament, metriques)
 
         # Generar etiqueta i resultats (amb adaptador)
-        label, resultatsResponse = generateLabel(qualifFinal, qualifMetriques, resultats_entrenament, entrenament.model, 'Training')
+        label, resultatsResponse = generateLabel(qualifFinal, qualifMetriques, resultats_entrenament, entrenament.model, entrenament.id, 'Training')
 
         # Preparar les dades que es responen al client
         response_data = {
@@ -114,7 +116,7 @@ class InferenciesView(viewsets.ModelViewSet):
         qualifFinal, qualifMetriques = calculateRating(resultats_inferencia, metriques)
 
         # Generar etiqueta i resultats (amb adaptador)
-        label, resultatsResponse = generateLabel(qualifFinal, qualifMetriques, resultats_inferencia, inferencia.model, 'Inference')
+        label, resultatsResponse = generateLabel(qualifFinal, qualifMetriques, resultats_inferencia, inferencia.model, inferencia.id, 'Inference')
 
         # Preparar les dades que es responen al client
         response_data = {
@@ -137,9 +139,17 @@ class InferenciesView(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
+class QualificacionsView(mixins.ListModelMixin, viewsets.GenericViewSet):
+    models = Qualificacio
+    serializer_class = QualificacioSerializer
+    queryset = Qualificacio.objects.all()
+
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    ordering_fields = ['ordre']
+
+
 class MetriquesView(viewsets.ModelViewSet):
     models = Metrica
-    serializer_class = MetricaAmbLimitsSerializer
     queryset = Metrica.objects.all()
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -152,3 +162,57 @@ class MetriquesView(viewsets.ModelViewSet):
     }
     search_fields = ['nom', 'fase']
     ordering_fields = ['id', 'nom', 'fase', 'pes', 'influencia']
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return MetricaSerializer
+        else:
+            return MetricaAmbLimitsSerializer
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        metrica = self.get_object()
+        data = request.data.copy()
+
+        # Actualitzem els intervals (recuperem la instància i la modifiquem amb els valors donats)
+        intervals = data.pop('intervals')
+        for intervalJSON in intervals:
+            interval = Interval.objects.get(metrica=metrica, qualificacio__id=intervalJSON['qualificacio'])
+            serializer = IntervalBasicSerializer(interval, data=intervalJSON, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+        # Actualitzem la mètrica (equivalent a super.update() amb petites modificacions)
+        serializer = self.get_serializer(metrica, data=data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
+
+
+class InfoAddicionalsView(viewsets.ModelViewSet):
+    model = InfoAddicional
+    serializer_class = InfoAddicionalSerializer
+    queryset = InfoAddicional.objects.all()
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = {
+        'id': ['exact', 'in'],
+        'nom': ['exact', 'in', 'contains'],
+        'fase': ['exact', 'in'],
+    }
+    search_fields = ['nom', 'fase']
+    ordering_fields = ['id', 'nom', 'fase']
+
+
+class CalculadorInferenciaView(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    def get_serializer_class(self):
+        pass
+
+    def create(self, request, *args, **kwargs):
+        endpoint = request.data.get('endpoint')
+        data = request.data.get('input')
+        if not endpoint or not data:
+            return Response("Cal donar els atributs endpoint i input!", status=status.HTTP_400_BAD_REQUEST)
+        resultats = calculateEfficiency(endpoint, data)
+        return Response(resultats, status=status.HTTP_201_CREATED)

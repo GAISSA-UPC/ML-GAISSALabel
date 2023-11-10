@@ -39,7 +39,8 @@
                 <el-descriptions-item>
                     <template #label>
                         <div class="cell-item">
-                            <font-awesome-icon :icon="['fas', 'dumbbell']" />
+                            <font-awesome-icon :icon="['fas', 'dumbbell']" v-if="fase === $t('Training')" />
+                            <font-awesome-icon :icon="['fas', 'bullseye']" v-else />
                             {{ fase }} {{ $t('identifier') }}
                         </div>
                     </template>
@@ -53,6 +54,15 @@
                         </div>
                     </template>
                     {{ formatData(info.dataRegistre) }}
+                </el-descriptions-item>
+                <el-descriptions-item v-for="(camps, infoAdd, i) in infoAddicional" :key="i">
+                    <template #label>
+                        <div class="cell-item">
+                            <font-awesome-icon :icon="['fas', 'circle-info']" />
+                            {{ camps.nom }}
+                        </div>
+                    </template>
+                    {{ camps.valor }}
                 </el-descriptions-item>
             </el-descriptions>
         </el-col>
@@ -75,7 +85,7 @@
                 <CustomSlider :marks="marks[metrica]" :max="inf[metrica]" :values="ranges[metrica]" :color="info.color"/>
             </el-col>
             <el-col :span="3" align="middle">
-                <p class="prova" :style="{ fontSize: '35px', fontWeight: 'bold', color: info.color }">{{ info.qualificacio }}</p>
+                <p :style="{ fontSize: '35px', fontWeight: 'bold', color: info.color }">{{ info.qualificacio }}</p>
                 <p style="font-size: 20px">{{ roundIfDecimal(info.value) }} <span v-if="info.unit">{{ info.unit }}</span> </p>
             </el-col>
         </el-row>
@@ -100,6 +110,7 @@ export default {
         return {
             labelBase64: null,
             resultats: null,
+            infoAddicional: null,
             info: null,
             model: null,
             metriques: null,
@@ -122,6 +133,7 @@ export default {
             }
             this.labelBase64 = response.data['energy_label']
             this.resultats = response.data['resultats']
+            this.infoAddicional = this.info['infoAddicional']
         },
         async refrescaInfoMetriques() {
             const faseAbr = (this.fase === 'Training') ? 'T' : 'I'

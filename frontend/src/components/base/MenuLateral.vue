@@ -38,7 +38,9 @@
             <el-menu-item index="inference file" @click="$router.push({name: 'inference file'})">
                 {{ $t('File') }}
             </el-menu-item>
-            <el-menu-item index="2-4">{{ $t('Deployment') }}</el-menu-item>
+            <el-menu-item index="inference deploy" @click="$router.push({name: 'inference deploy'})">
+                {{ $t('Deployment') }}
+            </el-menu-item>
         </el-sub-menu>
         <el-menu-item index="3">
             <font-awesome-icon :icon="['fas', 'people-group']" class="icon"/>
