@@ -84,3 +84,34 @@ class ResultatInferencia(models.Model):
 
     class Meta:
         verbose_name_plural = _('Resultat Inferències')
+
+
+class InfoAddicional(models.Model):
+    TRAIN = 'T'
+    INF = 'I'
+    TFASE = (
+        (TRAIN, _('Entrenament')),
+        (INF, _('Inferència'))
+    )
+
+    id = models.CharField(primary_key=True, max_length=100, verbose_name=_('Identificador'))
+    nom = models.CharField(max_length=100, null=False, blank=False, verbose_name=_('Nom'))
+    fase = models.CharField(choices=TFASE, null=False, blank=False, max_length=5, verbose_name=_('Fase'))
+    descripcio = models.CharField(max_length=1000, null=True, blank=True, verbose_name=_('Descripcio'))
+    # Opcions possibles (separades per ';'). Si null vol dir que és camp lliure
+    opcions = models.CharField(max_length=10000, null=True, blank=True, verbose_name=_('Opcions'))
+
+
+class ValorInfoEntrenament(models.Model):
+    valor = models.CharField(max_length=10000, null=False, blank=False, verbose_name=_('Valor'))
+    entrenament = models.ForeignKey(Entrenament, related_name='informacionsEntrenament', null=False, on_delete=models.CASCADE, verbose_name=_('Entrenament'))
+    infoAddicional = models.ForeignKey(InfoAddicional, related_name='informacionsEntrenament', null=False, on_delete=models.CASCADE, verbose_name=_('Informació'))
+
+
+class ValorInfoInferencia(models.Model):
+    class Meta:
+        verbose_name_plural = _('Valor info inferències')
+
+    valor = models.CharField(max_length=10000, null=False, blank=False, verbose_name=_('Valor'))
+    inferencia = models.ForeignKey(Inferencia, related_name='informacionsInferencia', null=False, on_delete=models.CASCADE, verbose_name=_('Inferència'))
+    infoAddicional = models.ForeignKey(InfoAddicional, related_name='informacionsInferencia', null=False, on_delete=models.CASCADE, verbose_name=_('Informació'))

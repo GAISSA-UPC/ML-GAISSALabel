@@ -37,6 +37,30 @@
             <p style="margin-left: 10px">{{ metrica.unitat }}</p>
         </el-form-item>
         <br>
+
+        <h3>{{ $t("Additional information") }}</h3><br>
+        <el-form-item
+            v-for="(infoAdd, i) in informacions" :key="i"
+            :label="infoAdd.nom"
+        >
+            <el-select
+                v-if="infoAdd.opcions_list"
+                v-model="infoAdd.valor"
+                clearable
+            >
+                <el-option
+                    v-for="(opcio, i) in infoAdd.opcions_list" :key="i"
+                    :value="opcio"
+                    :label="opcio"
+                />
+            </el-select>
+            <el-input
+                style="max-width: 195px"
+                v-else
+                v-model="infoAdd.valor"
+            />
+        </el-form-item>
+        <br>
         <el-button
             @click="mostrarEtiqueta"
             color="var(--gaissa_green)"
@@ -45,41 +69,27 @@
         </el-button>
     </el-form><br>
 
-    <el-dialog v-model="dialogNewModel"
-               :title="$t('Add a new model')"
-               @close="closeDialogNewModel"
-    >
-        <el-form :model="newModel" label-position="top">
-            <el-form-item :label="$t('Name')">
-                <el-input
-                    v-model="newModel.nom"
-                />
-            </el-form-item>
-            <el-form-item :label="$t('Description')">
-                <el-input
-                    v-model="newModel.informacio"
-                    type="textarea"
-                />
-            </el-form-item>
-        </el-form>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="dialogNewModel = false">{{ $t('Cancel') }}</el-button>
-                <el-button type="success" @click="afegirModel">{{ $t('Create') }}</el-button>
-            </span>
-        </template>
-    </el-dialog>
+    <DialogNewModel v-model="dialogNewModel"
+                    @cancel="dialogNewModel = false"
+                    @model-creat-ok="dialogNewModel = false;selectedModel = models.length; estat = 'modelCreat-ok'"
+                    @model-creat-ko="dialogNewModel = false; estat = 'modelCreat-ko'"
+    />
+
 </template>
 
 <script>
 import models from '@/services/models'
 import metriques from '@/services/metriques'
+import informacions from "@/services/informacions";
 import inferencies from '@/services/inferencies'
 import trainings from '@/services/trainings'
+import DialogNewModel from "@/components/DialogNewModel.vue";
 export default {
     name: "FormNewExperiment",
+    components: {DialogNewModel},
     props: {
-        fase: {required: true, type: String}
+        fase: {required: true, type: String},
+        dadesInicials: {required: false, type: Object, default: null},
     },
     data() {
         return {
@@ -89,6 +99,7 @@ export default {
             newModel: {},
             dialogNewModel: false,
             metriques: null,
+            informacions: null,
         };
     },
     methods: {
@@ -97,18 +108,35 @@ export default {
             this.models = response.data
         },
         async refrescaMetriques() {
-            let faseAbr = null
-            if (this.fase === this.$t('Training')) faseAbr = 'T'
-            else faseAbr = 'I'
+            const faseAbr = (this.fase === this.$t('Training'))? 'T' : 'I'
             const response = await metriques.listOrderedFilteredByPhase(faseAbr)
             this.metriques = response.data
+        },
+        async refrescaInformacions() {
+            const faseAbr = (this.fase === this.$t('Training'))? 'T' : 'I'
+            const response = await informacions.listFilteredByPhase(faseAbr)
+            this.informacions = response.data
+        },
+        async inicialitzarMetriques() {
+            this.metriques.forEach((metrica) => {
+                if (metrica.id in this.dadesInicials) {
+                    metrica.valor = this.dadesInicials[metrica.id]
+                }
+            })
+        },
+        async inicialitzarInformacions() {
+            this.informacions.forEach((informacio) => {
+                if (informacio.id in this.dadesInicials) {
+                    informacio.valor = this.dadesInicials[informacio.id]
+                }
+            })
         },
         async mostrarEtiqueta() {
             let responseCreate = null
             if (this.fase === this.$t('Training'))
-                responseCreate = await trainings.create(this.selectedModel, this.metriques)
+                responseCreate = await trainings.create(this.selectedModel, this.metriques, this.informacions)
             else
-                responseCreate = await inferencies.create(this.selectedModel, this.metriques)
+                responseCreate = await inferencies.create(this.selectedModel, this.metriques, this.informacions)
             if (responseCreate.status === 201) {
                 const experiment_id = responseCreate.data['id']
                 if (this.fase === this.$t('Training'))
@@ -123,23 +151,15 @@ export default {
                     })
             }
         },
-        async afegirModel() {
-            const response = await models.create(this.newModel)
-            if (response.status === 201) {
-                this.models.push(response.data)
-                this.selectedModel = this.models.length
-            }
-            this.dialogNewModel = false
-            this.estat = 'modelCreat-ok'
-        },
-        async closeDialogNewModel() {
-            this.newModel = {}
-            this.dialogNewModel = false
-        },
     },
     async mounted() {
         await this.refrescaModels();
         await this.refrescaMetriques();
+        await this.refrescaInformacions();
+        if (this.dadesInicials) {
+            await this.inicialitzarMetriques();
+            await this.inicialitzarInformacions();
+        }
     },
 };
 </script>

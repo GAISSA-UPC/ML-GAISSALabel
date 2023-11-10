@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-(v_ee*8-^#61=ifwx$%zmf1))p5tuaa82(9a^@u#@u-jyz@v8t
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*', 'localhost']
 
 
 # Application definition
@@ -123,6 +123,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -131,7 +132,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS
 
+URL_FRONTEND = os.environ.get('URL_FRONTEND', 'http://localhost:5173')
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://gaissalabel.essi.upc.edu",
     os.environ.get('URL_FRONTEND', 'http://localhost:5173'),
 ]

@@ -9,10 +9,10 @@
                 style="cursor:pointer; max-width: 40px; margin-left: 20px; margin-right: 5px"
                 @click="obrirLink"
             />
-            <span class="text-large font-600 mr-3"> Tool's name :) </span>
+            <span class="text-large font-600 mr-3" style="color: var(--gaissa_green);font-weight: bold"> GAISSA Label </span>
         </div>
         <div>
-            <el-button color="var(--gaissa_green)" class="ml-2">{{ $t('Admin') }}</el-button>
+            <el-button color="var(--gaissa_green)" class="ml-2" @click="$router.push({name: 'Admin mètriques i informacions'})">{{ $t('Admin') }}</el-button>
         </div>
     </span>
 </template>

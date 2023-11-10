@@ -1,10 +1,11 @@
 import base64
+from gaissalabel.settings import URL_FRONTEND
 from .models import Qualificacio, Metrica, Interval
 from .serializers import QualificacioSerializer
 from .label_generator import generate_efficency_label
 
 
-def generateLabel(qualifFinal, qualifMetriques, resultats, model, fase):
+def generateLabel(qualifFinal, qualifMetriques, resultats, model, experiment_id, fase):
     # Adaptem els resultats rebuts al que necessita el label_generator
     # Limitem el nombre de resultats que mostrem a l'EL a 6 màxim (que seran els que tinguis major pes)
     resultats_formatted = {}
@@ -26,8 +27,11 @@ def generateLabel(qualifFinal, qualifMetriques, resultats, model, fase):
         qualificacio['id'] for qualificacio in qualificacions_info
     ]
 
+    # Enllaç a la pàgina d'info de l'etiqueta
+    url = URL_FRONTEND + '/models/' + str(model.id) + '/' + fase.lower() + 's/' + str(experiment_id)
+
     # Generació de l'etiqueta a partir del label_generator
-    label = generate_efficency_label(resultats_formatted, qualificacions_valor, qualifFinal, model.nom, fase)
+    label = generate_efficency_label(resultats_formatted, qualificacions_valor, qualifFinal, model.nom, fase, url)
 
     # Adaptar resultats
     resultatsResponse = {
