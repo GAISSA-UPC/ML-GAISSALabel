@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
-import trainingForm from '@/views/trainingForm.vue'
+import TrainingForm from '@/views/TrainingForm.vue'
 import TrainingPreSaved from '@/views/TrainingPreSaved.vue'
 import TrainingFile from '@/views/TrainingFile.vue'
 import InferenceForm from '@/views/InferenceForm.vue'
@@ -24,7 +24,7 @@ const router = createRouter({
     {
       path: '/trainingForm',
       name: 'training form',
-      component: trainingForm
+      component: TrainingForm
     },
     {
       path: '/trainingPre',
