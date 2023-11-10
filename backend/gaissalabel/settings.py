@@ -135,5 +135,6 @@ URL_FRONTEND = os.environ.get('URL_FRONTEND', 'http://localhost:5173')
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://gaissalabel.essi.upc.edu/",
     os.environ.get('URL_FRONTEND', 'http://localhost:5173'),
 ]
