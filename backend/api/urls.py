@@ -10,6 +10,7 @@ router.register(r'qualificacions', views.QualificacionsView, basename='qualifica
 router.register(r'metriques', views.MetriquesView, basename='metriques')
 router.register(r'informacions', views.InfoAddicionalsView, basename='informacions addicionals')
 router.register(r'calculadors/inferencia', views.CalculadorInferenciaView, basename='calculador inferencia')
+router.register(r'eines', views.EinesCalculView, basename='eines càlcul')
 
 urlpatterns = [
     path('', include(router.urls)),

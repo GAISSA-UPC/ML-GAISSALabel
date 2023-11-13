@@ -9,7 +9,7 @@ codecarbon==2.3.1
 configobj==5.0.8
 configparser==6.0.0
 Django==4.2.3
-django-cors-headers==4.2.0
+django-cors-headers==3.14.0
 django-filter==23.1
 django-qrcode==0.3
 djangorestframework==3.14.0

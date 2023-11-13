@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 
 from .models import Model, Entrenament, Inferencia, Metrica, Qualificacio, Interval, ResultatEntrenament, \
-    ResultatInferencia, InfoAddicional, ValorInfoEntrenament, ValorInfoInferencia
+    ResultatInferencia, InfoAddicional, ValorInfoEntrenament, ValorInfoInferencia, EinaCalcul
 
 
 class ModelSerializer(serializers.ModelSerializer):
@@ -191,4 +191,10 @@ class InfoAddicionalSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = InfoAddicional
+        fields = '__all__'
+
+
+class EinaCalculSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EinaCalcul
         fields = '__all__'
