@@ -11,7 +11,7 @@ from .models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qua
     TransformacioMetrica, TransformacioInformacio
 from .serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
     EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer, \
-    IntervalBasicSerializer, MetricaSerializer, EinaCalculSerializer, TransformacioMetricaSerializer
+    IntervalBasicSerializer, MetricaSerializer, EinaCalculSerializer, TransformacioMetricaSerializer, TransformacioInformacioSerializer
 
 from .rating_calculator_adapter import calculateRating
 from .label_generator_adapter import generateLabel
@@ -229,3 +229,9 @@ class TransformacioMetriquesView(viewsets.ModelViewSet):
     models = TransformacioMetrica
     queryset = TransformacioMetrica.objects.all()
     serializer_class = TransformacioMetricaSerializer
+
+
+class TransformacioInformacionsView(viewsets.ModelViewSet):
+    models = TransformacioInformacio
+    queryset = TransformacioInformacio.objects.all()
+    serializer_class = TransformacioInformacioSerializer

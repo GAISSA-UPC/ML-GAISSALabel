@@ -197,6 +197,7 @@ class InfoAddicionalSerializer(serializers.ModelSerializer):
 
 class EinaCalculSerializer(serializers.ModelSerializer):
     transformacionsMetriques = serializers.SerializerMethodField(read_only=True)
+    transformacionsInformacions = serializers.SerializerMethodField(read_only=True)
 
     def get_transformacionsMetriques(self, eina):
         transformacions = {}
@@ -204,12 +205,24 @@ class EinaCalculSerializer(serializers.ModelSerializer):
             transformacions[transfMetrica.metrica.id] = transfMetrica.valor
         return transformacions
 
+    def get_transformacionsInformacions(self, eina):
+        transformacions = {}
+        for transfInfo in eina.transformacionsInformacions.all():
+            transformacions[transfInfo.informacio.id] = transfInfo.valor
+        return transformacions
+
     class Meta:
         model = EinaCalcul
-        fields = ('id', 'nom', 'descripcio', 'transformacionsMetriques')
+        fields = ('id', 'nom', 'descripcio', 'transformacionsMetriques', 'transformacionsInformacions')
 
 
 class TransformacioMetricaSerializer(serializers.ModelSerializer):
     class Meta:
         model = TransformacioMetrica
+        fields = '__all__'
+
+
+class TransformacioInformacioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TransformacioInformacio
         fields = '__all__'
