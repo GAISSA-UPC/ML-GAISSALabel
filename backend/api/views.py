@@ -7,10 +7,11 @@ from django.shortcuts import get_object_or_404
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, Interval
+from .models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, Interval, EinaCalcul, \
+    TransformacioMetrica, TransformacioInformacio
 from .serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
     EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer, \
-    IntervalBasicSerializer, MetricaSerializer
+    IntervalBasicSerializer, MetricaSerializer, EinaCalculSerializer, TransformacioMetricaSerializer, TransformacioInformacioSerializer
 
 from .rating_calculator_adapter import calculateRating
 from .label_generator_adapter import generateLabel
@@ -216,3 +217,21 @@ class CalculadorInferenciaView(mixins.CreateModelMixin, viewsets.GenericViewSet)
             return Response("Cal donar els atributs endpoint i input!", status=status.HTTP_400_BAD_REQUEST)
         resultats = calculateEfficiency(endpoint, data)
         return Response(resultats, status=status.HTTP_201_CREATED)
+
+
+class EinesCalculView(viewsets.ModelViewSet):
+    models = EinaCalcul
+    queryset = EinaCalcul.objects.all()
+    serializer_class = EinaCalculSerializer
+
+
+class TransformacioMetriquesView(viewsets.ModelViewSet):
+    models = TransformacioMetrica
+    queryset = TransformacioMetrica.objects.all()
+    serializer_class = TransformacioMetricaSerializer
+
+
+class TransformacioInformacionsView(viewsets.ModelViewSet):
+    models = TransformacioInformacio
+    queryset = TransformacioInformacio.objects.all()
+    serializer_class = TransformacioInformacioSerializer

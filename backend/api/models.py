@@ -109,9 +109,36 @@ class ValorInfoEntrenament(models.Model):
 
 
 class ValorInfoInferencia(models.Model):
-    class Meta:
-        verbose_name_plural = _('Valor info inferències')
-
     valor = models.CharField(max_length=10000, null=False, blank=False, verbose_name=_('Valor'))
     inferencia = models.ForeignKey(Inferencia, related_name='informacionsInferencia', null=False, on_delete=models.CASCADE, verbose_name=_('Inferència'))
     infoAddicional = models.ForeignKey(InfoAddicional, related_name='informacionsInferencia', null=False, on_delete=models.CASCADE, verbose_name=_('Informació'))
+
+    class Meta:
+        verbose_name_plural = _('Valor info inferències')
+
+
+class EinaCalcul(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name=_('Identificador'))
+    nom = models.CharField(max_length=100, null=False, blank=False, verbose_name=_('Nom'))
+    descripcio = models.CharField(max_length=1000, null=False, blank=False, verbose_name=_('Descripció'))
+
+    class Meta:
+        verbose_name_plural = _('Eines càlcul')
+
+
+class TransformacioMetrica(models.Model):
+    valor = models.CharField(max_length=100, null=False, blank=False, verbose_name=_('Valor'))
+    metrica = models.ForeignKey(Metrica, related_name='transformacions', null=False, on_delete=models.CASCADE, verbose_name=_('Mètrica'))
+    eina = models.ForeignKey(EinaCalcul, related_name='transformacionsMetriques', null=False, on_delete=models.CASCADE, verbose_name=_('Eina càlcul'))
+
+    class Meta:
+        verbose_name_plural = _('Transformació Mètriques')
+
+
+class TransformacioInformacio(models.Model):
+    valor = models.CharField(max_length=100, null=False, blank=False, verbose_name=_('Valor'))
+    informacio = models.ForeignKey(InfoAddicional, related_name='transformacions', null=False, on_delete=models.CASCADE, verbose_name=_('Informació addicional'))
+    eina = models.ForeignKey(EinaCalcul, related_name='transformacionsInformacions', null=False, on_delete=models.CASCADE, verbose_name=_('Eina càlcul'))
+
+    class Meta:
+        verbose_name_plural = _('Transformació Informacions')
