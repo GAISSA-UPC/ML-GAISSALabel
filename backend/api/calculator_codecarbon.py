@@ -5,18 +5,13 @@ from codecarbon import OfflineEmissionsTracker
 output_dir = '.'
 output_file = 'emissions.csv'
 
-TRANSFORMACIO_METRIQUES = {
-    'power_draw': 'energy_consumed',
-    'time': 'duration',
-}
-
 
 def query(endpoint, payload):
     response = requests.post(endpoint, json=payload)
     return response.json()
 
 
-def get_efficiency_results(endpoint, data):
+def get_efficiency_results(endpoint, data, transformacions):
     # Definir tracker i realitzar la query
     tracker = OfflineEmissionsTracker(
         country_iso_code="CAN",
@@ -36,7 +31,7 @@ def get_efficiency_results(endpoint, data):
 
     # Transformar valors a mètriques de l'aplicació i retornar resultats
     resultats = {}
-    for (metrica, transformacio) in TRANSFORMACIO_METRIQUES.items():
+    for (metrica, transformacio) in transformacions.items():
         resultats[metrica] = dataCSV[-1].get(transformacio)
 
     return resultats
