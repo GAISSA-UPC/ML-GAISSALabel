@@ -3,7 +3,8 @@ from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 
 from .models import Model, Entrenament, Inferencia, Metrica, Qualificacio, Interval, ResultatEntrenament, \
-    ResultatInferencia, InfoAddicional, ValorInfoEntrenament, ValorInfoInferencia, EinaCalcul
+    ResultatInferencia, InfoAddicional, ValorInfoEntrenament, ValorInfoInferencia, EinaCalcul, \
+    TransformacioMetrica, TransformacioInformacio
 
 
 class ModelSerializer(serializers.ModelSerializer):
@@ -195,6 +196,20 @@ class InfoAddicionalSerializer(serializers.ModelSerializer):
 
 
 class EinaCalculSerializer(serializers.ModelSerializer):
+    transformacionsMetriques = serializers.SerializerMethodField(read_only=True)
+
+    def get_transformacionsMetriques(self, eina):
+        transformacions = {}
+        for transfMetrica in eina.transformacionsMetriques.all():
+            transformacions[transfMetrica.metrica.id] = transfMetrica.valor
+        return transformacions
+
     class Meta:
         model = EinaCalcul
+        fields = ('id', 'nom', 'descripcio', 'transformacionsMetriques')
+
+
+class TransformacioMetricaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TransformacioMetrica
         fields = '__all__'
