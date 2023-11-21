@@ -8,10 +8,11 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, Interval, EinaCalcul, \
-    TransformacioMetrica, TransformacioInformacio
+    TransformacioMetrica, TransformacioInformacio, Administrador
 from .serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
     EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer, \
-    IntervalBasicSerializer, MetricaSerializer, EinaCalculSerializer, TransformacioMetricaSerializer, TransformacioInformacioSerializer
+    IntervalBasicSerializer, MetricaSerializer, EinaCalculSerializer, TransformacioMetricaSerializer, \
+    TransformacioInformacioSerializer, LoginAdminSerializer
 
 from .rating_calculator_adapter import calculateRating
 from .label_generator_adapter import generateLabel
@@ -235,3 +236,9 @@ class TransformacioInformacionsView(viewsets.ModelViewSet):
     models = TransformacioInformacio
     queryset = TransformacioInformacio.objects.all()
     serializer_class = TransformacioInformacioSerializer
+
+
+class LoginAdminView(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    queryset = Administrador.objects.all()
+    serializer_class = LoginAdminSerializer
+    models = Administrador
