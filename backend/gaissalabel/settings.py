@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-(v_ee*8-^#61=ifwx$%zmf1))p5tuaa82(9a^@u#@u-jyz@v8t'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*', 'localhost']
 
@@ -82,8 +82,12 @@ WSGI_APPLICATION = 'gaissalabel.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'bdgaissa',
+        'USER': 'pduran',
+        'PASSWORD': 'gaissapau',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
