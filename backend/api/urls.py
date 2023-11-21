@@ -13,6 +13,7 @@ router.register(r'calculadors/inferencia', views.CalculadorInferenciaView, basen
 router.register(r'eines', views.EinesCalculView, basename='eines càlcul')
 router.register(r'transformacions/metriques', views.TransformacioMetriquesView, basename='transformacions mètriques')
 router.register(r'transformacions/informacions', views.TransformacioInformacionsView, basename='transformacions informacions')
+router.register(r'login/admins', views.LoginAdminView, basename='login admins')
 
 urlpatterns = [
     path('', include(router.urls)),

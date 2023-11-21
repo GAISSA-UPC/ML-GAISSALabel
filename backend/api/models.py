@@ -1,6 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Model(models.Model):
@@ -142,3 +143,7 @@ class TransformacioInformacio(models.Model):
 
     class Meta:
         verbose_name_plural = _('Transformació Informacions')
+
+
+class Administrador(models.Model):
+    user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE, verbose_name=_('User'))

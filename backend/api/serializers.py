@@ -1,10 +1,13 @@
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User
+from django.contrib.auth.hashers import check_password
 
 from .models import Model, Entrenament, Inferencia, Metrica, Qualificacio, Interval, ResultatEntrenament, \
     ResultatInferencia, InfoAddicional, ValorInfoEntrenament, ValorInfoInferencia, EinaCalcul, \
-    TransformacioMetrica, TransformacioInformacio
+    TransformacioMetrica, TransformacioInformacio, Administrador
 
 
 class ModelSerializer(serializers.ModelSerializer):
@@ -226,3 +229,53 @@ class TransformacioInformacioSerializer(serializers.ModelSerializer):
     class Meta:
         model = TransformacioInformacio
         fields = '__all__'
+
+
+# LOGIN
+def validacioLogin(data):
+    username = data.get("username", None)
+    password = data.get("password", None)
+
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        raise serializers.ValidationError("No existeix un usuari amb aquest username.")
+
+    pwd_valid = check_password(password, user.password)
+
+    if not pwd_valid:
+        raise serializers.ValidationError("Contrasenya incorrecta.")
+    return user
+
+
+def creacioLogin(data, user):
+    token, created = Token.objects.get_or_create(user=user)
+    data['token'] = token.key
+    data['created'] = created
+    return data
+
+
+class LoginAdminSerializer(serializers.ModelSerializer):
+    username = serializers.CharField()
+    password = serializers.CharField(max_length=128, write_only=True, required=True)
+    token = serializers.CharField(required=False, read_only=True)
+
+    class Meta:
+        model = Administrador
+        fields = ('username', 'password', 'token')
+
+    def create(self, data):
+        user = self.context['user']
+        data = creacioLogin(data, user)
+        data['user'] = user
+        return data
+
+    def validate(self, data):
+        user = validacioLogin(data)
+        try:
+            _ = user.administrador
+        except:
+            raise serializers.ValidationError("No existeix un admininstrador amb aquest username.")
+        self.context['user'] = user
+
+        return data
