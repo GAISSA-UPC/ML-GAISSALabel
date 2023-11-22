@@ -12,6 +12,7 @@ import InferenceLabelInfo from "@/views/InferenceLabelInfo.vue"
 import AdminMetriquesInfo from "@/views/AdminMetriquesInfo.vue"
 import AdminMetrica from "@/views/AdminMetrica.vue"
 import AdminInformacio from "@/views/AdminInformacio.vue"
+import AdminLogin from "@/views/AdminLogin.vue"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -90,6 +91,11 @@ const router = createRouter({
       path: '/admin/informacions',
       name: 'Admin informació new',
       component: AdminInformacio
+    },
+    {
+      path: '/admin/login',
+      name: 'Admin login',
+      component: AdminLogin
     },
   ]
 })
