@@ -1,146 +1,58 @@
 <template>
     <div class="background">
-        <div>
-            <el-alert
-                v-show="msgErrorLogin !== ''"
-                class="mx-3 my-3"
-                title="Error login"
-                :description="msgErrorLogin"
-                type="error"
-                :closable="false"
-            ></el-alert>
-        </div>
-        <div class="formStyle">
-            <el-card
-                style="border-radius: 40px;width: 40vw;height: 80vh;align-items: center"
-            >
-                <div class="text-center mt-3">{{ $t('Administration Login') }}</div>
-                <el-form ref="loginForm" :model="loginForm" label-position="top">
-                    <el-form-item :label="$t('Username')" required>
-                        <el-input v-model="loginForm.username"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('Password')" required>
-                        <el-input
-                            v-model="loginForm.password"
-                            type="password"
-                        ></el-input>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-button color="var(--gaissa_green)" @click="doLogin">{{ $t('Login') }}</el-button>
-                    </el-form-item>
-                </el-form>
-            </el-card>
-        </div>
+        <el-alert v-if="estat === 'login-ko-username'" :title="$t('The username does not match any of the existent user\'s one')" type="error" @close="estat = ''"/>
+        <el-alert v-else-if="estat === 'login-ko-password'" :title="$t('Incorrect password')" type="error" @close="estat = ''"/>
+
+        <el-card style="border-radius: 40px;width: 40vw;height: 80vh;">
+            {{ $t('Administration Login') }}
+            <el-form ref="loginForm" label-position="top">
+                <el-form-item :label="$t('Username')" required>
+                    <el-input v-model="username"/>
+                </el-form-item>
+                <el-form-item :label="$t('Password')" required>
+                    <el-input
+                        v-model="password"
+                        type="password"
+                    />
+                </el-form-item>
+                <el-form-item>
+                    <el-button @click="login" color="var(--gaissa_green)">{{ $t('Login') }}</el-button>
+                </el-form-item>
+            </el-form>
+        </el-card>
     </div>
 </template>
 
 <script>
-
-import {ref} from 'vue';
-//import {setToken} from '../utils/utilFunctions';
-import { useRouter } from 'vue-router';
-
+import usuaris from '@/services/usuaris'
 export default {
-
     name: "AdminLogin",
-
     data() {
         return {
             msgErrorLogin: '',
-            loginForm: {
-                username: '',
-                password: '',
-                admin: false,
-            },
+            username: '',
+            password: '',
+            estat: '',
         };
     },
+    methods: {
+        async login() {
+            const response = await usuaris.login(this.username, this.password)
 
-    setup() {
-        const router = useRouter();
-
-        let username = ref('');
-        let password = ref('');
-        let admin = ref(false);
-
-        let msgErrorLogin = ref('');
-
-        function setCookie(cname, cvalue, exdays) {
-            const d = new Date();
-            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-            let expires = "expires="+d.toUTCString();
-            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-        }
-
-        async function doLogin() {
-            let data;
-            let host = 'http://deploy-env.eba-6a6b2amf.us-west-2.elasticbeanstalk.com/';
-
-            if (admin.value) {
-                msgErrorLogin.value = '';
-
-                let response = await fetch(host+"usuaris/login/admins/",  {
-                    method: "POST",
-                    headers: {
-                        'Accept': 'application/json',
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({username: username.value, password: password.value}),
-                })
-                let data = await response.json();
-                console.log("data: ", data);
-                if (data.non_field_errors) {
-                    let str = '';
-                    for (let string of data.non_field_errors) {
-                        str += string + '\n';
-                    }
-                    msgErrorLogin.value = str;
-                }
-                else if (data.token) {
-                    setCookie("Token", data.token, 1);
-                    //setToken(data.token);
-                    //redirect path --> /Review
-                    router.push('/Review');
-                }
+            // Si tenim status i és 201 --> Login correcte i tenim token.
+            if (response.status === 201) {
+                console.log("hola")
             }
+
+            // Si no, vol dir que rebem el error. Si status és 404 --> username no trobat.
+            else if (response.response.status === 404) {
+                this.estat = 'login-ko-username'
+            }
+
+            // Si no, vol dir que rebem error i si status és 400 --> La contrasenya no és correcta.
             else {
-                msgErrorLogin.value = '';
-
-                let response =  await fetch(host+"usuaris/login/organitzadors/",  {
-                    method: "POST",
-                    headers: {
-                        'Accept': 'application/json',
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({username: username.value, password: password.value}),
-                })
-                console.log("response: ", response);
-
-                let data = await response.json();
-                console.log("login org data: ", data);
-                if (data.non_field_errors) {
-                    let str = '';
-                    for (let string of data.non_field_errors) {
-                        str += string + '\n';
-                    }
-                    msgErrorLogin.value = str;
-                }
-                else if (data.token) {
-                    setCookie("Token", data.token, 1);
-                    //document.cookie = `${data.token}; max-age=${60000 * 30};`;
-                    //setToken(data.token);
-                    //redirect path  --> /edit
-                    router.push('/edit');
-                }
+                this.estat = 'login-ko-password'
             }
-
-        }
-
-        return {
-            username,
-            password,
-            admin,
-            msgErrorLogin,
-            doLogin
         }
     }
 }

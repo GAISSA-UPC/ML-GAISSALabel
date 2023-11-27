@@ -5,6 +5,7 @@ import { createApp } from 'vue'
 import elementplus from 'element-plus'
 import App from './App.vue'
 import router from './router'
+import store from './store'
 import {i18n} from './i18n.js'
 
 import '@fortawesome/fontawesome-free/css/all.css';
@@ -26,6 +27,9 @@ app.use(elementplus)
 
 // Router: Definició de les rutes de la single page application
 app.use(router)
+
+// Store: Variables que es conserven durant les vistes
+app.use(store)
 
 // i18n: Llibreria per traduir, fent servir $t('...') en les templates
 app.use(i18n)
