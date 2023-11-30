@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
+from rest_framework.exceptions import NotFound
 
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
@@ -239,7 +240,7 @@ def validacioLogin(data):
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
-        raise serializers.ValidationError("No existeix un usuari amb aquest username.")
+        raise NotFound("No existeix un usuari amb aquest username.")
 
     pwd_valid = check_password(password, user.password)
 
@@ -275,7 +276,7 @@ class LoginAdminSerializer(serializers.ModelSerializer):
         try:
             _ = user.administrador
         except:
-            raise serializers.ValidationError("No existeix un admininstrador amb aquest username.")
+            raise NotFound("No existeix un admininstrador amb aquest username.")
         self.context['user'] = user
 
         return data
