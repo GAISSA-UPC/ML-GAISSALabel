@@ -12,7 +12,8 @@
             <span class="text-large font-600 mr-3" style="color: var(--gaissa_green);font-weight: bold"> GAISSA Label </span>
         </div>
         <div>
-            <el-button color="var(--gaissa_green)" class="ml-2" @click="$router.push({name: 'Admin mètriques i informacions'})">{{ $t('Admin') }}</el-button>
+            <el-button v-if="$store.getters.isLogged" color="var(--gaissa_green)" class="ml-2" @click="$router.push({name: 'home'});$store.commit('logout')">{{ $t('Log out') }}</el-button>
+            <el-button v-else color="var(--gaissa_green)" class="ml-2" @click="$router.push({name: 'Admin login'})">{{ $t('Admin') }}</el-button>
         </div>
     </span>
 </template>

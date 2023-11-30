@@ -1,4 +1,5 @@
-/*import { createStore } from 'vuex'
+import { createStore } from 'vuex'
+import createPersistedState from "vuex-persistedstate";
 
 const store = createStore({
     state: {
@@ -14,10 +15,13 @@ const store = createStore({
     },
     mutations: {
         setToken(state, token) {
-            store.token = token
+            state.token = token
+        },
+        logout(state) {
+            state.token = null
         }
-    }
-})*/
+    },
+    plugins: [createPersistedState()],
+})
 
-const store = 3
 export default store
