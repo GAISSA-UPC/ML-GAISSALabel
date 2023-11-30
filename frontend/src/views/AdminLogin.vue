@@ -1,7 +1,7 @@
 <template>
     <div class="background">
         <el-alert v-if="estat === 'login-ko-buit'" :title="$t('Please, enter username and password')" type="error" @close="estat = ''"/>
-        <el-alert v-else-if="estat === 'login-ko-username'" :title="$t('There is not administrator with such username')" type="error" @close="estat = ''"/>
+        <el-alert v-else-if="estat === 'login-ko-username'" :title="$t('There is no administrator with such username')" type="error" @close="estat = ''"/>
         <el-alert v-else-if="estat === 'login-ko-password'" :title="$t('Incorrect password')" type="error" @close="estat = ''"/>
 
         <br>
