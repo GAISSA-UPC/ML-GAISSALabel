@@ -1,5 +1,11 @@
 <template>
     <div class="background">
+        <el-alert v-if="estat === 'login-ko-buit'" :title="$t('Please, enter username and password')" type="error" @close="estat = ''"/>
+        <el-alert v-else-if="estat === 'login-ko-username'" :title="$t('There is not administrator with such username')" type="error" @close="estat = ''"/>
+        <el-alert v-else-if="estat === 'login-ko-password'" :title="$t('Incorrect password')" type="error" @close="estat = ''"/>
+
+        <br>
+
         <div>
             <v-card
                 height="500"
@@ -33,8 +39,13 @@ export default {
         async login() {
             const response = await usuaris.login(this.username, this.password)
 
+            // Username i contrasenya han d'estar omplerts
+            if (!this.username || !this.password) {
+                this.estat = 'login-ko-buit'
+            }
+
             // Si tenim status i és 201 --> Login correcte i tenim token.
-            if (response.status === 201) {
+            else if (response.status === 201) {
                 this.$store.commit("setToken", "hola")
                 this.$router.push({name: 'Admin mètriques i informacions'})
             }
