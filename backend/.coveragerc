@@ -1,0 +1,9 @@
+[run]
+source=gaissalabel/,api/
+omit=
+    */env/*
+    */migrations/*
+    */test*
+    */__init__.py
+    */wsgi.py
+    */asgi.py
