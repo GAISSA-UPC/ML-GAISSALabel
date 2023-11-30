@@ -3,6 +3,11 @@ import '@/assets/common.scss'
 
 import { createApp } from 'vue'
 import elementplus from 'element-plus'
+import 'vuetify/styles'
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -22,8 +27,14 @@ library.add(fab);
 
 const app = createApp(App)
 
-// ElementPlus: Llibreria amb components per facilitar disseny de les templates
+// ElementPlus i Vuetify: Llibreries amb components per facilitar disseny de les templates
 app.use(elementplus)
+
+const vuetify = createVuetify({
+    components,
+    directives,
+})
+app.use(vuetify)
 
 // Router: Definició de les rutes de la single page application
 app.use(router)

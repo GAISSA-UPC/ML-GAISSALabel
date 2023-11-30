@@ -1,25 +1,20 @@
 <template>
     <div class="background">
-        <el-alert v-if="estat === 'login-ko-username'" :title="$t('The username does not match any of the existent user\'s one')" type="error" @close="estat = ''"/>
-        <el-alert v-else-if="estat === 'login-ko-password'" :title="$t('Incorrect password')" type="error" @close="estat = ''"/>
-
-        <el-card style="border-radius: 40px;width: 40vw;height: 80vh;">
-            {{ $t('Administration Login') }}
-            <el-form ref="loginForm" label-position="top">
-                <el-form-item :label="$t('Username')" required>
-                    <el-input v-model="username"/>
-                </el-form-item>
-                <el-form-item :label="$t('Password')" required>
-                    <el-input
-                        v-model="password"
-                        type="password"
-                    />
-                </el-form-item>
-                <el-form-item>
-                    <el-button @click="login" color="var(--gaissa_green)">{{ $t('Login') }}</el-button>
-                </el-form-item>
-            </el-form>
-        </el-card>
+        <div>
+            <v-card
+                height="500"
+                width="500"
+                color="#C0D8AF60"
+                style="border-radius: 40px;"
+            >
+                <v-card-title class="text-center mt-3">{{ $t('Administrator login') }}</v-card-title>
+                <v-card-text>
+                    <v-text-field v-model="username" :label="$t('Username')" required style="margin-top: 100px;"></v-text-field>
+                    <v-text-field @keydown.enter="login()" v-model="password" :label="$t('Password')" type="password" required style="margin-top: 30px;"></v-text-field>
+                    <el-button @click="login()" color="var(--gaissa_green)" class="mx-auto d-block mt-16" style="font-size: medium" >{{ $t('Login') }}</el-button>
+                </v-card-text>
+            </v-card>
+        </div>
     </div>
 </template>
 
@@ -29,7 +24,6 @@ export default {
     name: "AdminLogin",
     data() {
         return {
-            msgErrorLogin: '',
             username: '',
             password: '',
             estat: '',
@@ -41,7 +35,8 @@ export default {
 
             // Si tenim status i és 201 --> Login correcte i tenim token.
             if (response.status === 201) {
-                console.log("hola")
+                this.$store.commit("setToken", "hola")
+                this.$router.push({name: 'Admin mètriques i informacions'})
             }
 
             // Si no, vol dir que rebem el error. Si status és 404 --> username no trobat.
