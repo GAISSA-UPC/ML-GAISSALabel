@@ -48,6 +48,8 @@ class Metrica(models.Model):
     unitat = models.CharField(max_length=5, null=True, blank=True, verbose_name=_('Unitat'))
     influencia = models.CharField(choices=TINFLUENCIA, null=False, blank=False, max_length=5, verbose_name=_('Influència'))
     descripcio = models.CharField(max_length=1000, null=True, blank=True, verbose_name=_('Descripcio'))
+    calcul = models.CharField(max_length=1000, null=True, blank=True, verbose_name=_('Com es calcula'))
+    recomanacions = models.CharField(max_length=1000, null=True, blank=True, verbose_name=_('Recomanacions'))
 
     class Meta:
         verbose_name_plural = _('Mètriques')
