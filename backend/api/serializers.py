@@ -45,7 +45,7 @@ class MetricaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Metrica
-        fields = ('id', 'nom', 'fase', 'pes', 'unitat', 'influencia', 'descripcio', 'intervals')
+        fields = ('id', 'nom', 'fase', 'pes', 'unitat', 'influencia', 'descripcio', 'calcul', 'recomanacions', 'intervals')
 
 
 class QualificacioSerializer(serializers.ModelSerializer):
