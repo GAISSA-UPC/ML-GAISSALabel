@@ -54,7 +54,7 @@
                                 </i>
                                 <span class="el-upload-list__item-file-name" :title="file.name">{{ file.name }}</span>
                                 <el-select style="margin-left: 10px" v-model="file.tool" :placeholder="$t('Tool used')" :clearable="true">
-                                    <el-option key="hola" label="hola" value="hola" />
+                                    <el-option v-for="eina in eines" :key="eina.nom" :label="eina.nom" :value="eina.id" />
                                 </el-select>
                             </a>
                         </div>
@@ -90,6 +90,7 @@ import trainings from '@/services/trainings'
 import inferencies from '@/services/inferencies'
 import DialogNewModel from "@/components/DialogNewModel.vue";
 import * as XLSX from "xlsx";
+import eines from "@/services/eines";
 export default {
     name: "FileNewExperiment",
     props: {
@@ -103,6 +104,7 @@ export default {
             selectedModel: null,
             fileList: [],
             dialogNewModel: false,
+            eines: null,
         };
     },
     methods: {
@@ -117,7 +119,8 @@ export default {
             this.experiments = response.data
         },
         async refrescaEines() {
-
+            let response = await eines.list()
+            this.eines = response.data
         },
         async canviModel() {
             await this.refrescaExperiments()
@@ -170,6 +173,7 @@ export default {
     },
     async mounted() {
         await this.refrescaModels();
+        await this.refrescaEines();
     },
 };
 </script>
