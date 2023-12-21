@@ -10,7 +10,6 @@
             <el-form-item :label="$t('Model')">
                 <el-select
                     v-model="selectedModel"
-                    @change="canviModel"
                 >
                     <el-option
                         v-for="(model, i) in models" :key="i"
@@ -86,8 +85,6 @@
 
 <script>
 import models from '@/services/models'
-import trainings from '@/services/trainings'
-import inferencies from '@/services/inferencies'
 import DialogNewModel from "@/components/DialogNewModel.vue";
 import * as XLSX from "xlsx";
 import eines from "@/services/eines";
@@ -112,19 +109,9 @@ export default {
             const response = await models.list()
             this.models = response.data
         },
-        async refrescaExperiments() {
-            let response = null
-            if (this.fase === this.$t('Training')) response = await trainings.listByModel(this.selectedModel)
-            else response = await inferencies.listByModel(this.selectedModel)
-            this.experiments = response.data
-        },
         async refrescaEines() {
             let response = await eines.list()
             this.eines = response.data
-        },
-        async canviModel() {
-            await this.refrescaExperiments()
-            this.selectedExperiment = null
         },
         async gestioFitxers() {
             const info = await this.carregarFitxers()
@@ -143,7 +130,7 @@ export default {
                     reader.onload = (event) => {
                         const contingut = event.target.result;
                         // Agafem només la info de la primera fila
-                        const contingutFormatted = this.parseExcelJSON(contingut)[0];
+                        const contingutFormatted = this.transformarContingut(this.parseExcelJSON(contingut)[0], file.tool);
                         resolve(contingutFormatted);
                     };
                     reader.onerror = reject;
@@ -163,6 +150,21 @@ export default {
             const camps = data.Sheets[data.SheetNames[0]];
             const jsonData = XLSX.utils.sheet_to_json(camps);
             return jsonData;
+        },
+        transformarContingut(contingut, eina) {
+            const dadesEina = this.eines.find(e => e.id = eina)
+            const transformacionsMetriques = dadesEina.transformacionsMetriques
+            const transformacionsInformacions = dadesEina.transformacionsInformacions
+            console.log(dadesEina)
+            return this.substituirContingut(contingut, {...transformacionsMetriques, ...transformacionsInformacions})
+        },
+        substituirContingut(contingut, transformacio) {
+            let nouContingut = {}
+            for (const clau in contingut) {
+                if (transformacio[clau]) nouContingut[transformacio[clau]] = contingut[clau]
+                else nouContingut[clau] = contingut[clau]
+            }
+            return nouContingut
         },
         async modelCreat() {
             await this.refrescaModels()
