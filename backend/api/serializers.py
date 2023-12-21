@@ -7,8 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password
 
 from .models import Model, Entrenament, Inferencia, Metrica, Qualificacio, Interval, ResultatEntrenament, \
-    ResultatInferencia, InfoAddicional, ValorInfoEntrenament, ValorInfoInferencia, EinaCalcul, \
-    TransformacioMetrica, TransformacioInformacio, Administrador
+    ResultatInferencia, InfoAddicional, ValorInfoEntrenament, ValorInfoInferencia, EinaCalcul, Administrador
 
 
 class ModelSerializer(serializers.ModelSerializer):
@@ -218,18 +217,6 @@ class EinaCalculSerializer(serializers.ModelSerializer):
     class Meta:
         model = EinaCalcul
         fields = ('id', 'nom', 'descripcio', 'transformacionsMetriques', 'transformacionsInformacions')
-
-
-class TransformacioMetricaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TransformacioMetrica
-        fields = '__all__'
-
-
-class TransformacioInformacioSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TransformacioInformacio
-        fields = '__all__'
 
 
 # LOGIN
