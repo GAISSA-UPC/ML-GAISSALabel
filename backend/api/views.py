@@ -8,10 +8,11 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, Interval, EinaCalcul, \
-    Administrador
+    TransformacioMetrica, TransformacioInformacio, Administrador
 from .serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
     EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer, \
-    IntervalBasicSerializer, MetricaSerializer, EinaCalculSerializer, LoginAdminSerializer
+    IntervalBasicSerializer, MetricaSerializer, EinaCalculBasicSerializer, EinaCalculSerializer, \
+    TransformacioMetricaSerializer, TransformacioInformacioSerializer, LoginAdminSerializer
 
 from .rating_calculator_adapter import calculateRating
 from .label_generator_adapter import generateLabel
@@ -223,6 +224,42 @@ class EinesCalculView(viewsets.ModelViewSet):
     models = EinaCalcul
     queryset = EinaCalcul.objects.all()
     serializer_class = EinaCalculSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return EinaCalculBasicSerializer
+        else:
+            return EinaCalculSerializer
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        eina = self.get_object()
+        data = request.data.copy()
+
+        # Actualitzem les transformacions de mètriques (recuperem la instància i la modifiquem amb els valors donats)
+        transfMetriques = data.pop('transformacionsMetriques', None)
+        if transfMetriques:
+            for transfMetricaJSON in transfMetriques:
+                transfMetrica, created = TransformacioMetrica.objects.get_or_create(eina=eina, metrica__id=transfMetricaJSON['metrica'])
+                serializer = TransformacioMetricaSerializer(transfMetrica, data=transfMetricaJSON, partial=True)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+
+        # Actualitzem les transformacions de informacions (recuperem la instància i la modifiquem amb els valors donats)
+        transfInformacions = data.pop('transformacionsInformacions', None)
+        if transfInformacions:
+            for transfInfoJSON in transfInformacions:
+                transfInfo, created = TransformacioInformacio.objects.get_or_create(eina=eina, informacio__id=transfInfoJSON['informacio'])
+                serializer = TransformacioInformacioSerializer(transfInfo, data=transfInfoJSON, partial=True)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+
+        # Actualitzem l'eina (equivalent a super.update() amb petites modificacions)
+        serializer = self.get_serializer(eina, data=data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
 
 
 class LoginAdminView(mixins.CreateModelMixin, viewsets.GenericViewSet):
