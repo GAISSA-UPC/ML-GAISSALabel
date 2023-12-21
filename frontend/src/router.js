@@ -70,27 +70,32 @@ const router = createRouter({
     {
       path: '/admin/metriquesinfo',
       name: 'Admin mètriques i informacions',
-      component: AdminMetriquesInfo
+      component: AdminMetriquesInfo,
+      meta: { requiresAuth: true }
     },
     {
       path: '/admin/metriques/:id_metrica',
       name: 'Admin mètrica edit',
-      component: AdminMetrica
+      component: AdminMetrica,
+      meta: { requiresAuth: true }
     },
     {
       path: '/admin/metriques',
       name: 'Admin mètrica new',
-      component: AdminMetrica
+      component: AdminMetrica,
+      meta: { requiresAuth: true }
     },
     {
       path: '/admin/informacions/:id_informacio',
       name: 'Admin informació edit',
-      component: AdminInformacio
+      component: AdminInformacio,
+      meta: { requiresAuth: true }
     },
     {
       path: '/admin/informacions',
       name: 'Admin informació new',
-      component: AdminInformacio
+      component: AdminInformacio,
+      meta: { requiresAuth: true }
     },
     {
       path: '/admin/login',

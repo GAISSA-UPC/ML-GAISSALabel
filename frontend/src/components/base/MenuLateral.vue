@@ -42,7 +42,16 @@
                 {{ $t('Deployment') }}
             </el-menu-item>
         </el-sub-menu>
-        <el-menu-item index="3">
+        <el-sub-menu index="3" v-if="$store.getters.isLogged">
+            <template #title>
+                <font-awesome-icon :icon="['fas', 'screwdriver-wrench']" class="icon"/>
+                <span>{{ $t('Administrator') }}</span>
+            </template>
+            <el-menu-item index="Admin mètriques i informacions" @click="$router.push({name: 'Admin mètriques i informacions'})">
+                {{ $t('Metrics') }}
+            </el-menu-item>
+        </el-sub-menu>
+        <el-menu-item index="4">
             <font-awesome-icon :icon="['fas', 'people-group']" class="icon"/>
             <template #title>{{ $t('About') }}</template>
         </el-menu-item>
