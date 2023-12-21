@@ -206,13 +206,13 @@ class EinaCalculSerializer(serializers.ModelSerializer):
     def get_transformacionsMetriques(self, eina):
         transformacions = {}
         for transfMetrica in eina.transformacionsMetriques.all():
-            transformacions[transfMetrica.metrica.id] = transfMetrica.valor
+            transformacions[transfMetrica.valor] = transfMetrica.metrica.id
         return transformacions
 
     def get_transformacionsInformacions(self, eina):
         transformacions = {}
         for transfInfo in eina.transformacionsInformacions.all():
-            transformacions[transfInfo.informacio.id] = transfInfo.valor
+            transformacions[transfInfo.valor] = transfInfo.informacio.id
         return transformacions
 
     class Meta:
