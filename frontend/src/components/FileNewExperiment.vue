@@ -129,7 +129,6 @@ export default {
                     const reader = new FileReader();
                     reader.onload = (event) => {
                         const contingut = event.target.result;
-                        // Agafem només la info de la primera fila
                         const contingutFormatted = this.transformarContingut(this.parseExcelJSON(contingut)[0], file.tool);
                         resolve(contingutFormatted);
                     };
@@ -146,17 +145,62 @@ export default {
             }
         },
         parseExcelJSON(contingut) {
-            const data = XLSX.read(contingut, { type: 'binary' });
-            const camps = data.Sheets[data.SheetNames[0]];
-            const jsonData = XLSX.utils.sheet_to_json(camps);
-            return jsonData;
+            const workbook = XLSX.read(contingut, { type: 'binary' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+
+            const data = {};
+
+            Object.keys(worksheet).forEach((cell) => {
+                const col = cell.replace(/[0-9]/g, '');
+                const row = parseInt(cell.replace(/[A-Za-z]/g, ''), 10);
+
+                // Skip header row
+                if (row === 1) return;
+
+                const value = worksheet[cell].v;
+
+                if (!data[col]) {
+                    data[col] = {
+                        count: 0,
+                        total: 0,
+                        value: null,
+                    };
+                }
+
+                if (!isNaN(value)) {
+                    // If the value is a number, update the total and count
+                    data[col].total += parseFloat(value);
+                    data[col].count += 1;
+                } else if (data[col].count === 0) {
+                    // If the value is not a number and it's the first non-numeric value, set it as the value
+                    data[col].value = value;
+                }
+            });
+
+            const result = {};
+
+            Object.keys(data).forEach((key) => {
+                if (data[key].count > 0) {
+                    // If the column has numerical values, calculate the average
+                    result[key] = data[key].total / data[key].count;
+                } else {
+                    // If the column has only text, use the first non-numeric value
+                    result[key] = data[key].value;
+                }
+            });
+
+            // Assign the resulting JSON to a variable
+            const jsonResult = result;
+            return jsonResult
         },
         transformarContingut(contingut, eina) {
-            const dadesEina = this.eines.find(e => e.id = eina)
-            const transformacionsMetriques = dadesEina.transformacionsMetriques
-            const transformacionsInformacions = dadesEina.transformacionsInformacions
-            console.log(dadesEina)
-            return this.substituirContingut(contingut, {...transformacionsMetriques, ...transformacionsInformacions})
+            if (eina) {
+                const dadesEina = this.eines.find(e => e.id = eina)
+                const transformacionsMetriques = dadesEina.transformacionsMetriques
+                const transformacionsInformacions = dadesEina.transformacionsInformacions
+                return this.substituirContingut(contingut, {...transformacionsMetriques, ...transformacionsInformacions})
+            } else return contingut
         },
         substituirContingut(contingut, transformacio) {
             let nouContingut = {}
