@@ -129,7 +129,7 @@ export default {
                     const reader = new FileReader();
                     reader.onload = (event) => {
                         const contingut = event.target.result;
-                        const contingutFormatted = this.transformarContingut(this.parseExcelJSON(contingut)[0], file.tool);
+                        const contingutFormatted = this.transformarContingut(this.parseExcelJSON(contingut), file.tool);
                         resolve(contingutFormatted);
                     };
                     reader.onerror = reject;
@@ -151,6 +151,17 @@ export default {
 
             const data = {};
 
+            // Extract headers from the first row
+            const headers = [];
+            for (let cell in worksheet) {
+                const col = cell.replace(/[0-9]/g, '');
+                const row = parseInt(cell.replace(/[A-Za-z]/g, ''), 10);
+
+                if (row === 1) {
+                    headers.push(worksheet[cell].v);
+                }
+            }
+
             Object.keys(worksheet).forEach((cell) => {
                 const col = cell.replace(/[0-9]/g, '');
                 const row = parseInt(cell.replace(/[A-Za-z]/g, ''), 10);
@@ -160,8 +171,10 @@ export default {
 
                 const value = worksheet[cell].v;
 
-                if (!data[col]) {
-                    data[col] = {
+                const header = headers[col.charCodeAt(0) - 'A'.charCodeAt(0)];
+
+                if (!data[header]) {
+                    data[header] = {
                         count: 0,
                         total: 0,
                         value: null,
@@ -170,11 +183,11 @@ export default {
 
                 if (!isNaN(value)) {
                     // If the value is a number, update the total and count
-                    data[col].total += parseFloat(value);
-                    data[col].count += 1;
-                } else if (data[col].count === 0) {
+                    data[header].total += parseFloat(value);
+                    data[header].count += 1;
+                } else if (data[header].count === 0) {
                     // If the value is not a number and it's the first non-numeric value, set it as the value
-                    data[col].value = value;
+                    data[header].value = value;
                 }
             });
 
