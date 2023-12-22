@@ -36,9 +36,9 @@
         </el-table-column>
     </el-table><br><br><br>
 
-    <el-dialog v-model="dialogEsborrar" :title="titleDelete">
+    <el-dialog v-model="dialogEsborrar" :title="$t('Delete calculation tool')">
         <span>
-            <p>{{ $t("Are you sure you want to delete this calculation tool?") }}</p>
+            <p>{{ $t("Are you sure you want to delete ") }} <span style="font-weight: bold">{{ itemEsborrar.nom }}</span>?</p>
             <p>{{ $t("Be aware that if you do so, users would not be able to use this tool to generate energy labels anymore") }}.</p>
         </span>
         <template #footer>
@@ -100,11 +100,9 @@ export default {
             })*/
         },
         async deleteItem(item) {
-            /*
-            ToDO
-            await metriques.delete(item.id)
-            await this.refrescaMetriques()
-            this.dialogEsborrar = false*/
+            await eines.delete(item.id)
+            await this.refrescaEines()
+            this.dialogEsborrar = false
         }
     },
     async mounted() {
