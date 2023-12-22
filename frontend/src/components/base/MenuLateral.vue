@@ -45,7 +45,7 @@
         <el-sub-menu index="3" v-if="$store.getters.isLogged">
             <template #title>
                 <font-awesome-icon :icon="['fas', 'screwdriver-wrench']" class="icon"/>
-                <span>{{ $t('Administrator') }}</span>
+                <span>{{ $t('Administration') }}</span>
             </template>
             <el-menu-item index="Admin mètriques i informacions" @click="$router.push({name: 'Admin mètriques i informacions'})">
                 {{ $t('Metrics') }}
