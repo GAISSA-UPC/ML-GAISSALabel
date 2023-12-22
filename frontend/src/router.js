@@ -12,6 +12,7 @@ import InferenceLabelInfo from "@/views/InferenceLabelInfo.vue"
 import AdminMetriquesInfo from "@/views/AdminMetriquesInfo.vue"
 import AdminMetrica from "@/views/AdminMetrica.vue"
 import AdminInformacio from "@/views/AdminInformacio.vue"
+import AdminEines from "@/views/AdminEines.vue"
 import AdminLogin from "@/views/AdminLogin.vue"
 
 const router = createRouter({
@@ -95,6 +96,12 @@ const router = createRouter({
       path: '/admin/informacions',
       name: 'Admin informació new',
       component: AdminInformacio,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/admin/eines',
+      name: 'Admin eines',
+      component: AdminEines,
       meta: { requiresAuth: true }
     },
     {
