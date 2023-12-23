@@ -80,24 +80,19 @@ export default {
             )
         },
         handleEdit(index, row) {
-            /*
-            ToDo
             this.$router.push({
-                name: 'Admin mètrica edit',
-                params: {id_metrica: row.id}
-            })*/
+                name: 'Admin eina edit',
+                params: {id_eina: row.id}
+            })
         },
         handleDelete(index, row) {
             this.itemEsborrar = row
             this.dialogEsborrar = true
         },
         handleAfegir() {
-            /*
-            ToDo
             this.$router.push({
-                name: 'Admin mètrica new',
-                query: {'fase': fase}
-            })*/
+                name: 'Admin eina new'
+            })
         },
         async deleteItem(item) {
             await eines.delete(item.id)
