@@ -13,6 +13,7 @@ import AdminMetriquesInfo from "@/views/AdminMetriquesInfo.vue"
 import AdminMetrica from "@/views/AdminMetrica.vue"
 import AdminInformacio from "@/views/AdminInformacio.vue"
 import AdminEines from "@/views/AdminEines.vue"
+import AdminEina from "@/views/AdminEina.vue"
 import AdminLogin from "@/views/AdminLogin.vue"
 
 const router = createRouter({
@@ -99,9 +100,21 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/admin/eines',
+      path: '/admin/listeines',
       name: 'Admin eines',
       component: AdminEines,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/admin/eines/:id_eina',
+      name: 'Admin eina edit',
+      component: AdminEina,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/admin/eines',
+      name: 'Admin eina new new',
+      component: AdminEina,
       meta: { requiresAuth: true }
     },
     {
