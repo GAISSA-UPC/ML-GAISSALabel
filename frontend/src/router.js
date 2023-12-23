@@ -113,7 +113,7 @@ const router = createRouter({
     },
     {
       path: '/admin/eines',
-      name: 'Admin eina new new',
+      name: 'Admin eina new',
       component: AdminEina,
       meta: { requiresAuth: true }
     },
