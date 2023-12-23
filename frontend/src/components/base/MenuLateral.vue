@@ -50,6 +50,9 @@
             <el-menu-item index="Admin mètriques i informacions" @click="$router.push({name: 'Admin mètriques i informacions'})">
                 {{ $t('Metrics') }}
             </el-menu-item>
+            <el-menu-item index="Admin eines" @click="$router.push({name: 'Admin eines'})">
+                {{ $t('Calculation tools') }}
+            </el-menu-item>
         </el-sub-menu>
         <el-menu-item index="4">
             <font-awesome-icon :icon="['fas', 'people-group']" class="icon"/>
