@@ -45,10 +45,13 @@
         <el-sub-menu index="3" v-if="$store.getters.isLogged">
             <template #title>
                 <font-awesome-icon :icon="['fas', 'screwdriver-wrench']" class="icon"/>
-                <span>{{ $t('Administrator') }}</span>
+                <span>{{ $t('Administration') }}</span>
             </template>
             <el-menu-item index="Admin mètriques i informacions" @click="$router.push({name: 'Admin mètriques i informacions'})">
                 {{ $t('Metrics') }}
+            </el-menu-item>
+            <el-menu-item index="Admin eines" @click="$router.push({name: 'Admin eines'})">
+                {{ $t('Calculation tools') }}
             </el-menu-item>
         </el-sub-menu>
         <el-menu-item index="4">
