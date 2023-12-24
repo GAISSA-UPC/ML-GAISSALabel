@@ -237,19 +237,23 @@ class EinesCalculView(viewsets.ModelViewSet):
         data = request.data.copy()
 
         # Actualitzem les transformacions de mètriques (recuperem la instància i la modifiquem amb els valors donats)
+        TransformacioMetrica.objects.filter(eina=eina).delete()
         transfMetriques = data.pop('transformacionsMetriques', None)
         if transfMetriques:
             for transfMetricaJSON in transfMetriques:
-                transfMetrica, created = TransformacioMetrica.objects.get_or_create(eina=eina, metrica__id=transfMetricaJSON['metrica'])
+                metrica = get_object_or_404(Metrica, id=transfMetricaJSON['metrica'])
+                transfMetrica, created = TransformacioMetrica.objects.get_or_create(eina=eina, metrica=metrica)
                 serializer = TransformacioMetricaSerializer(transfMetrica, data=transfMetricaJSON, partial=True)
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
 
         # Actualitzem les transformacions de informacions (recuperem la instància i la modifiquem amb els valors donats)
+        TransformacioInformacio.objects.filter(eina=eina).delete()
         transfInformacions = data.pop('transformacionsInformacions', None)
         if transfInformacions:
             for transfInfoJSON in transfInformacions:
-                transfInfo, created = TransformacioInformacio.objects.get_or_create(eina=eina, informacio__id=transfInfoJSON['informacio'])
+                informacio = get_object_or_404(InfoAddicional, id=transfInfoJSON['informacio'])
+                transfInfo, created = TransformacioInformacio.objects.get_or_create(eina=eina, informacio=informacio)
                 serializer = TransformacioInformacioSerializer(transfInfo, data=transfInfoJSON, partial=True)
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
