@@ -8,6 +8,8 @@ output_file = 'emissions.csv'
 
 def query(endpoint, payload):
     response = requests.post(endpoint, json=payload)
+    print(payload)
+    print(response.status_code)
     return response.json()
 
 

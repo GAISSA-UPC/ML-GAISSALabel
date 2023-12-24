@@ -11,8 +11,6 @@ router.register(r'metriques', views.MetriquesView, basename='metriques')
 router.register(r'informacions', views.InfoAddicionalsView, basename='informacions_addicionals')
 router.register(r'calculadors/inferencia', views.CalculadorInferenciaView, basename='calculador_inferencia')
 router.register(r'eines', views.EinesCalculView, basename='eines_calcul')
-router.register(r'transformacions/metriques', views.TransformacioMetriquesView, basename='transformacions_metriques')
-router.register(r'transformacions/informacions', views.TransformacioInformacionsView, basename='transformacions_informacions')
 router.register(r'login/admins', views.LoginAdminView, basename='login_admins')
 
 urlpatterns = [

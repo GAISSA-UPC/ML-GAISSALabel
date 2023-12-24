@@ -83,6 +83,7 @@
                 <h3 style="font-weight: bold;margin-bottom: 6px">{{info.nom}}</h3>
                 <p align="justify">{{ descripcions[metrica] }}</p>
                 <CustomSlider :marks="marks[metrica]" :max="inf[metrica]" :values="ranges[metrica]" :color="info.color"/>
+                <p align="justify">{{ recomanacions[metrica] }}</p>
             </el-col>
             <el-col :span="3" align="middle">
                 <p :style="{ fontSize: '35px', fontWeight: 'bold', color: info.color }">{{ info.qualificacio }}</p>
@@ -118,6 +119,7 @@ export default {
             inf: {},
             ranges: {},
             descripcions: {},
+            recomanacions: {},
         };
     },
     methods: {
@@ -169,6 +171,7 @@ export default {
                 this.marks[metrica.id] = marks
                 this.inf[metrica.id] = toAdd
                 this.descripcions[metrica.id] = metrica.descripcio
+                this.recomanacions[metrica.id] = metrica.recomanacions
             })
         },
         getImageDecoded(img) {

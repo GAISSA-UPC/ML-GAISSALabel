@@ -27,6 +27,20 @@ library.add(fab);
 
 const app = createApp(App)
 
+router.beforeEach((to, from, next) => {
+    const isAuthenticated = store.getters.isLogged;
+
+    if (to.matched.some((record) => record.meta.requiresAuth)) {
+        if (!isAuthenticated) {
+            next({name: 'Admin login'}); // Redirect to login page if not authenticated
+        } else {
+            next();
+        }
+    } else {
+        next();
+    }
+});
+
 // ElementPlus i Vuetify: Llibreries amb components per facilitar disseny de les templates
 app.use(elementplus)
 

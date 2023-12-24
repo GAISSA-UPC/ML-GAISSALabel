@@ -48,6 +48,8 @@ class Metrica(models.Model):
     unitat = models.CharField(max_length=5, null=True, blank=True, verbose_name=_('Unitat'))
     influencia = models.CharField(choices=TINFLUENCIA, null=False, blank=False, max_length=5, verbose_name=_('Influència'))
     descripcio = models.CharField(max_length=1000, null=True, blank=True, verbose_name=_('Descripcio'))
+    calcul = models.CharField(max_length=1000, null=True, blank=True, verbose_name=_('Com es calcula'))
+    recomanacions = models.CharField(max_length=1000, null=True, blank=True, verbose_name=_('Recomanacions'))
 
     class Meta:
         verbose_name_plural = _('Mètriques')
@@ -121,7 +123,7 @@ class ValorInfoInferencia(models.Model):
 class EinaCalcul(models.Model):
     id = models.AutoField(primary_key=True, verbose_name=_('Identificador'))
     nom = models.CharField(max_length=100, null=False, blank=False, verbose_name=_('Nom'))
-    descripcio = models.CharField(max_length=1000, null=False, blank=False, verbose_name=_('Descripció'))
+    descripcio = models.CharField(max_length=1000, null=True, blank=True, verbose_name=_('Descripció'))
 
     class Meta:
         verbose_name_plural = _('Eines càlcul')
