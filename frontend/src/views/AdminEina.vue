@@ -29,7 +29,50 @@
         <br>
 
         <h2>{{ $t('Transformations') }}</h2><br>
-        <!-- ToDo -->
+        <el-row style="justify-content: space-between">
+            <el-col :span="11">
+                <h3>{{ $t('Training metrics') }}</h3><br>
+                <el-form-item
+                    v-for="(metricaTrain, i) in metriquesTraining" :key="i"
+                    :label="metricaTrain.id"
+                >
+                    <el-input
+                        v-model="metricaTrain.transformacio"
+                        :placeholder="metricaTrain.id"/>
+                </el-form-item>
+            </el-col>
+            <el-col :span="11">
+                <h3>{{ $t('Training information') }}</h3><br>
+                <el-form-item
+                    v-for="(infoTrain, i) in informacionsTraining" :key="i"
+                    :label="infoTrain.id"
+                >
+                    <el-input v-model="infoTrain.transformacio" :placeholder="infoTrain.id"/>
+                </el-form-item>
+            </el-col>
+        </el-row><br><br>
+        <el-row style="justify-content: space-between">
+            <el-col :span="11">
+                <h3>{{ $t('Inference metrics') }}</h3><br>
+                <el-form-item
+                    v-for="(metricaInf, i) in metriquesInference" :key="i"
+                    :label="metricaInf.id"
+                >
+                    <el-input
+                        v-model="metricaInf.transformacio"
+                        :placeholder="metricaInf.id"/>
+                </el-form-item>
+            </el-col>
+            <el-col :span="11">
+                <h3>{{ $t('Inference information') }}</h3><br>
+                <el-form-item
+                    v-for="(infoInf, i) in informacionsInference" :key="i"
+                    :label="infoInf.id"
+                >
+                    <el-input v-model="infoInf.transformacio" :placeholder="infoInf.id"/>
+                </el-form-item>
+            </el-col>
+        </el-row>
 
         <br><br>
         <el-button
@@ -52,21 +95,50 @@
 
 <script>
 import eines from "@/services/eines";
+import metriques from "@/services/metriques";
+import informacions from "@/services/informacions";
 export default {
     name: "AdminEina",
     data() {
         return {
             estat: this.$route.query.status,
             creacio: false,
-            eina: {},
+            eina: {
+                "transformacionsMetriques": [],
+                "transformacionsInformacions": [],
+            },
             editantNom: false,
+            metriquesTraining: null,
+            metriquesInference: null,
+            informacionsTraining: null,
+            informacionsInference: null,
         };
     },
     methods: {
         async refrescaEina(id=this.$route.params.id_eina) {
             const response = await eines.getById(id)
             this.eina = response.data
-            this.inicialitzaEina()
+            await this.inicialitzaEina()
+        },
+        async refrescaMetriques() {
+            const response = await metriques.listOrdered()
+            const metriquesData = response.data
+            metriquesData.forEach(metrica => {
+                const transf = this.eina.transformacionsMetriques.filter(transf => transf.metrica === metrica.id)[0]
+                if (transf) metrica.transformacio = transf.valor
+            })
+            this.metriquesTraining = metriquesData.filter(metrica => metrica.fase === 'T')
+            this.metriquesInference = metriquesData.filter(metrica => metrica.fase === 'I')
+        },
+        async refrescaInformacions() {
+            const response = await informacions.list()
+            const informacionsData = response.data
+            informacionsData.forEach(info => {
+                const transf = this.eina.transformacionsInformacions.filter(transf => transf.informacio === info.id)[0]
+                if (transf) info.transformacio = transf.valor
+            })
+            this.informacionsTraining = informacionsData.filter(info => info.fase === 'T')
+            this.informacionsInference = informacionsData.filter(info => info.fase === 'I')
         },
         async inicialitzaEina() {
             const transfMetriques = this.eina.transformacionsMetriques
@@ -76,15 +148,39 @@ export default {
                     "metrica": metrica
                 };
             });
-            const transfInformacionns = this.eina.transformacionsInformacions
-            this.eina.transformacionsInformacions = Object.entries(transfInformacionns).map(([valor, info]) => {
+            const transfInformacions = this.eina.transformacionsInformacions
+            this.eina.transformacionsInformacions = Object.entries(transfInformacions).map(([valor, info]) => {
                 return {
                     "valor": valor,
                     "informacio": info
                 };
             });
         },
+        passarTransformacions(metriques, informacions) {
+            this.eina.transformacionsMetriques = []
+            metriques.forEach(metrica => {
+                if (metrica.transformacio && metrica.transformacio !== '') {
+                    this.eina.transformacionsMetriques.push({
+                        "valor": metrica.transformacio,
+                        "metrica": metrica.id
+                    })
+                }
+            })
+            this.eina.transformacionsInformacions = []
+            informacions.forEach(info => {
+                if (info.transformacio && info.transformacio !== '') {
+                    this.eina.transformacionsInformacions.push({
+                        "valor": info.transformacio,
+                        "informacio": info.id
+                    })
+                }
+            })
+        },
         async crearEina() {
+            this.passarTransformacions(
+                this.metriquesTraining.concat(this.metriquesInference),
+                this.informacionsTraining.concat(this.informacionsInference)
+            )
             const response = await eines.create(this.eina)
             window.scrollTo({top:0})
             if (response.status === 201) {
@@ -99,6 +195,10 @@ export default {
             } else this.estat = 'eina-creada-ko'
         },
         async updateEina() {
+            this.passarTransformacions(
+                this.metriquesTraining.concat(this.metriquesInference),
+                this.informacionsTraining.concat(this.informacionsInference)
+            )
             const response = await eines.update(this.eina)
             if (response.status === 200) {
                 this.estat = 'eina-update-ok'
@@ -109,6 +209,8 @@ export default {
     async mounted() {
         this.creacio = !this.$route.params.id_eina       // Si hi ha paràmetre de id eina vol dir que estem editant, si no, creant.
         if (!this.creacio) await this.refrescaEina()
+        await this.refrescaMetriques()
+        await this.refrescaInformacions()
     },
 }
 </script>
