@@ -7,8 +7,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password
 
 from .models import Model, Entrenament, Inferencia, Metrica, Qualificacio, Interval, ResultatEntrenament, \
-    ResultatInferencia, InfoAddicional, ValorInfoEntrenament, ValorInfoInferencia, EinaCalcul, \
-    TransformacioMetrica, TransformacioInformacio, Administrador
+    ResultatInferencia, InfoAddicional, ValorInfoEntrenament, ValorInfoInferencia, EinaCalcul, TransformacioMetrica, \
+    TransformacioInformacio, Administrador
 
 
 class ModelSerializer(serializers.ModelSerializer):
@@ -199,7 +199,33 @@ class InfoAddicionalSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class EinaCalculSerializer(serializers.ModelSerializer):
+class EinaCalculBasicSerializer(serializers.ModelSerializer):
+    transformacionsMetriques = serializers.ListField(write_only=True, required=False)
+    transformacionsInformacions = serializers.ListField(write_only=True, required=False)
+
+    def create(self, validated_data):
+        transfMetriques_data = validated_data.pop('transformacionsMetriques', None)
+        transfInformacions_data = validated_data.pop('transformacionsInformacions', None)
+        eina = super().create(validated_data)
+
+        if transfMetriques_data:
+            for transfMetrica_data in transfMetriques_data:
+                metrica = transfMetrica_data.pop('metrica')
+                TransformacioMetrica.objects.create(eina=eina, metrica_id=metrica, **transfMetrica_data)
+
+        if transfInformacions_data:
+            for transfInfo_data in transfInformacions_data:
+                informacio = transfInfo_data.pop('informacio')
+                TransformacioInformacio.objects.create(eina=eina, informacio_id=informacio, **transfInfo_data)
+
+        return eina
+
+    class Meta:
+        model = EinaCalcul
+        fields = ('id', 'nom', 'descripcio', 'transformacionsMetriques', 'transformacionsInformacions')
+
+
+class EinaCalculSerializer(EinaCalculBasicSerializer):
     transformacionsMetriques = serializers.SerializerMethodField(read_only=True)
     transformacionsInformacions = serializers.SerializerMethodField(read_only=True)
 
