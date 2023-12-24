@@ -35,6 +35,9 @@
                 min="0"
             />
             <p style="margin-left: 10px">{{ metrica.unitat }}</p>
+            <el-alert v-if="metrica.calcul" type="info" show-icon :closable="false" style="margin-top: 10px">
+                <p>{{ metrica.calcul }}</p>
+            </el-alert>
         </el-form-item>
         <br>
 
