@@ -17,6 +17,7 @@ from .serializers import ModelSerializer, EntrenamentSerializer, InferenciaSeria
 from .rating_calculator_adapter import calculateRating
 from .label_generator_adapter import generateLabel
 from .efficiency_calculator_adapter import calculateEfficiency
+from . import adaptador_huggingface
 
 
 class ModelsView(viewsets.ModelViewSet):
@@ -270,3 +271,14 @@ class LoginAdminView(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Administrador.objects.all()
     serializer_class = LoginAdminSerializer
     models = Administrador
+
+
+class SincroView(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    def get_serializer_class(self):
+        pass
+
+    def create(self, request, *args, **kwargs):
+        adaptador_huggingface.sincro_huggingFace()
+        print(adaptador_huggingface.sincro_huggingFace())
+
+        return Response({}, status=status.HTTP_200_OK)

@@ -12,6 +12,7 @@ router.register(r'informacions', views.InfoAddicionalsView, basename='informacio
 router.register(r'calculadors/inferencia', views.CalculadorInferenciaView, basename='calculador_inferencia')
 router.register(r'eines', views.EinesCalculView, basename='eines_calcul')
 router.register(r'login/admins', views.LoginAdminView, basename='login_admins')
+router.register(r'sincronitzacio', views.SincroView, basename='sincro')
 
 urlpatterns = [
     path('', include(router.urls)),

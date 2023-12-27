@@ -22,8 +22,10 @@ etelemetry==0.3.0
 filelock==3.12.2
 fitz==0.0.1.dev2
 flatbuffers==23.5.26
+fsspec==2023.12.2
 future==0.18.3
 fuzzywuzzy==0.18.0
+gaissacalculator @ file:///Users/pduran/Desktop/TFG/Plugin/gaissacalculator
 gast==0.4.0
 google-auth==2.23.4
 google-auth-oauthlib==1.0.0
@@ -31,6 +33,7 @@ google-pasta==0.2.0
 grpcio==1.59.3
 h5py==3.10.0
 httplib2==0.22.0
+huggingface-hub==0.20.1
 idna==3.4
 importlib-metadata==6.8.0
 importlib-resources==6.0.0
@@ -56,6 +59,7 @@ prometheus-client==0.17.1
 protobuf==4.25.1
 prov==2.0.0
 psutil==5.9.6
+psycopg2-binary==2.9.9
 py-cpuinfo==9.0.0
 pyasn1==0.5.0
 pyasn1-modules==0.3.0
@@ -84,6 +88,7 @@ tensorflow==2.13.1
 tensorflow-estimator==2.13.0
 tensorflow-io-gcs-filesystem==0.34.0
 termcolor==2.3.0
+tqdm==4.66.1
 traits==6.3.2
 types-python-dateutil==2.8.19.14
 typing_extensions==4.5.0
