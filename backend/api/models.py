@@ -76,13 +76,13 @@ class Interval(models.Model):
 
 
 class ResultatEntrenament(models.Model):
-    valor = models.FloatField(null=False, blank=False, verbose_name=_('Valor'))
+    valor = models.FloatField(null=True, blank=True, verbose_name=_('Valor'))
     entrenament = models.ForeignKey(Entrenament, related_name='resultatsEntrenament', null=False, on_delete=models.CASCADE, verbose_name=_('Entrenament'))
     metrica = models.ForeignKey(Metrica, related_name='resultatsEntrenament', null=False, on_delete=models.CASCADE, verbose_name=_('Mètrica'))
 
 
 class ResultatInferencia(models.Model):
-    valor = models.FloatField(null=False, blank=False, verbose_name=_('Valor'))
+    valor = models.FloatField(null=True, blank=True, verbose_name=_('Valor'))
     inferencia = models.ForeignKey(Inferencia, related_name='resultatsInferencia', null=False, on_delete=models.CASCADE, verbose_name=_('Inferència'))
     metrica = models.ForeignKey(Metrica, related_name='resultatsInferencia', null=False, on_delete=models.CASCADE, verbose_name=_('Mètrica'))
 
