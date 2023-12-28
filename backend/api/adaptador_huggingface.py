@@ -8,6 +8,7 @@ import yaml
 
 from scipy import stats
 from requests.exceptions import JSONDecodeError
+from datetime import datetime
 
 from concurrent.futures import ThreadPoolExecutor
 from huggingface_hub import HfApi
@@ -211,6 +212,7 @@ def find_datasets_size(datasets):
 
     for dataset in datasets:
         try:
+            api = HfApi()
             datasets_size += api.dataset_info(dataset).cardData["dataset_info"]["dataset_size"]
         except:
             pass
@@ -864,13 +866,31 @@ def replace_none(obj):
         return obj
 
 
+def crear_model(model_info):
+    model = Model.objects.create(
+        nom=model_info['modelName'],
+    )
+
+    entrenament = Entrenament.objects.create(
+        model=model,
+    )
+
+    if model_info['created_at']:
+        dataCreacio = datetime.strptime(model_info['created_at'].strftime('%Y-%m-%d'), '%Y-%m-%d')
+        model.dataCreacio = dataCreacio
+        model.save()
+        entrenament.dataRegistre = dataCreacio
+        entrenament.save()
+
+
 def modify_database(df):
     for model_json in df:
         try:
             model = Model.objects.get(nom=model_json['modelName'])
-            print(model)
+            print('[SINCRO HF] ' + model_json['modelName'] + ' updated')
         except Model.DoesNotExist:
-            print("No existeix!")
+            crear_model(model_json)
+            print('[SINCRO HF] ' + model_json['modelName'] + ' created')
 
 
 
@@ -879,13 +899,16 @@ def modify_database(df):
 def sincro_huggingFace():
     try:
         print('[SINCRO HF] starting HF sincro')
-        df_extracted = extraction()
+        """df_extracted = extraction()
         print('[SINCRO HF] extraction done')
         df_preprocessed_raw = preprocessing_rawData(df_extracted)
         print('[SINCRO HF] pre raw done')
         df_final = preprocessing_co2(df_preprocessed_raw)
         print('[SINCRO HF] pre co2 done')
-        df_final.to_csv('./hf_sincro.csv', index=False)
+        df_final.to_csv('./hf_sincro.csv', index=False)"""
+
+        # ToDo: Delete després de fer proves!!!
+        df_final = pd.read_csv('./hf_sincro.csv')
 
         df_json_records = df_final.to_json(orient='records')
         json_list = pd.read_json(df_json_records, orient='records').to_dict(orient='records')
