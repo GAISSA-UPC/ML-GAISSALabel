@@ -96,6 +96,6 @@ def calculate_ratings(metrics, boundaries, weights, meanings, rating_mode='mean'
 
     # Transforma els ratings de les mètriques (0, 1, ...) al valor real del resultat (A, B, ...)
     metrics_to_rating = (
-        {metric: meanings[value] for metric, value in metrics_to_rating.items()}
+        {metric: meanings[value] if value is not np.nan else None for metric, value in metrics_to_rating.items()}
     )
     return calculate_compound_rating(ratings, weights, meanings, rating_mode), metrics_to_rating
