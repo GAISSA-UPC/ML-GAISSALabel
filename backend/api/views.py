@@ -61,15 +61,11 @@ class EntrenamentsView(viewsets.ModelViewSet):
         # Aconseguir informació de les mètriques (de training i que tinguin pes)
         metriques = Metrica.objects.filter(fase=Metrica.TRAIN).order_by('-pes').exclude(pes=0)
 
-        print("starting")
-
         # Calcular ratings (amb adaptador)
         qualifFinal, qualifMetriques = calculateRating(resultats_entrenament, metriques)
-        print("rating ok")
 
         # Generar etiqueta i resultats (amb adaptador)
         label, resultatsResponse = generateLabel(qualifFinal, qualifMetriques, resultats_entrenament, entrenament.model, entrenament.id, 'Training')
-        print("label ok")
 
         # Preparar les dades que es responen al client
         response_data = {
@@ -83,8 +79,6 @@ class EntrenamentsView(viewsets.ModelViewSet):
         # Afegim l'id d'esdeveniment del paràmetre a les dades de la request abans de crear
         data = request.data.copy()
         data['model'] = model_id
-
-        print(data)
 
         # Equivalent super().create, però amb "data"
         serializer = self.get_serializer(data=data)

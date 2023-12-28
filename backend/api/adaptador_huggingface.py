@@ -9,13 +9,14 @@ import yaml
 from scipy import stats
 from requests.exceptions import JSONDecodeError
 from datetime import datetime
+from django.utils import timezone
 
 from concurrent.futures import ThreadPoolExecutor
 from huggingface_hub import HfApi
 from huggingface_hub import ModelCard
 from huggingface_hub import hf_hub_url, get_hf_file_metadata
 
-from .models import Model, Entrenament
+from .models import Model, Entrenament, Metrica, InfoAddicional, ResultatEntrenament, ValorInfoEntrenament
 
 
 ########## PRIMERA PART: EXTRACTION FROM HUGGING FACE
@@ -869,6 +870,7 @@ def replace_none(obj):
 def crear_model(model_info):
     model = Model.objects.create(
         nom=model_info['modelName'],
+        autor=model_info['modelAuthor'],
     )
 
     entrenament = Entrenament.objects.create(
@@ -882,11 +884,19 @@ def crear_model(model_info):
         entrenament.dataRegistre = dataCreacio
         entrenament.save()
 
+    metriques = Metrica.objects.filter(fase='T')
+    for metrica in metriques:
+        ResultatEntrenament.objects.create(
+            entrenament=entrenament,
+            metrica=metrica,
+            valor=model_info[metrica.id]
+        )
+
 
 def modify_database(df):
     for model_json in df:
         try:
-            model = Model.objects.get(nom=model_json['modelName'])
+            model = Model.objects.get(nom=model_json['modelName'], autor=model_json['modelAuthor'])
             print('[SINCRO HF] ' + model_json['modelName'] + ' updated')
         except Model.DoesNotExist:
             crear_model(model_json)
