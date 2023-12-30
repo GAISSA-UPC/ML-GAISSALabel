@@ -867,6 +867,25 @@ def replace_none(obj):
         return obj
 
 
+def inicialitzar_entrenament(entrenament, model_info):
+    metriques = Metrica.objects.filter(fase='T')
+    for metrica in metriques:
+        ResultatEntrenament.objects.create(
+            entrenament=entrenament,
+            metrica=metrica,
+            valor=model_info[metrica.id]
+        )
+
+    informacions = InfoAddicional.objects.filter(fase='T')
+    for informacio in informacions:
+        if informacio.id in model_info.keys() and model_info[informacio.id]:
+            ValorInfoEntrenament.objects.create(
+                entrenament=entrenament,
+                infoAddicional=informacio,
+                valor=model_info[informacio.id]
+            )
+
+
 def crear_model(model_info):
     model = Model.objects.create(
         nom=model_info['modelName'],
@@ -877,35 +896,64 @@ def crear_model(model_info):
         model=model,
     )
 
-    if model_info['created_at']:
+    if 'created_at' in model_info.keys() and model_info['created_at']:
         dataCreacio = datetime.strptime(model_info['created_at'].strftime('%Y-%m-%d'), '%Y-%m-%d')
         model.dataCreacio = dataCreacio
         model.save()
         entrenament.dataRegistre = dataCreacio
         entrenament.save()
 
-    metriques = Metrica.objects.filter(fase='T')
-    for metrica in metriques:
-        ResultatEntrenament.objects.create(
-            entrenament=entrenament,
-            metrica=metrica,
-            valor=model_info[metrica.id]
+    inicialitzar_entrenament(entrenament, model_info)
+
+
+def actualitzar_model(model, model_info):
+    # Si tenim data de creació i trobem un entrenament amb aquella data, actualitzarem les dades de l'entrenament.
+    dataCreacio = None
+    if 'created_at' in model_info.keys() and model_info['created_at']:
+        dataCreacio = datetime.strptime(model_info['created_at'].strftime('%Y-%m-%d'), '%Y-%m-%d')
+
+    try:
+        entrenament = Entrenament.objects.get(model=model, dataRegistre=dataCreacio)
+        metriques = Metrica.objects.filter(fase='T')
+        for metrica in metriques:
+            # Fem get_or_create per si hi ha noves mètriques
+            resultat, created = ResultatEntrenament.objects.get_or_create(entrenament=entrenament, metrica=metrica)
+            resultat.valor = model_info[metrica.id]
+            resultat.save()
+
+        informacions = InfoAddicional.objects.filter(fase='T')
+        for informacio in informacions:
+            if informacio.id in model_info.keys() and model_info[informacio.id]:
+                info, created = ValorInfoEntrenament.objects.get_or_create(entrenament=entrenament, infoAddicional=informacio)
+                info.valor = model_info[informacio.id]
+                info.save()
+
+    # En cas que no hi hagi data o no coincideixi amb cap entrenament del model, en crearem un de nou.
+    except Entrenament.DoesNotExist:
+        entrenament = Entrenament.objects.create(
+            model=model,
         )
+        if dataCreacio:
+            entrenament.dataRegistre = dataCreacio
+            entrenament.save()
+        inicialitzar_entrenament(entrenament, model_info)
 
 
 def modify_database(df):
+    created = []
     for model_json in df:
         try:
             model = Model.objects.get(nom=model_json['modelName'], autor=model_json['modelAuthor'])
+            actualitzar_model(model, model_json)
             print('[SINCRO HF] ' + model_json['modelName'] + ' updated')
         except Model.DoesNotExist:
             crear_model(model_json)
+            created.append(model_json['modelName'])
             print('[SINCRO HF] ' + model_json['modelName'] + ' created')
-
+    return created
 
 
 ########## MAIN
-
 def sincro_huggingFace():
     try:
         print('[SINCRO HF] starting HF sincro')
@@ -924,8 +972,7 @@ def sincro_huggingFace():
         json_list = pd.read_json(df_json_records, orient='records').to_dict(orient='records')
         json_list_replaced = replace_none(json_list)
 
-        modify_database(json_list_replaced)
-        return 'OK'
+        return modify_database(json_list_replaced)
     except Exception as e:
         print('[SINCRO HF] ' + str(e))
         return 'KO'

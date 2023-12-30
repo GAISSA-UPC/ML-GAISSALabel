@@ -278,11 +278,14 @@ class LoginAdminView(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
 
 class SincroView(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    permission_classes = [permissions.IsAdmin]
+
     def get_serializer_class(self):
         pass
 
     def create(self, request, *args, **kwargs):
-        adaptador_huggingface.sincro_huggingFace()
-        print(adaptador_huggingface.sincro_huggingFace())
-
-        return Response({}, status=status.HTTP_200_OK)
+        resposta = adaptador_huggingface.sincro_huggingFace()
+        if resposta == 'KO':
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'Created models': resposta}, status=status.HTTP_200_OK)
