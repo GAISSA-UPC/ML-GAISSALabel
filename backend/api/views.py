@@ -19,7 +19,7 @@ from .label_generator_adapter import generateLabel
 from .efficiency_calculator_adapter import calculateEfficiency
 
 
-class ModelsView(viewsets.ModelViewSet):
+class ModelsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Model.objects.all()
     serializer_class = ModelSerializer
     models = Model
@@ -33,7 +33,7 @@ class ModelsView(viewsets.ModelViewSet):
     ordering_fields = ['nom', 'dataCreacio']
 
 
-class EntrenamentsView(viewsets.ModelViewSet):
+class EntrenamentsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     models = Entrenament
     serializer_class = EntrenamentSerializer
 
@@ -87,7 +87,7 @@ class EntrenamentsView(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-class InferenciesView(viewsets.ModelViewSet):
+class InferenciesView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     models = Inferencia
     serializer_class = InferenciaSerializer
 
