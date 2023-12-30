@@ -3,7 +3,8 @@
     <h2>{{ $t("Create label for dataset model") }}</h2><br>
     <div>
         <el-form label-position="top">
-            <el-form-item :label="$t('Model')">
+            <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Model") }}</h3><br>
+            <el-form-item>
                 <el-select
                     v-model="selectedModel"
                     @change="canviModel"
@@ -14,9 +15,9 @@
                         :label="model.nom"
                     />
                 </el-select>
-            </el-form-item>
+            </el-form-item><br>
+            <h3 style="color: var(--gaissa_green);font-weight: bold" v-show="selectedModel != null">{{ fase }}</h3><br>
             <el-form-item
-                :label="fase"
                 v-show="selectedModel != null"
             >
                 <el-select
@@ -28,7 +29,7 @@
                         :label="formatData(experiment.dataRegistre)"
                     />
                 </el-select>
-            </el-form-item>
+            </el-form-item><br>
             <el-button
                 @click="mostrarEtiqueta"
                 color="var(--gaissa_green)"

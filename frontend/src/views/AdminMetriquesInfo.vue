@@ -3,7 +3,7 @@
     <h2 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Training") }}</h2><br>
     <el-row justify="space-between">
         <el-col :span="6">
-            <h3>{{ $t("Metrics") }}</h3><br>
+            <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Metrics") }}</h3><br>
         </el-col>
         <el-col :span="2">
             <el-button
@@ -43,7 +43,7 @@
 
     <el-row justify="space-between">
         <el-col :span="6">
-            <h3>{{ $t("Additional information") }}</h3><br>
+            <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Additional information") }}</h3><br>
         </el-col>
         <el-col :span="2">
             <el-button
@@ -85,7 +85,7 @@
     <h2 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Inference") }}</h2><br>
     <el-row justify="space-between">
         <el-col :span="6">
-            <h3>{{ $t("Metrics") }}</h3><br>
+            <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Metrics") }}</h3><br>
         </el-col>
         <el-col :span="2">
             <el-button
@@ -125,7 +125,7 @@
 
     <el-row justify="space-between">
         <el-col :span="6">
-            <h3>{{ $t("Additional information") }}</h3><br>
+            <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Additional information") }}</h3><br>
         </el-col>
         <el-col :span="2">
             <el-button

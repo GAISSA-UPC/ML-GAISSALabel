@@ -941,32 +941,33 @@ def actualitzar_model(model, model_info):
 
 def modify_database(df):
     created = []
+    updated = []
     for model_json in df:
         try:
             model = Model.objects.get(nom=model_json['modelName'], autor=model_json['modelAuthor'])
             actualitzar_model(model, model_json)
+            updated.append(model_json['modelName'])
             print('[SINCRO HF] ' + model_json['modelName'] + ' updated')
         except Model.DoesNotExist:
             crear_model(model_json)
             created.append(model_json['modelName'])
             print('[SINCRO HF] ' + model_json['modelName'] + ' created')
-    return created
+    return created, updated
 
 
 ########## MAIN
 def sincro_huggingFace():
     try:
-        print('[SINCRO HF] starting HF sincro')
-        """df_extracted = extraction()
+        df_extracted = extraction()
         print('[SINCRO HF] extraction done')
         df_preprocessed_raw = preprocessing_rawData(df_extracted)
         print('[SINCRO HF] pre raw done')
         df_final = preprocessing_co2(df_preprocessed_raw)
         print('[SINCRO HF] pre co2 done')
-        df_final.to_csv('./hf_sincro.csv', index=False)"""
+        df_final.to_csv('./hf_sincro.csv', index=False)
 
         # ToDo: Delete després de fer proves!!!
-        df_final = pd.read_csv('./hf_sincro.csv')
+        #df_final = pd.read_csv('./hf_sincro.csv')
 
         df_json_records = df_final.to_json(orient='records')
         json_list = pd.read_json(df_json_records, orient='records').to_dict(orient='records')
@@ -975,4 +976,4 @@ def sincro_huggingFace():
         return modify_database(json_list_replaced)
     except Exception as e:
         print('[SINCRO HF] ' + str(e))
-        return 'KO'
+        return 'KO', 'KO'
