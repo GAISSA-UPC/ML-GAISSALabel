@@ -14,12 +14,13 @@ from .serializers import ModelSerializer, EntrenamentSerializer, InferenciaSeria
     IntervalBasicSerializer, MetricaSerializer, EinaCalculBasicSerializer, EinaCalculSerializer, \
     TransformacioMetricaSerializer, TransformacioInformacioSerializer, LoginAdminSerializer
 
+from . import permissions
 from .rating_calculator_adapter import calculateRating
 from .label_generator_adapter import generateLabel
 from .efficiency_calculator_adapter import calculateEfficiency
 
 
-class ModelsView(viewsets.ModelViewSet):
+class ModelsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Model.objects.all()
     serializer_class = ModelSerializer
     models = Model
@@ -33,7 +34,7 @@ class ModelsView(viewsets.ModelViewSet):
     ordering_fields = ['nom', 'dataCreacio']
 
 
-class EntrenamentsView(viewsets.ModelViewSet):
+class EntrenamentsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     models = Entrenament
     serializer_class = EntrenamentSerializer
 
@@ -87,7 +88,7 @@ class EntrenamentsView(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-class InferenciesView(viewsets.ModelViewSet):
+class InferenciesView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     models = Inferencia
     serializer_class = InferenciaSerializer
 
@@ -153,6 +154,7 @@ class QualificacionsView(mixins.ListModelMixin, viewsets.GenericViewSet):
 class MetriquesView(viewsets.ModelViewSet):
     models = Metrica
     queryset = Metrica.objects.all()
+    permission_classes = [permissions.IsAdminEditOthersRead]
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = {
@@ -196,6 +198,7 @@ class InfoAddicionalsView(viewsets.ModelViewSet):
     model = InfoAddicional
     serializer_class = InfoAddicionalSerializer
     queryset = InfoAddicional.objects.all()
+    permission_classes = [permissions.IsAdminEditOthersRead]
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = {
@@ -224,6 +227,7 @@ class EinesCalculView(viewsets.ModelViewSet):
     models = EinaCalcul
     queryset = EinaCalcul.objects.all()
     serializer_class = EinaCalculSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
 
     def get_serializer_class(self):
         if self.action == 'create':
