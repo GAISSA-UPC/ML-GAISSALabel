@@ -1,16 +1,15 @@
 <template>
     <h1>{{ $t("Energy label for inference") }}</h1><br>
+    <h2>{{ $t("Register a new inference") }}</h2><br>
 
     <el-form label-position="top">
-        <el-form-item
-            :label="$t('Endpoint where the model is deployed')"
-        >
+        <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Endpoint where the model is deployed") }}</h3><br>
+        <el-form-item>
             <el-input v-model="endpoint"/>
         </el-form-item>
         <br>
-        <el-form-item
-            :label="$t('Input for the inference')"
-        >
+        <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Input for the inference") }}</h3><br>
+        <el-form-item>
             <el-input v-model="input"/>
         </el-form-item>
         <br>

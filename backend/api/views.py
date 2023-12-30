@@ -284,8 +284,8 @@ class SincroView(mixins.CreateModelMixin, viewsets.GenericViewSet):
         pass
 
     def create(self, request, *args, **kwargs):
-        resposta = adaptador_huggingface.sincro_huggingFace()
-        if resposta == 'KO':
+        creats, actualitzats = adaptador_huggingface.sincro_huggingFace()
+        if creats == 'KO':
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'Created models': resposta}, status=status.HTTP_200_OK)
+            return Response({'Created models': creats, 'Updated models': actualitzats}, status=status.HTTP_200_OK)

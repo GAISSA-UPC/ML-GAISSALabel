@@ -14,6 +14,7 @@ import AdminMetrica from "@/views/AdminMetrica.vue"
 import AdminInformacio from "@/views/AdminInformacio.vue"
 import AdminEines from "@/views/AdminEines.vue"
 import AdminEina from "@/views/AdminEina.vue"
+import AdminSincro from "@/views/AdminSincro.vue"
 import AdminLogin from "@/views/AdminLogin.vue"
 
 const router = createRouter({
@@ -115,6 +116,12 @@ const router = createRouter({
       path: '/admin/eines',
       name: 'Admin eina new',
       component: AdminEina,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/admin/sincronitzacio',
+      name: 'Admin sincronitzacio',
+      component: AdminSincro,
       meta: { requiresAuth: true }
     },
     {
