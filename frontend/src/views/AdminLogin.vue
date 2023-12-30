@@ -46,7 +46,7 @@ export default {
 
             // Si tenim status i és 201 --> Login correcte i tenim token.
             else if (response.status === 201) {
-                this.$store.commit("setToken", "hola")
+                this.$store.commit("setToken", response.data['token'])
                 this.$router.push({name: 'Admin mètriques i informacions'})
             }
 
