@@ -156,8 +156,7 @@ CORS_ALLOWED_ORIGINS = [
 
 # LOGS
 
-# settings.py
-
+"""
 # Configure the root logger to handle INFO-level messages and above
 logging.basicConfig(level=logging.INFO)
 
@@ -192,7 +191,7 @@ sys.stdout = StreamToLogger(logger)
 
 # Now, both print statements and log messages will be written to the log file
 
-
+"""
 
 """
 # Configure the root logger to handle INFO-level messages and above
@@ -213,7 +212,7 @@ logging.getLogger('').addHandler(file_handler)
 
 # Redirect stdout to the logging handler
 sys.stdout = file_handler.stream"""
-
+"""
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -242,5 +241,5 @@ LOGGING = {
             'propagate': True,
         },
     },
-}
+}"""
 
