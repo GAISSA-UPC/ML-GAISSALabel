@@ -7,7 +7,8 @@
 
     <div>
         <el-form label-position="top">
-            <el-form-item :label="$t('Model')">
+            <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Model") }}</h3><br>
+            <el-form-item>
                 <el-select
                     v-model="selectedModel"
                 >
@@ -24,10 +25,9 @@
                 >
                     <font-awesome-icon :icon="['fas', 'plus']" />
                 </el-button>
-            </el-form-item>
-            <el-form-item
-                :label="$t('Files')"
-            >
+            </el-form-item><br>
+            <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Files") }}</h3><br>
+            <el-form-item>
                 <el-upload
                     v-model:file-list="fileList"
                     multiple

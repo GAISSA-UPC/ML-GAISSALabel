@@ -3,10 +3,11 @@
     <h2>{{ $t("Register a new") }} {{ fase }}</h2><br>
 
     <el-alert v-if="estat === 'modelCreat-ok'" :title="$t('Model registered correctly')" type="success" @close="estat = ''"/>
-    <el-alert v-else-if="estat === 'modelCreat-ko'" :title="$t('There was an error while creating the model')" type="success" @close="estat = ''"/>
+    <el-alert v-else-if="estat === 'modelCreat-ko'" :title="$t('There was an error while creating the model')" type="error" @close="estat = ''"/>
 
     <el-form label-position="top">
-        <el-form-item :label="$t('Model')">
+        <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Model") }}</h3><br>
+        <el-form-item>
             <el-select v-model="selectedModel">
                 <el-option
                     v-for="(model, i) in models" :key="i"
@@ -24,7 +25,7 @@
         </el-form-item>
         <br>
 
-        <h3>{{ $t("Metrics") }}</h3><br>
+        <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Metrics") }}</h3><br>
         <el-form-item
             v-for="(metrica, i) in metriques" :key="i"
             :label="metrica.nom"
@@ -41,7 +42,7 @@
         </el-form-item>
         <br>
 
-        <h3>{{ $t("Additional information") }}</h3><br>
+        <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Additional information") }}</h3><br>
         <el-form-item
             v-for="(infoAdd, i) in informacions" :key="i"
             :label="infoAdd.nom"
