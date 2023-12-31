@@ -455,7 +455,6 @@ def extraction():
         cardData=True,
         full=True,
         fetch_config=True,
-        limit=5000,
         sort='last_modified',
         direction=-1,
     ))
@@ -472,9 +471,6 @@ def extraction():
     # Ens quedem només amb els nous
     cutoff_date = Configuracio.objects.get(id=1).ultimaSincronitzacio
     models_to_process = [(index, model_info) for index, model_info in models if model_info.last_modified >= cutoff_date]
-    print("Aquñiiiii")
-    print(len(models_to_process))
-    print(len(models))
 
     # Use ThreadPoolExecutor for parallel processing
     with ThreadPoolExecutor(max_workers=num_threads) as executor:
@@ -821,14 +817,14 @@ def create_performance_metrics(row):
 def preprocessing_co2(df):
     df = read_df_processed(df)
 
-    # df_clean = read_df_clean()
+    df_clean = read_df_clean()
 
     df = df[df['co2_reported'] == True]
 
     wanted_columns = [col for col in df.columns if not col.startswith('is_')]
     df = df[wanted_columns]
 
-    # df = merge_dataFrames(df, df_clean)
+    df = merge_dataFrames(df, df_clean)
 
     df['domain'] = df['domain'].fillna('Not Specified')
     df['training_type'] = df['training_type'].fillna('Not Specified')
@@ -992,8 +988,6 @@ def sincro_huggingFace():
 
         configuracio = Configuracio.objects.get(id=1)
         configuracio.ultimaSincronitzacio = datetime.now(pytz.timezone('Europe/Madrid'))
-        print(configuracio)
-        print(configuracio.ultimaSincronitzacio)
         configuracio.save()
 
         return created, updated
