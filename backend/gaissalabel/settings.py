@@ -154,7 +154,6 @@ CORS_ALLOWED_ORIGINS = [
 
 # LOGS
 
-"""
 # Configure the root logger to handle INFO-level messages and above
 logging.basicConfig(level=logging.INFO)
 
@@ -187,30 +186,7 @@ logger = logging.getLogger('')
 logger.addHandler(file_handler)
 sys.stdout = StreamToLogger(logger)
 
-# Now, both print statements and log messages will be written to the log file
 
-"""
-
-"""
-# Configure the root logger to handle INFO-level messages and above
-logging.basicConfig(level=logging.INFO)
-
-# Create a handler that writes log messages to a file
-file_handler = logging.FileHandler('./django_logs.log')
-file_handler.setLevel(logging.INFO)
-
-# Create a formatter with a date and time format
-formatter = logging.Formatter('{asctime} - {levelname} - {message}', style='{')
-
-# Set the formatter for the handler
-file_handler.setFormatter(formatter)
-
-# Add the handler to the root logger
-logging.getLogger('').addHandler(file_handler)
-
-# Redirect stdout to the logging handler
-sys.stdout = file_handler.stream"""
-"""
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -239,5 +215,5 @@ LOGGING = {
             'propagate': True,
         },
     },
-}"""
+}
 
