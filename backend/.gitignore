@@ -9,3 +9,4 @@ db.sqlite3
 /*.png
 emissions.csv
 hf_sincro.csv
+django_logs.log
