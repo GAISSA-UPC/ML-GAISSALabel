@@ -755,12 +755,14 @@ def is_iterable(obj):
 
 
 def process_datasets(datasets):
-    if is_iterable(datasets) and any(pd.isnull(element) for element in datasets) or pd.isna(datasets):
+    if is_iterable(datasets) and any(pd.isnull(element) for element in datasets):
         return None
     elif is_iterable(datasets) and '[' not in datasets:
         return [datasets]
-    else:
+    elif is_iterable(datasets):
         return ast.literal_eval(datasets)
+    else:
+        return None
 
 
 def read_df_processed(df):
