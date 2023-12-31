@@ -457,7 +457,6 @@ def extraction():
         fetch_config=True,
         sort='last_modified',
         direction=-1,
-        limit=1000,
     ))
 
     print(len(models))
@@ -743,10 +742,23 @@ def preprocessing_rawData(df):
 We join the co2 subset from the raw preprocessed data with the cleaned dataset and continue the preprocessing on the co2.
 """
 
+
+def process_datasets(datasets):
+    print(datasets)
+    if pd.isnull(datasets):
+        return ['']
+    elif any(pd.isnull(element) for element in datasets):
+        return ['']
+    elif '[' not in datasets:
+        return [datasets]
+    else:
+        return ast.literal_eval(datasets)
+
+
 def read_df_processed(df):
     # df = df.drop(['Unnamed: 0.1', 'Unnamed: 0'], axis=1)
     df['library_name'] = df['library_name'].apply(lambda libraries:  ast.literal_eval(libraries) if not isinstance(libraries, list) else libraries)
-    df['datasets'] = df['datasets'].apply(lambda datasets: [''] if any(pd.isnull(element) for element in datasets) else [datasets] if '[' not in datasets else ast.literal_eval(datasets))
+    df['datasets'] = df['datasets'].apply(process_datasets)
 
     return df
 
@@ -966,26 +978,27 @@ def sincro_huggingFace():
         created = []
         updated = []
 
-        df_extracted = extraction()
+        """df_extracted = extraction()
         print('[SINCRO HF] extraction done')
         if len(df_extracted) == 0:
             print('[SINCRO HF] no models to process')
         else:
             df_preprocessed_raw = preprocessing_rawData(df_extracted)
             print('[SINCRO HF] pre raw done')
-            df_preprocessed_raw.to_csv('./hf_sincro.csv', index=False)
-            df_final = preprocessing_co2(df_preprocessed_raw)
-            print('[SINCRO HF] pre co2 done')
-            df_final.to_csv('./hf_sincro.csv', index=False)
+            df_preprocessed_raw.to_csv('./hf_preRaw.csv', index=False)"""
+        df_preprocessed_raw = pd.read_csv('./hf_preRaw.csv')
+        df_final = preprocessing_co2(df_preprocessed_raw)
+        print('[SINCRO HF] pre co2 done')
+        df_final.to_csv('./hf_sincro.csv', index=False)
 
-            # ToDo: Delete després de fer proves!!!
-            #df_final = pd.read_csv('./hf_sincro.csv')
+        # ToDo: Delete després de fer proves!!!
+        #df_final = pd.read_csv('./hf_sincro.csv')
 
-            df_json_records = df_final.to_json(orient='records')
-            json_list = pd.read_json(df_json_records, orient='records').to_dict(orient='records')
-            json_list_replaced = replace_none(json_list)
+        df_json_records = df_final.to_json(orient='records')
+        json_list = pd.read_json(df_json_records, orient='records').to_dict(orient='records')
+        json_list_replaced = replace_none(json_list)
 
-            created, updated = modify_database(json_list_replaced)
+        created, updated = modify_database(json_list_replaced)
 
         configuracio = Configuracio.objects.get(id=1)
         configuracio.ultimaSincronitzacio = datetime.now(pytz.timezone('Europe/Madrid'))
