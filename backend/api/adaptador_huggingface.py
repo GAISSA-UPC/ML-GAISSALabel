@@ -457,6 +457,7 @@ def extraction():
         fetch_config=True,
         sort='last_modified',
         direction=-1,
+        limit=1000,
     ))
 
     print(len(models))
