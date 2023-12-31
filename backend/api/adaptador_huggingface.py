@@ -970,7 +970,6 @@ def sincro_huggingFace():
         updated = []
 
         df_extracted = extraction()
-        df_extracted.to_csv('./hf_extracted.csv', index=False)
         print('[SINCRO HF] extraction done')
         if len(df_extracted) == 0:
             print('[SINCRO HF] no models to process')

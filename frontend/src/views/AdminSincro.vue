@@ -9,9 +9,10 @@
     that are registered in the following providers: ") }}</p><br>
 
     <ul style="margin-left: 40px">
-        <li>Hugging Face</li>
+        <li v-for="(proveidor, i) in proveidors" :key="i">{{ proveidor }}</li>
     </ul><br>
 
+    <p>{{ $t("The last synchronization was made on the ") }} <span style="font-weight: bold"> {{ ultimaSincro }} </span>.</p><br>
     <p>{{ $t("Be aware that the process of synchronization may take up to 5 minutes in some cases.") }}</p><br>
 
     <el-button @click="sincronitzar"
@@ -50,11 +51,18 @@ export default {
     data() {
         return {
             estat: '',
+            ultimaSincro: null,
+            proveidors: null,
             createdModels: null,
             updatedModels: null,
         }
     },
     methods: {
+        async refrescaInfo() {
+            const response = await sincronitzacions.informacio()
+            this.ultimaSincro = response.data['Last update']
+            this.proveidors = response.data['Providers']
+        },
         async sincronitzar() {
             const loading = ElLoading.service({
                 lock: true,
@@ -73,6 +81,7 @@ export default {
         },
     },
     async mounted() {
+        await this.refrescaInfo()
     },
 }
 
