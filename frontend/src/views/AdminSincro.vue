@@ -70,6 +70,7 @@ export default {
                 background: 'rgba(0, 0, 0, 0.7)',
             })
             const response = await sincronitzacions.sincronitzar()
+            await this.refrescaInfo()
             loading.close()
             if (response.status === 200) {
                 this.estat = 'sincro-ok'

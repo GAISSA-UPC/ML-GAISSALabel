@@ -1,4 +1,5 @@
 import base64
+import pytz
 from datetime import datetime
 
 from rest_framework import viewsets, filters, status, mixins
@@ -286,7 +287,7 @@ class SincroView(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.Generi
 
     def list(self, request, *args, **kwargs):
         ultimaSincro = Configuracio.objects.get(id=1).ultimaSincronitzacio
-        ultimaSincroFormatted = ultimaSincro.strftime('%d-%m-%Y at %H:%M:%S')
+        ultimaSincroFormatted = ultimaSincro.astimezone(pytz.timezone('Europe/Madrid')).strftime('%d-%m-%Y at %H:%M:%S')
         return Response({'Last update': ultimaSincroFormatted,
                          'Providers': ['Hugging Face']},
                         status=status.HTTP_200_OK)
