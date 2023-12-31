@@ -5,6 +5,7 @@ import re
 import requests
 import ast
 import yaml
+import pytz
 
 from scipy import stats
 from requests.exceptions import JSONDecodeError
@@ -988,6 +989,13 @@ def sincro_huggingFace():
             json_list_replaced = replace_none(json_list)
 
             created, updated = modify_database(json_list_replaced)
+
+        configuracio = Configuracio.objects.get(id=1)
+        configuracio.ultimaSincronitzacio = datetime.now(pytz.timezone('Europe/Madrid'))
+        print(configuracio)
+        print(configuracio.ultimaSincronitzacio)
+        configuracio.save()
+
         return created, updated
     except Exception as e:
         print('[SINCRO HF] ' + str(e))
