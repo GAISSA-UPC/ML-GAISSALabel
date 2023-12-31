@@ -1,4 +1,5 @@
 import base64
+from datetime import datetime
 
 from rest_framework import viewsets, filters, status, mixins
 from rest_framework.response import Response
@@ -8,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, Interval, EinaCalcul, \
-    TransformacioMetrica, TransformacioInformacio, Administrador
+    TransformacioMetrica, TransformacioInformacio, Administrador, Configuracio
 from .serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
     EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer, \
     IntervalBasicSerializer, MetricaSerializer, EinaCalculBasicSerializer, EinaCalculSerializer, \
@@ -277,11 +278,18 @@ class LoginAdminView(mixins.CreateModelMixin, viewsets.GenericViewSet):
     models = Administrador
 
 
-class SincroView(mixins.CreateModelMixin, viewsets.GenericViewSet):
+class SincroView(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     permission_classes = [permissions.IsAdmin]
 
     def get_serializer_class(self):
         pass
+
+    def list(self, request, *args, **kwargs):
+        ultimaSincro = Configuracio.objects.get(id=1).ultimaSincronitzacio
+        ultimaSincroFormatted = ultimaSincro.strftime('%d-%m-%Y at %H:%M:%S')
+        return Response({'Last update': ultimaSincroFormatted,
+                         'Providers': ['Hugging Face']},
+                        status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         creats, actualitzats = adaptador_huggingface.sincro_huggingFace()
