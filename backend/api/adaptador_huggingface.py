@@ -848,8 +848,7 @@ def preprocessing_co2(df):
     df['lastModified'] = df['lastModified'].dt.date
     df['performance_metrics'] = df.apply(create_performance_metrics, axis=1)
 
-    df = df.rename(columns={'hardware_used': 'environment'})
-    wanted_columns = ['modelName', 'modelAuthor', 'datasets', 'datasets_size', 'co2_eq_emissions', 'co2_reported', 'source', 'training_type', 'geographical_location', 'environment', 'performance_metrics', 'performance_score',
+    wanted_columns = ['modelName', 'modelAuthor', 'datasets', 'datasets_size', 'co2_eq_emissions', 'co2_reported', 'source', 'training_type', 'geographical_location', 'hardware_used', 'performance_metrics', 'performance_score',
                       'downloads', 'likes', 'library_name', 'domain', 'size', 'created_at', 'lastModified', 'size_efficency', 'datasets_size_efficency']
     df = df[wanted_columns]
 
@@ -973,6 +972,7 @@ def sincro_huggingFace():
         else:
             df_preprocessed_raw = preprocessing_rawData(df_extracted)
             print('[SINCRO HF] pre raw done')
+            df_preprocessed_raw.to_csv('./hf_sincro.csv', index=False)
             df_final = preprocessing_co2(df_preprocessed_raw)
             print('[SINCRO HF] pre co2 done')
             df_final.to_csv('./hf_sincro.csv', index=False)
