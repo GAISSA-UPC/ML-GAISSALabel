@@ -8,5 +8,5 @@ db.sqlite3
 .coverage
 /*.png
 emissions.csv
-hf_sincro.csv
+hf_preRaw.csv
 django_logs.log
