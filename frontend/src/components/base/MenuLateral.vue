@@ -47,6 +47,9 @@
                 <font-awesome-icon :icon="['fas', 'screwdriver-wrench']" class="icon"/>
                 <span>{{ $t('Administration') }}</span>
             </template>
+            <el-menu-item index="Admin sincronitzacio" @click="$router.push({name: 'Admin sincronitzacio'})">
+                {{ $t('Synchronization') }}
+            </el-menu-item>
             <el-menu-item index="Admin mètriques i informacions" @click="$router.push({name: 'Admin mètriques i informacions'})">
                 {{ $t('Metrics') }}
             </el-menu-item>

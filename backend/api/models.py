@@ -2,11 +2,13 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import User
+from solo.models import SingletonModel
 
 
 class Model(models.Model):
     id = models.AutoField(primary_key=True, verbose_name=_('Identificador'))
     nom = models.CharField(max_length=100, null=False, blank=False, verbose_name=_('Nom'))
+    autor = models.CharField(max_length=100, null=True, blank=True, verbose_name=_('Autor/a'))
     informacio = models.CharField(max_length=1000, null=True, blank=True, verbose_name=_('Informació'))
     dataCreacio = models.DateTimeField(auto_now_add=True, verbose_name=_('Data creació'))
 
@@ -75,13 +77,13 @@ class Interval(models.Model):
 
 
 class ResultatEntrenament(models.Model):
-    valor = models.FloatField(null=False, blank=False, verbose_name=_('Valor'))
+    valor = models.FloatField(null=True, blank=True, verbose_name=_('Valor'))
     entrenament = models.ForeignKey(Entrenament, related_name='resultatsEntrenament', null=False, on_delete=models.CASCADE, verbose_name=_('Entrenament'))
     metrica = models.ForeignKey(Metrica, related_name='resultatsEntrenament', null=False, on_delete=models.CASCADE, verbose_name=_('Mètrica'))
 
 
 class ResultatInferencia(models.Model):
-    valor = models.FloatField(null=False, blank=False, verbose_name=_('Valor'))
+    valor = models.FloatField(null=True, blank=True, verbose_name=_('Valor'))
     inferencia = models.ForeignKey(Inferencia, related_name='resultatsInferencia', null=False, on_delete=models.CASCADE, verbose_name=_('Inferència'))
     metrica = models.ForeignKey(Metrica, related_name='resultatsInferencia', null=False, on_delete=models.CASCADE, verbose_name=_('Mètrica'))
 
@@ -149,3 +151,10 @@ class TransformacioInformacio(models.Model):
 
 class Administrador(models.Model):
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE, verbose_name=_('User'))
+
+
+class Configuracio(SingletonModel):
+    ultimaSincronitzacio = models.DateTimeField(verbose_name=_('Última sincronització'))
+
+    class Meta:
+        verbose_name_plural = _('Configuracions')

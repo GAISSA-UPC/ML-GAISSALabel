@@ -8,3 +8,4 @@ db.sqlite3
 .coverage
 /*.png
 emissions.csv
+hf_sincro.csv
