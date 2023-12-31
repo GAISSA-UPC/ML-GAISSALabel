@@ -9,14 +9,13 @@ import yaml
 from scipy import stats
 from requests.exceptions import JSONDecodeError
 from datetime import datetime
-from django.utils import timezone
 
 from concurrent.futures import ThreadPoolExecutor
 from huggingface_hub import HfApi
 from huggingface_hub import ModelCard
 from huggingface_hub import hf_hub_url, get_hf_file_metadata
 
-from .models import Model, Entrenament, Metrica, InfoAddicional, ResultatEntrenament, ValorInfoEntrenament
+from .models import Model, Entrenament, Metrica, InfoAddicional, ResultatEntrenament, ValorInfoEntrenament, Configuracio
 
 
 ########## PRIMERA PART: EXTRACTION FROM HUGGING FACE
@@ -455,7 +454,9 @@ def extraction():
         cardData=True,
         full=True,
         fetch_config=True,
-        limit=1000
+        limit=5000,
+        sort='last_modified',
+        direction=-1,
     ))
 
     print(len(models))
@@ -466,7 +467,13 @@ def extraction():
 
     # Set the number of threads you want to use for parallel processing
     num_threads = 8 # adjust threads
-    models_to_process = models
+
+    # Ens quedem només amb els nous
+    cutoff_date = Configuracio.objects.get(id=1).ultimaSincronitzacio
+    models_to_process = [(index, model_info) for index, model_info in models if model_info.last_modified >= cutoff_date]
+    print("Aquñiiiii")
+    print(len(models_to_process))
+    print(len(models))
 
     # Use ThreadPoolExecutor for parallel processing
     with ThreadPoolExecutor(max_workers=num_threads) as executor:
@@ -639,29 +646,30 @@ def extract_context_info(text):
     return results
 
 def context_metrics_treatment(df):
-    context_info_results = [extract_context_info(text) for text in df['modelcard_text']]
+    if 'modelcard_text' in df:
+        context_info_results = [extract_context_info(text) for text in df['modelcard_text']]
 
 
-    null_phrases = ['Unknown', 'unknown', 'needed', 'Needed']
-    df['hardware_used'] = [context_info_results[idx]['hardware_type']
-                           if pd.isnull(x) and all([phrase not in str(context_info_results[idx]['hardware_type']) for phrase in null_phrases]) else x
-                           for idx, x in enumerate(df['hardware_used'])]
-    df['geographical_location'] = [context_info_results[idx]['compute_region']
-                                   if pd.isnull(x) and all([phrase not in str(context_info_results[idx]['compute_region']) for phrase in null_phrases]) else x
-                                   for idx, x in enumerate(df['geographical_location'])]
-    df['co2_eq_emissions'] = [context_info_results[idx]['carbon_emitted']
-                              if pd.isnull(x) and all([phrase not in str(context_info_results[idx]['carbon_emitted']) for phrase in null_phrases]) else x
-                              for idx, x in enumerate(df['co2_eq_emissions'])]
-    df['hours_used'] = [context_dict['hours_used'] for context_dict in context_info_results]
-    df['cloud_provider'] = [context_dict['cloud_provider'] for context_dict in context_info_results]
+        null_phrases = ['Unknown', 'unknown', 'needed', 'Needed']
+        df['hardware_used'] = [context_info_results[idx]['hardware_type']
+                               if pd.isnull(x) and all([phrase not in str(context_info_results[idx]['hardware_type']) for phrase in null_phrases]) else x
+                               for idx, x in enumerate(df['hardware_used'])]
+        df['geographical_location'] = [context_info_results[idx]['compute_region']
+                                       if pd.isnull(x) and all([phrase not in str(context_info_results[idx]['compute_region']) for phrase in null_phrases]) else x
+                                       for idx, x in enumerate(df['geographical_location'])]
+        df['co2_eq_emissions'] = [context_info_results[idx]['carbon_emitted']
+                                  if pd.isnull(x) and all([phrase not in str(context_info_results[idx]['carbon_emitted']) for phrase in null_phrases]) else x
+                                  for idx, x in enumerate(df['co2_eq_emissions'])]
+        df['hours_used'] = [context_dict['hours_used'] for context_dict in context_info_results]
+        df['cloud_provider'] = [context_dict['cloud_provider'] for context_dict in context_info_results]
 
     return df
 
 def performance_metrics_treatment(df):
-    df['f1'] = df['f1'].apply(lambda x: normalize_performance_metric(x, 'f1'))
-    df['accuracy'] = df['accuracy'].apply(lambda x: normalize_performance_metric(x, 'accuracy'))
-    df['rouge1'] = df['rouge1'].apply(lambda x: normalize_performance_metric(x, 'rouge1'))
-    df['rougeL'] = df['rougeL'].apply(lambda x: normalize_performance_metric(x, 'rougeL'))
+    df['f1'] = df['f1'].apply(lambda x: normalize_performance_metric(x, 'f1')) if 'f1' in df.keys() else None
+    df['accuracy'] = df['accuracy'].apply(lambda x: normalize_performance_metric(x, 'accuracy')) if 'accuracy' in df.keys() else None
+    df['rouge1'] = df['rouge1'].apply(lambda x: normalize_performance_metric(x, 'rouge1')) if 'rouge1' in df.keys() else None
+    df['rougeL'] = df['rougeL'].apply(lambda x: normalize_performance_metric(x, 'rougeL')) if 'rougeL' in df.keys() else None
     return df
 
 
@@ -740,7 +748,7 @@ We join the co2 subset from the raw preprocessed data with the cleaned dataset a
 def read_df_processed(df):
     # df = df.drop(['Unnamed: 0.1', 'Unnamed: 0'], axis=1)
     df['library_name'] = df['library_name'].apply(lambda libraries:  ast.literal_eval(libraries) if not isinstance(libraries, list) else libraries)
-    df['datasets'] = df['datasets'].apply(lambda datasets: [''] if pd.isnull(datasets) else [datasets] if '[' not in datasets else ast.literal_eval(datasets))
+    df['datasets'] = df['datasets'].apply(lambda datasets: [''] if any(pd.isnull(element) for element in datasets) else [datasets] if '[' not in datasets else ast.literal_eval(datasets))
 
     return df
 
@@ -958,22 +966,30 @@ def modify_database(df):
 ########## MAIN
 def sincro_huggingFace():
     try:
+        created = []
+        updated = []
+
         df_extracted = extraction()
+        df_extracted.to_csv('./hf_extracted.csv', index=False)
         print('[SINCRO HF] extraction done')
-        df_preprocessed_raw = preprocessing_rawData(df_extracted)
-        print('[SINCRO HF] pre raw done')
-        df_final = preprocessing_co2(df_preprocessed_raw)
-        print('[SINCRO HF] pre co2 done')
-        df_final.to_csv('./hf_sincro.csv', index=False)
+        if len(df_extracted) == 0:
+            print('[SINCRO HF] no models to process')
+        else:
+            df_preprocessed_raw = preprocessing_rawData(df_extracted)
+            print('[SINCRO HF] pre raw done')
+            df_final = preprocessing_co2(df_preprocessed_raw)
+            print('[SINCRO HF] pre co2 done')
+            df_final.to_csv('./hf_sincro.csv', index=False)
 
-        # ToDo: Delete després de fer proves!!!
-        #df_final = pd.read_csv('./hf_sincro.csv')
+            # ToDo: Delete després de fer proves!!!
+            #df_final = pd.read_csv('./hf_sincro.csv')
 
-        df_json_records = df_final.to_json(orient='records')
-        json_list = pd.read_json(df_json_records, orient='records').to_dict(orient='records')
-        json_list_replaced = replace_none(json_list)
+            df_json_records = df_final.to_json(orient='records')
+            json_list = pd.read_json(df_json_records, orient='records').to_dict(orient='records')
+            json_list_replaced = replace_none(json_list)
 
-        return modify_database(json_list_replaced)
+            created, updated = modify_database(json_list_replaced)
+        return created, updated
     except Exception as e:
         print('[SINCRO HF] ' + str(e))
         return 'KO', 'KO'

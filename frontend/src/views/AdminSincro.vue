@@ -1,6 +1,6 @@
 <template>
     <el-alert v-if="estat === 'sincro-ok'" :title="$t('The synchronization was successful!')" type="success" @close="estat = ''"/>
-    <el-alert v-else-if="estat === 'sincro-ko'" :title="$t('There was an error while synchronizing the database')" type="error" @close="estat = ''"/>
+    <el-alert v-else-if="estat === 'sincro-ko'" :title="$t('There was an error while synchronizing the database. Please, try again later.')" type="error" @close="estat = ''"/>
     <br v-if="estat">
 
     <h1>{{ $t("Database Synchronization") }}</h1><br>
