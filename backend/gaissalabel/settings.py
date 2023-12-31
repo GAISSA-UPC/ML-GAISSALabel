@@ -153,7 +153,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # LOGS
-
+"""
 # Configure the root logger to handle INFO-level messages and above
 logging.basicConfig(level=logging.INFO)
 
@@ -216,4 +216,4 @@ LOGGING = {
         },
     },
 }
-
+"""
