@@ -1,4 +1,6 @@
 import base64
+import pytz
+from datetime import datetime
 
 from rest_framework import viewsets, filters, status, mixins
 from rest_framework.response import Response
@@ -8,7 +10,7 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, Interval, EinaCalcul, \
-    TransformacioMetrica, TransformacioInformacio, Administrador
+    TransformacioMetrica, TransformacioInformacio, Administrador, Configuracio
 from .serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
     EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer, \
     IntervalBasicSerializer, MetricaSerializer, EinaCalculBasicSerializer, EinaCalculSerializer, \
@@ -18,6 +20,7 @@ from . import permissions
 from .rating_calculator_adapter import calculateRating
 from .label_generator_adapter import generateLabel
 from .efficiency_calculator_adapter import calculateEfficiency
+from . import adaptador_huggingface
 
 
 class ModelsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -274,3 +277,24 @@ class LoginAdminView(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Administrador.objects.all()
     serializer_class = LoginAdminSerializer
     models = Administrador
+
+
+class SincroView(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
+    permission_classes = [permissions.IsAdmin]
+
+    def get_serializer_class(self):
+        pass
+
+    def list(self, request, *args, **kwargs):
+        ultimaSincro = Configuracio.objects.get(id=1).ultimaSincronitzacio
+        ultimaSincroFormatted = ultimaSincro.astimezone(pytz.timezone('Europe/Madrid')).strftime('%d-%m-%Y at %H:%M:%S')
+        return Response({'Last update': ultimaSincroFormatted,
+                         'Providers': ['Hugging Face']},
+                        status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        creats, actualitzats = adaptador_huggingface.sincro_huggingFace()
+        if creats == 'KO':
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'Created models': creats, 'Updated models': actualitzats}, status=status.HTTP_200_OK)

@@ -175,8 +175,8 @@ def generate_efficency_label(results, meanings, frate, model_name, task_type, ur
     i = 0
     for metric, info in results.items():
         # Unpack the information of the metric
-        value = str(round(info['value'], 2))
-        unit = info['unit']
+        value = str(round(info['value'], 2)) if info['value'] else ''
+        unit = info['unit'] if info['value'] else ''
         image = info['image']
 
         # Get the base position of the information to draw
@@ -192,7 +192,11 @@ def generate_efficency_label(results, meanings, frate, model_name, task_type, ur
         canvas.drawCentredString(int(C_SIZE[0] * posx), int(C_SIZE[1] * (posy - 0.05)), metric)
 
         # Draw image of the metric
-        canvas.drawImage(ImageReader(Image.open(BytesIO(image))), int(C_SIZE[0] * posx - 125), int(C_SIZE[1] * posy))
+        if image is None:
+            imageToCanvas = os.path.join(PARTS_DIR, f"nan.png")
+        else:
+            imageToCanvas = ImageReader(Image.open(BytesIO(image)))
+        canvas.drawImage(imageToCanvas, int(C_SIZE[0] * posx - 125), int(C_SIZE[1] * posy))
 
         i += 1
 
