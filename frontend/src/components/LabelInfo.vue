@@ -148,30 +148,31 @@ export default {
         },
         async calculateVariables() {
             this.metriques.forEach(metrica => {
-                const intervals = metrica['intervals']
-                let marks = {0: '',}
-                let last = 0
-                let toAdd = 0
-                intervals.reverse().forEach(interval => {
-                    const limSup = interval['limitSuperior']
-                    const limInf = interval['limitInferior']
-                    if (limSup === 100000000000000000000) {
-                        toAdd = last/(intervals.length - 1) + last
-                        marks[toAdd] = ''//toAdd.toFixed(2)
-                    }
-                    else {
-                        last = interval['limitSuperior']
-                        marks[last] = ''//interval['limitSuperior'].toFixed(2)
-                    }
-                    if (limSup > this.resultats[metrica.id].value && this.resultats[metrica.id].value > limInf) {
-                        if (limSup === 100000000000000000000) this.ranges[metrica.id] = [limInf, toAdd]
-                        else this.ranges[metrica.id] = [limInf, limSup]
-                    }
-                })
-                this.marks[metrica.id] = marks
-                this.inf[metrica.id] = toAdd
-                this.descripcions[metrica.id] = metrica.descripcio
-                this.recomanacions[metrica.id] = metrica.recomanacions
+                if (metrica.id in this.resultats) {
+                    const intervals = metrica['intervals']
+                    let marks = {0: '',}
+                    let last = 0
+                    let toAdd = 0
+                    intervals.reverse().forEach(interval => {
+                        const limSup = interval['limitSuperior']
+                        const limInf = interval['limitInferior']
+                        if (limSup === 100000000000000000000) {
+                            toAdd = last / (intervals.length - 1) + last
+                            marks[toAdd] = ''//toAdd.toFixed(2)
+                        } else {
+                            last = interval['limitSuperior']
+                            marks[last] = ''//interval['limitSuperior'].toFixed(2)
+                        }
+                        if (limSup > this.resultats[metrica.id].value && this.resultats[metrica.id].value > limInf) {
+                            if (limSup === 100000000000000000000) this.ranges[metrica.id] = [limInf, toAdd]
+                            else this.ranges[metrica.id] = [limInf, limSup]
+                        }
+                    })
+                    this.marks[metrica.id] = marks
+                    this.inf[metrica.id] = toAdd
+                    this.descripcions[metrica.id] = metrica.descripcio
+                    this.recomanacions[metrica.id] = metrica.recomanacions
+                }
             })
         },
         getImageDecoded(img) {
