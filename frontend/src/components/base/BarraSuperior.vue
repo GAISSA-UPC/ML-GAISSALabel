@@ -5,7 +5,7 @@
                 <font-awesome-icon :icon="['fas', 'bars']" />
             </el-button>
             <el-image
-                src="https://gaissa.upc.edu/en/shared/GAISSALOGO.png/@@images/image-1600-06666a1dbbeb6508fe3df5dd86092b2c.png"
+                src="public/gaissalogo.png"
                 style="cursor:pointer; max-width: 40px; margin-left: 20px; margin-right: 5px"
                 @click="obrirLink"
             />
