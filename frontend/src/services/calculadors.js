@@ -6,7 +6,10 @@ export default {
             'endpoint': endpoint,
             'input': input,
         }
-        const responseCalculador = await axios.post(`/api/calculadors/inferencia/`, data)
-        return responseCalculador['data']
+        let responseCalculador = null
+        await axios.post(`/api/calculadors/inferencia/`, data)
+            .then(response => responseCalculador = response)
+            .catch(error => responseCalculador = error)
+        return responseCalculador
     }
 }
