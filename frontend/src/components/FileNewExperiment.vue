@@ -2,30 +2,8 @@
     <h1>{{ $t("Energy label for") }} {{ fase }}</h1><br>
     <h2>{{ $t("Register a new") }} {{ fase }}</h2><br>
 
-    <el-alert v-if="estat === 'modelCreat-ok'" :title="$t('Model registered correctly')" type="success" @close="estat = ''"/>
-    <el-alert v-else-if="estat === 'modelCreat-ko'" :title="$t('There was an error while creating the model')" type="success" @close="estat = ''"/>
-
     <div>
         <el-form label-position="top">
-            <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Model") }}</h3><br>
-            <el-form-item>
-                <el-select
-                    v-model="selectedModel"
-                >
-                    <el-option
-                        v-for="(model, i) in models" :key="i"
-                        :value="model.id"
-                        :label="model.nom"
-                    />
-                </el-select>
-                <el-button
-                    style="margin-left: 10px"
-                    @click="dialogNewModel = true"
-                    class="action-button-light"
-                >
-                    <font-awesome-icon :icon="['fas', 'plus']" />
-                </el-button>
-            </el-form-item><br>
             <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Files") }}</h3><br>
             <el-form-item>
                 <el-upload
@@ -75,17 +53,9 @@
         </el-form><br>
     </div>
 
-    <DialogNewModel v-model="dialogNewModel"
-                    @cancel="dialogNewModel = false"
-                    @model-creat-ok="modelCreat()"
-                    @model-creat-ko="dialogNewModel = false; estat = 'modelCreat-ko'"
-    />
-
 </template>
 
 <script>
-import models from '@/services/models'
-import DialogNewModel from "@/components/DialogNewModel.vue";
 import * as XLSX from "xlsx";
 import eines from "@/services/eines";
 export default {
@@ -93,22 +63,14 @@ export default {
     props: {
         fase: {required: true, type: String}
     },
-    components: {DialogNewModel},
     data() {
         return {
             estat: '',
-            models: null,
-            selectedModel: null,
             fileList: [],
-            dialogNewModel: false,
             eines: null,
         };
     },
     methods: {
-        async refrescaModels() {
-            const response = await models.list()
-            this.models = response.data
-        },
         async refrescaEines() {
             let response = await eines.list()
             this.eines = response.data
@@ -223,15 +185,8 @@ export default {
             }
             return nouContingut
         },
-        async modelCreat() {
-            await this.refrescaModels()
-            this.dialogNewModel = false
-            this.selectedModel = this.models.length
-            this.estat = 'modelCreat-ok'
-        }
     },
     async mounted() {
-        await this.refrescaModels();
         await this.refrescaEines();
     },
 };
