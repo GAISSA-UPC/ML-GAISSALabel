@@ -2,8 +2,12 @@
     <h1>{{ $t("Energy label for") }} {{ fase }}</h1><br>
     <h2>{{ $t("Register a new") }} {{ fase }}</h2><br>
 
-    <el-alert v-if="estat === 'modelCreat-ok'" :title="$t('Model registered correctly')" type="success" @close="estat = ''"/>
-    <el-alert v-else-if="estat === 'modelCreat-ko'" :title="$t('There was an error while creating the model')" type="error" @close="estat = ''"/>
+    <div v-if="estat">
+        <el-alert v-if="estat === 'modelCreat-ok'" :title="$t('Model registered correctly')" type="success" @close="estat = ''"/>
+        <el-alert v-else-if="estat === 'modelCreat-ko'" :title="$t('There was an error while creating the model')" type="error" @close="estat = ''"/>
+        <el-alert v-else-if="estat === 'select-model'" :title="$t('Please, select (or create) some model')" type="error" @close="estat = ''"/>
+        <br>
+    </div>
 
     <el-form label-position="top">
         <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Model") }}</h3><br>
@@ -34,6 +38,7 @@
                 step="0.01"
                 v-model="metrica.valor"
                 min="0"
+                style="width: 200px"
             />
             <p style="margin-left: 10px">{{ metrica.unitat }}</p>
             <el-alert v-if="metrica.calcul" type="info" show-icon :closable="false" style="margin-top: 10px">
@@ -136,23 +141,28 @@ export default {
             })
         },
         async mostrarEtiqueta() {
-            let responseCreate = null
-            if (this.fase === this.$t('Training'))
-                responseCreate = await trainings.create(this.selectedModel, this.metriques, this.informacions)
-            else
-                responseCreate = await inferencies.create(this.selectedModel, this.metriques, this.informacions)
-            if (responseCreate.status === 201) {
-                const experiment_id = responseCreate.data['id']
+            if (this.selectedModel) {
+                let responseCreate = null
                 if (this.fase === this.$t('Training'))
-                    this.$router.push({
-                        name: 'Label info for training',
-                        params: {id_model: this.selectedModel, id_training: experiment_id}
-                    })
+                    responseCreate = await trainings.create(this.selectedModel, this.metriques, this.informacions)
                 else
-                    this.$router.push({
-                        name: 'Label info for inference',
-                        params: {id_model: this.selectedModel, id_inference: experiment_id}
-                    })
+                    responseCreate = await inferencies.create(this.selectedModel, this.metriques, this.informacions)
+                if (responseCreate.status === 201) {
+                    const experiment_id = responseCreate.data['id']
+                    if (this.fase === this.$t('Training'))
+                        this.$router.push({
+                            name: 'Label info for training',
+                            params: {id_model: this.selectedModel, id_training: experiment_id}
+                        })
+                    else
+                        this.$router.push({
+                            name: 'Label info for inference',
+                            params: {id_model: this.selectedModel, id_inference: experiment_id}
+                        })
+                }
+            } else {
+                this.estat = 'select-model'
+                window.scrollTo({top:0})
             }
         },
     },

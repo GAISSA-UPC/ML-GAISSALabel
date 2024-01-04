@@ -18,6 +18,15 @@
                     </template>
                     {{ model.nom }}
                 </el-descriptions-item>
+                <el-descriptions-item v-if="model.autor">
+                    <template #label>
+                        <div class="cell-item">
+                            <font-awesome-icon :icon="['fas', 'user']" />
+                            {{ $t('Model author') }}
+                        </div>
+                    </template>
+                    {{ model.autor }}
+                </el-descriptions-item>
                 <el-descriptions-item>
                     <template #label>
                         <div class="cell-item">
