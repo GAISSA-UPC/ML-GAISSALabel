@@ -8,6 +8,11 @@
                     v-model="newModel.nom"
                 />
             </el-form-item>
+            <el-form-item :label="$t('Author')">
+                <el-input
+                    v-model="newModel.autor"
+                />
+            </el-form-item>
             <el-form-item :label="$t('Description')">
                 <el-input
                     v-model="newModel.informacio"
