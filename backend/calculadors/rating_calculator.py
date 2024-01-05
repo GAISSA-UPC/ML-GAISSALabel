@@ -1,6 +1,6 @@
-from .models import Interval, Qualificacio
-from .serializers import MetricaAmbLimitsSerializer, IntervalSerializer, QualificacioSerializer
-from .rating_calculator import calculate_ratings
+from api.models import Interval, Qualificacio
+from api.serializers import MetricaAmbLimitsSerializer, IntervalSerializer, QualificacioSerializer
+from .rating_calculator_strategy import calculate_ratings
 
 
 def calculateRating(resultats, metriques):

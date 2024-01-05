@@ -16,7 +16,7 @@ from huggingface_hub import HfApi
 from huggingface_hub import ModelCard
 from huggingface_hub import hf_hub_url, get_hf_file_metadata
 
-from .models import Model, Entrenament, Metrica, InfoAddicional, ResultatEntrenament, ValorInfoEntrenament, Configuracio
+from api.models import Model, Entrenament, Metrica, InfoAddicional, ResultatEntrenament, ValorInfoEntrenament, Configuracio
 
 
 ########## PRIMERA PART: EXTRACTION FROM HUGGING FACE
@@ -702,7 +702,7 @@ def performance_score(df):
 def preprocessing_rawData(df):
     pd.options.mode.chained_assignment = None
 
-    with open('./api/tags_metadata.yaml') as file:
+    with open('./tags_metadata.yaml') as file:
         tags_metadata = yaml.safe_load(file)
 
 

@@ -1,6 +1,5 @@
 import base64
 import pytz
-from datetime import datetime
 
 from rest_framework import viewsets, filters, status, mixins
 from rest_framework.response import Response
@@ -17,10 +16,10 @@ from .serializers import ModelSerializer, EntrenamentSerializer, InferenciaSeria
     TransformacioMetricaSerializer, TransformacioInformacioSerializer, LoginAdminSerializer
 
 from . import permissions
-from .rating_calculator_adapter import calculateRating
-from .label_generator_adapter import generateLabel
-from .efficiency_calculator_adapter import calculateEfficiency
-from . import adaptador_huggingface
+from calculadors.rating_calculator import calculateRating
+from calculadors.label_generator import generateLabel
+from calculadors.efficiency_calculator import calculateEfficiency
+from proveidors import adaptador_huggingface
 
 
 class ModelsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -298,3 +297,16 @@ class SincroView(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.Generi
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'Created models': creats, 'Updated models': actualitzats}, status=status.HTTP_200_OK)
+
+
+class EstadistiquesView(mixins.ListModelMixin, viewsets.GenericViewSet):
+    def get_serializer_class(self):
+        pass
+
+    def list(self, request, *args, **kwargs):
+        data = {
+            "numModels": Model.objects.count(),
+            "numEntrenaments": Entrenament.objects.count(),
+            "numInferencies": Inferencia.objects.count(),
+        }
+        return Response(data, status=status.HTTP_200_OK)

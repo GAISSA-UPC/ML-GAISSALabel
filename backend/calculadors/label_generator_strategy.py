@@ -12,7 +12,7 @@ from PIL import Image
 C_SIZE = (1560, 2411)
 
 # Directory of the label design elements
-PARTS_DIR = os.path.join(os.path.dirname(__file__), "label_design")
+PARTS_DIR = os.path.join(os.path.dirname(__file__), "../api/label_design")
 
 
 def get_position(i, total):
