@@ -1,8 +1,8 @@
 import base64
 from gaissalabel.settings import URL_FRONTEND
-from .models import Qualificacio, Metrica, Interval
-from .serializers import QualificacioSerializer
-from .label_generator import generate_efficency_label
+from api.models import Qualificacio, Metrica, Interval
+from api.serializers import QualificacioSerializer
+from .label_generator_strategy import generate_efficency_label
 
 
 def generateLabel(qualifFinal, qualifMetriques, resultats, model, experiment_id, fase):
