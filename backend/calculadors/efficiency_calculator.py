@@ -1,5 +1,5 @@
-from .calculator_codecarbon import get_efficiency_results
-from .models import TransformacioMetrica
+from .calculator_codecarbon_adapter import get_efficiency_results
+from api.models import TransformacioMetrica
 
 
 def calculateEfficiency(endpoint, data):
