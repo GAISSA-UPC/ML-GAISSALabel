@@ -1,5 +1,5 @@
 modelId,datasets,datasets_size,co2_eq_emissions,source,training_type,geographical_location,hardware_used,accuracy,loss,f1,rouge1,rougeL,size,auto,downloads,likes,library_name,lastModified,created_at,modelcard_text,hours_used,cloud_provider,modelName,modelAuthor,co2_reported,license,language,domain,year_month,size_efficency,performance_score
-nicholasKluge/Aira-OPT-1B3,['nicholasKluge/instruct-aira-dataset'],152455005,1.46,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,5263148862.0,False,4,0,"['transformers', 'pytorch', 'safetensors']",2023-12-28 14:54:14+00:00,2023-10-29 00:30:48+00:00,"# Aira-OPT-1B3
+nicholasKluge/Aira-OPT-1B3,['nicholasKluge/instruct-aira-dataset'],152455005,1.46,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,5263148862.0,False,4,0,"['pytorch', 'transformers', 'safetensors']",2023-12-28 14:54:14+00:00,2023-10-29 00:30:48+00:00,"# Aira-OPT-1B3
 
 Aira-2 is the second version of the Aira instruction-tuned series. Aira-OPT-1B3 is an instruction-tuned model based on [OPT](https://huggingface.co/facebook/opt-1.3b). The model was trained with a dataset composed of prompts and completions generated synthetically by prompting already-tuned models (ChatGPT, Llama, Open-Assistant, etc).
 
@@ -100,7 +100,7 @@ The model will output something like:
 ## License
 
 Aira-OPT-1B3 is licensed under the OPT-175B License Agreement, Copyright (c) Meta Platforms, Inc. All Rights Reserved. See the [LICENSE](LICENSE.md) file for more details.",,,Aira-OPT-1B3,nicholasKluge,1,[],[],NLP,2023-10,3604896480.821918,
-nicholasKluge/Aira-OPT-350M,['nicholasKluge/instruct-aira-dataset'],152455005,0.33,CodeCarbon,fine-tuning,United States of America,NVIDIA A100-SXM4-40GB,,,,,,1324913626.0,False,5,0,"['transformers', 'pytorch', 'safetensors']",2023-12-28 14:53:52+00:00,2023-10-30 16:56:28+00:00,"# Aira-OPT-350M
+nicholasKluge/Aira-OPT-350M,['nicholasKluge/instruct-aira-dataset'],152455005,0.33,CodeCarbon,fine-tuning,United States of America,NVIDIA A100-SXM4-40GB,,,,,,1324913626.0,False,5,0,"['pytorch', 'transformers', 'safetensors']",2023-12-28 14:53:52+00:00,2023-10-30 16:56:28+00:00,"# Aira-OPT-350M
 
 Aira-2 is the second version of the Aira instruction-tuned series. Aira-OPT-350M is an instruction-tuned model based on [OPT](https://huggingface.co/facebook/opt-350m). The model was trained with a dataset composed of prompts and completions generated synthetically by prompting already-tuned models (ChatGPT, Llama, Open-Assistant, etc).
 
@@ -201,7 +201,7 @@ The model will output something like:
 ## License
 
 Aira-OPT-350M is licensed under the OPT-175B License Agreement, Copyright (c) Meta Platforms, Inc. All Rights Reserved. See the [LICENSE](LICENSE.md) file for more details.",,,Aira-OPT-350M,nicholasKluge,1,[],[],NLP,2023-10,4014889775.7575755,
-nicholasKluge/Aira-OPT-125M,['nicholasKluge/instruct-aira-dataset'],152455005,0.25,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,501017690.0,False,18,0,"['transformers', 'pytorch', 'safetensors']",2023-12-28 14:53:32+00:00,2023-10-25 13:02:28+00:00,"# Aira-OPT-125M
+nicholasKluge/Aira-OPT-125M,['nicholasKluge/instruct-aira-dataset'],152455005,0.25,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,501017690.0,False,18,0,"['pytorch', 'transformers', 'safetensors']",2023-12-28 14:53:32+00:00,2023-10-25 13:02:28+00:00,"# Aira-OPT-125M
 
 Aira-2 is the second version of the Aira instruction-tuned series. Aira-OPT-125M is an instruction-tuned model based on [OPT](https://huggingface.co/facebook/opt-125m). The model was trained with a dataset composed of prompts and completions generated synthetically by prompting already-tuned models (ChatGPT, Llama, Open-Assistant, etc).
 
@@ -301,7 +301,7 @@ The model will output something like:
 ## License
 
 Aira-OPT-125M is licensed under the OPT-175B License Agreement, Copyright (c) Meta Platforms, Inc. All Rights Reserved. See the [LICENSE](LICENSE.md) file for more details.",,,Aira-OPT-125M,nicholasKluge,1,[],[],NLP,2023-10,2004070760.0,
-nicholasKluge/Aira-2-355M,['nicholasKluge/instruct-aira-dataset'],152455005,0.29,CodeCarbon,fine-tuning,United States of America,NVIDIA A100-SXM4-40GB,,,,,,1419404253.0,False,67,0,"['transformers', 'pytorch', 'safetensors']",2023-12-28 14:53:02+00:00,2023-06-28 16:23:47+00:00,"# Aira-2-355M
+nicholasKluge/Aira-2-355M,['nicholasKluge/instruct-aira-dataset'],152455005,0.29,CodeCarbon,fine-tuning,United States of America,NVIDIA A100-SXM4-40GB,,,,,,1419404253.0,False,67,0,"['pytorch', 'transformers', 'safetensors']",2023-12-28 14:53:02+00:00,2023-06-28 16:23:47+00:00,"# Aira-2-355M
 
 Aira-2 is the second version of the Aira instruction-tuned series. Aira-2-355M is an instruction-tuned model based on [GPT-2](https://huggingface.co/gpt2-medium). The model was trained with a dataset composed of prompts and completions generated synthetically by prompting already-tuned models (ChatGPT, Llama, Open-Assistant, etc).
 
@@ -406,7 +406,7 @@ The model will output something like:
 
 Aira-2-355M is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for more details.
 ",,,Aira-2-355M,nicholasKluge,1,[],[],NLP,2023-06,4894497424.137932,
-nicholasKluge/Aira-2-1B5,['nicholasKluge/instruct-aira-dataset'],152455005,1.69,CodeCarbon,fine-tuning,United States of America,NVIDIA A100-SXM4-40GB,,,,,,6230662245.0,False,2,1,"['transformers', 'pytorch', 'safetensors']",2023-12-28 14:52:40+00:00,2023-06-26 21:27:44+00:00,"# Aira-2-1B5
+nicholasKluge/Aira-2-1B5,['nicholasKluge/instruct-aira-dataset'],152455005,1.69,CodeCarbon,fine-tuning,United States of America,NVIDIA A100-SXM4-40GB,,,,,,6230662245.0,False,2,1,"['pytorch', 'transformers', 'safetensors']",2023-12-28 14:52:40+00:00,2023-06-26 21:27:44+00:00,"# Aira-2-1B5
 
 Aira-2 is the second version of the Aira instruction-tuned series. Aira-2-1B5 is an instruction-tuned model based on [GPT-2](https://huggingface.co/gpt2-xl). The model was trained with a dataset composed of prompts and completions generated synthetically by prompting already-tuned models (ChatGPT, Llama, Open-Assistant, etc).
 
@@ -511,7 +511,7 @@ The model will output something like:
 
 Aira-2-1B5 is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for more details.
 ",,,Aira-2-1B5,nicholasKluge,1,[],[],NLP,2023-06,3686782393.491124,
-nicholasKluge/Aira-2-774M,['nicholasKluge/instruct-aira-dataset'],152455005,0.77,CodeCarbon,fine-tuning,United States of America,NVIDIA A100-SXM4-40GB,,,,,,3096283165.0,False,71,2,"['transformers', 'pytorch', 'safetensors']",2023-12-28 14:52:23+00:00,2023-06-26 18:59:40+00:00,"# Aira-2-774M
+nicholasKluge/Aira-2-774M,['nicholasKluge/instruct-aira-dataset'],152455005,0.77,CodeCarbon,fine-tuning,United States of America,NVIDIA A100-SXM4-40GB,,,,,,3096283165.0,False,71,2,"['pytorch', 'transformers', 'safetensors']",2023-12-28 14:52:23+00:00,2023-06-26 18:59:40+00:00,"# Aira-2-774M
 
 Aira-2 is the second version of the Aira instruction-tuned series. Aira-2-774M is an instruction-tuned model based on [GPT-2](https://huggingface.co/gpt2-large). The model was trained with a dataset composed of prompts and completions generated synthetically by prompting already-tuned models (ChatGPT, Llama, Open-Assistant, etc).
 
@@ -616,7 +616,7 @@ The model will output something like:
 
 Aira-2-774M is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for more details.
 ",,,Aira-2-774M,nicholasKluge,1,[],[],NLP,2023-06,4021146967.5324674,
-nicholasKluge/Aira-2-124M,['nicholasKluge/instruct-aira-dataset'],152455005,0.25,CodeCarbon,fine-tuning,United States of America,NVIDIA A100-SXM4-40GB,,,,,,497819485.0,False,25,1,"['transformers', 'pytorch', 'safetensors']",2023-12-28 14:52:03+00:00,2023-08-26 13:00:20+00:00,"# Aira-2-124M
+nicholasKluge/Aira-2-124M,['nicholasKluge/instruct-aira-dataset'],152455005,0.25,CodeCarbon,fine-tuning,United States of America,NVIDIA A100-SXM4-40GB,,,,,,497819485.0,False,25,1,"['pytorch', 'transformers', 'safetensors']",2023-12-28 14:52:03+00:00,2023-08-26 13:00:20+00:00,"# Aira-2-124M
 
 Aira-2 is the second version of the Aira instruction-tuned series. Aira-2-124M is an instruction-tuned model based on [GPT-2](https://huggingface.co/gpt2). The model was trained with a dataset composed of prompts and completions generated synthetically by prompting already-tuned models (ChatGPT, Llama, Open-Assistant, etc).
 
@@ -721,7 +721,7 @@ The model will output something like:
 
 Aira-2-124M is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for more details.
 ",,,Aira-2-124M,nicholasKluge,1,[],[],NLP,2023-08,1991277940.0,
-nicholasKluge/Aira-2-1B1,['nicholasKluge/instruct-aira-dataset'],152455005,1.71,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,4400359870.0,False,1707,2,"['transformers', 'pytorch', 'safetensors']",2023-12-28 14:51:44+00:00,2023-10-11 02:43:15+00:00,"# Aira-2-1B1
+nicholasKluge/Aira-2-1B1,['nicholasKluge/instruct-aira-dataset'],152455005,1.71,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,4400359870.0,False,1707,2,"['pytorch', 'transformers', 'safetensors']",2023-12-28 14:51:44+00:00,2023-10-11 02:43:15+00:00,"# Aira-2-1B1
 
 Aira-2 is the second version of the Aira instruction-tuned series. Aira-2-1B1 is an instruction-tuned model based on [TinyLlama-1.1B](https://huggingface.co/TinyLlama/TinyLlama-1.1B-intermediate-step-955k-token-2T). The model was trained with a dataset composed of prompts and completions generated synthetically by prompting already-tuned models (ChatGPT, Llama, Open-Assistant, etc).
 
@@ -819,7 +819,7 @@ The model will output something like:
 
 Aira-2-1B1 is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for more details.
 ",,,Aira-2-1B1,nicholasKluge,1,[],[],NLP,2023-10,2573309865.497076,
-nicholasKluge/Aira-2-124M-DPO,"['nicholasKluge/instruct-aira-dataset', 'nicholasKluge/reward-aira-dataset']",265338410,0.15,CodeCarbon,fine-tuning,United States of America,NVIDIA A100-SXM4-40GB,,,,,,497823833.0,False,11,1,"['transformers', 'pytorch', 'safetensors']",2023-12-28 14:51:10+00:00,2023-12-03 17:47:39+00:00,"# Aira-2-124M-DPO
+nicholasKluge/Aira-2-124M-DPO,"['nicholasKluge/instruct-aira-dataset', 'nicholasKluge/reward-aira-dataset']",265338410,0.15,CodeCarbon,fine-tuning,United States of America,NVIDIA A100-SXM4-40GB,,,,,,497823833.0,False,11,1,"['pytorch', 'transformers', 'safetensors']",2023-12-28 14:51:10+00:00,2023-12-03 17:47:39+00:00,"# Aira-2-124M-DPO
 
 Aira-2 is the second version of the Aira instruction-tuned series. Aira-2-124M-DPO is an instruction-tuned model further fine-tuned via DPO based on [Aira-2-124M](https://huggingface.co/nicholasKluge/Aira-2-124M). The model was first trained with supervised fine-tuning (STF) with a dataset composed of prompts and completions generated synthetically by prompting already-tuned models (ChatGPT, Llama, Open-Assistant, etc). Secondly, the model was fine-tuned again via DPO using a reward dataset created by the [`Aira-RewardModel`](https://huggingface.co/nicholasKluge/RewardModel).
 
@@ -923,7 +923,7 @@ The model will output something like:
 ## License
 
 Aira-2-124M-DPO is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for more details.",,,Aira-2-124M-DPO,nicholasKluge,1,[],[],NLP,2023-12,3318825553.3333335,
-nicholasKluge/Aira-2-portuguese-124M,['nicholasKluge/instruct-aira-dataset'],152455005,0.35,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,497819485.0,False,60,1,"['transformers', 'pytorch', 'safetensors']",2023-12-28 14:45:32+00:00,2023-06-11 01:40:54+00:00,"# Aira-2-portuguese-124M
+nicholasKluge/Aira-2-portuguese-124M,['nicholasKluge/instruct-aira-dataset'],152455005,0.35,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,497819485.0,False,60,1,"['pytorch', 'transformers', 'safetensors']",2023-12-28 14:45:32+00:00,2023-06-11 01:40:54+00:00,"# Aira-2-portuguese-124M
 
 Aira-2 is the second version of the Aira instruction-tuned series. Aira-2-portuguese-124M is an instruction-tuned model based on [GPT-2](https://huggingface.co/pierreguillou/gpt2-small-portuguese). The model was trained with a dataset composed of prompt, completions generated synthetically by prompting already-tuned models (ChatGPT, Llama, Open-Assistant, etc).
 
@@ -1022,7 +1022,7 @@ The model will output something like:
 
 Aira-2-portuguese-124M is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for more details.
 ",,,Aira-2-portuguese-124M,nicholasKluge,1,[],[],NLP,2023-06,1422341385.7142859,
-nicholasKluge/RewardModel,['nicholasKluge/reward-aira-dataset'],112883405,0.08,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,433312561.0,False,21,0,"['transformers', 'pytorch', 'safetensors']",2023-12-28 00:16:07+00:00,2023-06-07 23:47:05+00:00,"# RewardModel
+nicholasKluge/RewardModel,['nicholasKluge/reward-aira-dataset'],112883405,0.08,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,433312561.0,False,21,0,"['pytorch', 'safetensors', 'transformers']",2023-12-28 00:16:07+00:00,2023-06-07 23:47:05+00:00,"# RewardModel
 
 The RewardModel is a [BERT](https://huggingface.co/bert-base-cased) model that can be used to score the quality of a completion for a given prompt.
 
@@ -1148,7 +1148,7 @@ and bitching about what the machines do. Score: -10.942
 
 RewardModel is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for more details.
 ",,,RewardModel,nicholasKluge,1,[],[],NLP,2023-06,5416407012.5,
-nicholasKluge/RewardModelPT,['nicholasKluge/reward-aira-dataset'],112883405,0.07,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,435764017.0,False,19,0,"['transformers', 'pytorch', 'safetensors']",2023-12-28 00:15:02+00:00,2023-06-07 17:14:50+00:00,"# RewardModel (Portuguese)
+nicholasKluge/RewardModelPT,['nicholasKluge/reward-aira-dataset'],112883405,0.07,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,435764017.0,False,19,0,"['pytorch', 'safetensors', 'transformers']",2023-12-28 00:15:02+00:00,2023-06-07 17:14:50+00:00,"# RewardModel (Portuguese)
 
 The RewardModelPT is a [BERT](https://huggingface.co/neuralmind/bert-base-portuguese-cased) model that can be used to score the quality of a completion for a given prompt.
 
@@ -1263,7 +1263,7 @@ IA e reclamam do que as máquinas fazem. Score: -10.744
 ## License
 
 RewardModelPT is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for more details.",,,RewardModelPT,nicholasKluge,1,[],[],NLP,2023-06,6225200242.857142,
-nicholasKluge/ToxicityModelPT,"['nicholasKluge/toxic-aira-dataset', 'Anthropic/hh-rlhf', 'allenai/prosocial-dialog', 'allenai/real-toxicity-prompts', 'dirtycomputer/Toxic_Comment_Classification_Challenge', 'Paul/hatecheck-portuguese', 'told-br', 'skg/toxigen-data']",38583726,0.06,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,435763821.0,False,31,1,"['transformers', 'pytorch', 'safetensors']",2023-12-28 00:14:31+00:00,2023-06-13 22:52:05+00:00,"# ToxicityModel (Portuguese)
+nicholasKluge/ToxicityModelPT,"['nicholasKluge/toxic-aira-dataset', 'Anthropic/hh-rlhf', 'allenai/prosocial-dialog', 'allenai/real-toxicity-prompts', 'dirtycomputer/Toxic_Comment_Classification_Challenge', 'Paul/hatecheck-portuguese', 'told-br', 'skg/toxigen-data']",38583726,0.06,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,435763821.0,False,31,1,"['pytorch', 'transformers', 'safetensors']",2023-12-28 00:14:31+00:00,2023-06-13 22:52:05+00:00,"# ToxicityModel (Portuguese)
 
 The ToxicityModelPT is a [BERT](https://huggingface.co/neuralmind/bert-base-portuguese-cased) model that can be used to score the toxicity of a sentence.
 
@@ -1370,7 +1370,7 @@ This will output the following:
 ## License
 
 ToxicityModelPT is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for more details.",,,ToxicityModelPT,nicholasKluge,1,[],[],NLP,2023-06,7262730350.0,
-nicholasKluge/ToxicityModel,"['nicholasKluge/toxic-aira-dataset', 'Anthropic/hh-rlhf', 'allenai/prosocial-dialog', 'allenai/real-toxicity-prompts', 'dirtycomputer/Toxic_Comment_Classification_Challenge']",38583726,0.0002,CodeCarbon,fine-tuning,Canada,NVIDIA A100-SXM4-40GB,,,,,,498654577.0,False,2384,8,"['transformers', 'pytorch', 'safetensors']",2023-12-28 00:14:14+00:00,2023-06-13 22:21:18+00:00,"# ToxicityModel
+nicholasKluge/ToxicityModel,"['nicholasKluge/toxic-aira-dataset', 'Anthropic/hh-rlhf', 'allenai/prosocial-dialog', 'allenai/real-toxicity-prompts', 'dirtycomputer/Toxic_Comment_Classification_Challenge']",38583726,0.0002,CodeCarbon,fine-tuning,Canada,NVIDIA A100-SXM4-40GB,,,,,,498654577.0,False,2384,8,"['pytorch', 'transformers', 'safetensors']",2023-12-28 00:14:14+00:00,2023-06-13 22:21:18+00:00,"# ToxicityModel
 
 The ToxicityModel is a fine-tuned version of [RoBERTa](https://huggingface.co/roberta-base) that can be used to score the toxicity of a sentence.
 
@@ -1483,7 +1483,7 @@ Idiot, Dumbass, Moron, Stupid, Fool, Fuck Face. Score: -7.300
 
 ToxicityModel is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for more details.
 ",,,ToxicityModel,nicholasKluge,1,[],[],NLP,2023-06,2493272885000.0,
-nicholasKluge/Aira-2-portuguese-1B7,['nicholasKluge/instruct-aira-dataset'],152455005,1.99,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,6888131257.0,False,15,2,"['transformers', 'pytorch', 'safetensors']",2023-12-28 00:11:55+00:00,2023-06-26 18:48:23+00:00,"# Aira-2-portuguese-1B7
+nicholasKluge/Aira-2-portuguese-1B7,['nicholasKluge/instruct-aira-dataset'],152455005,1.99,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,6888131257.0,False,15,2,"['pytorch', 'safetensors', 'transformers']",2023-12-28 00:11:55+00:00,2023-06-26 18:48:23+00:00,"# Aira-2-portuguese-1B7
 
 Aira-2 is the second version of the Aira instruction-tuned series. Aira-2-portuguese-1B7 is an instruction-tuned model based on [BLOOM](https://huggingface.co/bigscience/bloom-1b7). The model was trained with a dataset composed of prompts and completions generated synthetically by prompting already-tuned models (ChatGPT, Llama, Open-Assistant, etc).
 
@@ -1577,7 +1577,7 @@ The model will output something like:
 
 Aira-2-portuguese-1B7 is licensed under the RAIL License since it is a model derived from BLOOM. See the [LICENSE](LICENSE) file for more details.
 ",,,Aira-2-portuguese-1B7,nicholasKluge,1,[],[],NLP,2023-06,3461372490.954774,
-nicholasKluge/Aira-2-portuguese-560M,['nicholasKluge/instruct-aira-dataset'],152455005,0.8,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,2236154721.0,False,15,2,"['transformers', 'pytorch', 'safetensors']",2023-12-28 00:03:57+00:00,2023-06-10 12:25:43+00:00,"# Aira-2-portuguese-560M
+nicholasKluge/Aira-2-portuguese-560M,['nicholasKluge/instruct-aira-dataset'],152455005,0.8,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,2236154721.0,False,15,2,"['pytorch', 'safetensors', 'transformers']",2023-12-28 00:03:57+00:00,2023-06-10 12:25:43+00:00,"# Aira-2-portuguese-560M
 
 Aira-2 is the second version of the Aira instruction-tuned series. Aira-2-portuguese-560M is an instruction-tuned model based on [BLOOM](https://huggingface.co/bigscience/bloom-560m). The model was trained with a dataset composed of prompts and completions generated synthetically by prompting already-tuned models (ChatGPT, Llama, Open-Assistant, etc).
 
