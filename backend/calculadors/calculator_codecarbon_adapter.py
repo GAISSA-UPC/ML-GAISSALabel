@@ -20,8 +20,11 @@ def get_efficiency_results(endpoint, data, transformacions):
         output_file=output_file,
         output_dir=output_dir,
     )
+    payload = {
+        "input_text": data,
+    }
     tracker.start()
-    print(query(endpoint, data))
+    print(query(endpoint, payload))
     tracker.stop()
 
     # Recuperar resultats (transformant-los de CSV a array de JSONs)
