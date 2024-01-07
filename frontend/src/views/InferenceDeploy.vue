@@ -17,7 +17,7 @@
         <br>
         <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Input for the inference") }}</h3><br>
         <el-form-item>
-            <el-input v-model="input"/>
+            <el-input type="textarea" v-model="input"/>
         </el-form-item>
         <br>
         <el-button
