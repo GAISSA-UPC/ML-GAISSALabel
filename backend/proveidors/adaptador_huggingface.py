@@ -673,7 +673,7 @@ def performance_metrics_treatment(df):
 
 def harmonize_co2(co2):
 
-    if isinstance(co2, float):
+    if isinstance(co2, float) | isinstance(co2, int):
         return co2
 
     if pd.isnull(co2):
@@ -702,7 +702,7 @@ def performance_score(df):
 def preprocessing_rawData(df):
     pd.options.mode.chained_assignment = None
 
-    with open('./tags_metadata.yaml') as file:
+    with open('proveidors/tags_metadata.yaml') as file:
         tags_metadata = yaml.safe_load(file)
 
 
@@ -750,7 +750,6 @@ def is_iterable(obj):
         print(obj)
         return True
     except TypeError:
-        print("hola")
         return False
 
 
