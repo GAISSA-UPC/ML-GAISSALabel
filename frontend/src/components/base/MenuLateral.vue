@@ -15,13 +15,13 @@
                 <span>{{ $t('Training') }}</span>
             </template>
             <el-menu-item index="training form" @click="$router.push({name: 'training form'})">
-                {{ $t('Form') }}
-            </el-menu-item>
-            <el-menu-item index="training pre saved" @click="$router.push({name: 'training pre saved'})">
-                {{ $t('Database') }}
+                {{ $t('New from Form') }}
             </el-menu-item>
             <el-menu-item index="training file" @click="$router.push({name: 'training file'})">
-                {{ $t('File') }}
+                {{ $t('New from File') }}
+            </el-menu-item>
+            <el-menu-item index="training pre saved" @click="$router.push({name: 'training pre saved'})">
+                {{ $t('Consult') }}
             </el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="2">
@@ -30,16 +30,16 @@
                 <span>{{ $t('Inference') }}</span>
             </template>
             <el-menu-item index="inference form" @click="$router.push({name: 'inference form'})">
-                {{ $t('Form') }}
-            </el-menu-item>
-            <el-menu-item index="inference pre saved" @click="$router.push({name: 'inference pre saved'})">
-                {{ $t('Database') }}
+                {{ $t('New from Form') }}
             </el-menu-item>
             <el-menu-item index="inference file" @click="$router.push({name: 'inference file'})">
-                {{ $t('File') }}
+                {{ $t('New from File') }}
             </el-menu-item>
             <el-menu-item index="inference deploy" @click="$router.push({name: 'inference deploy'})">
-                {{ $t('Deployment') }}
+                {{ $t('New from Deployment') }}
+            </el-menu-item>
+            <el-menu-item index="inference pre saved" @click="$router.push({name: 'inference pre saved'})">
+                {{ $t('Consult') }}
             </el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="3" v-if="$store.getters.isLogged">
