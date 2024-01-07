@@ -8,6 +8,7 @@
                 <el-select
                     v-model="selectedModel"
                     @change="canviModel"
+                    filterable
                 >
                     <el-option
                         v-for="(model, i) in models" :key="i"

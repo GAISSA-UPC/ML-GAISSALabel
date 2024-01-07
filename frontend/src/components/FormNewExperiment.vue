@@ -12,7 +12,7 @@
     <el-form label-position="top">
         <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Model") }}</h3><br>
         <el-form-item>
-            <el-select v-model="selectedModel">
+            <el-select v-model="selectedModel" filterable>
                 <el-option
                     v-for="(model, i) in models" :key="i"
                     :value="model.id"
