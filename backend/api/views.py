@@ -222,6 +222,7 @@ class CalculadorInferenciaView(mixins.CreateModelMixin, viewsets.GenericViewSet)
         if not endpoint or not data:
             return Response("Cal donar els atributs endpoint i input!", status=status.HTTP_400_BAD_REQUEST)
         resultats = calculateEfficiency(endpoint, data)
+        print("hola")
         return Response(resultats, status=status.HTTP_201_CREATED)
 
 
