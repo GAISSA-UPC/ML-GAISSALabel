@@ -26,73 +26,84 @@ def get_position(i, total):
     Returns:
         Base position of the metric.
     """
-    if total == 1:
-        x = 780
-        y = 425
-    elif total == 2:
-        y = 425
-        if i == 0:
-            x = 520
-        else:   # i == 1
-            x = 1040
-    elif total == 3:
-        if i == 0:
-            x = 520
-            y = 650
-        elif i == 1:
-            x = 1040
-            y = 650
-        else:   # i == 2
+
+    """if total == 1:
             x = 780
-            y = 200
-    elif total == 4:
-        if i == 0:
-            x = 520
-            y = 650
-        elif i == 1:
-            x = 1040
-            y = 650
-        elif i == 2:
-            x = 520
-            y = 200
-        else:   # i == 3:
-            x = 1040
-            y = 200
-    elif total == 5:
-        if i == 0:
-            x = 260
-            y = 650
-        elif i == 1:
-            x = 780
-            y = 650
-        elif i == 2:
-            x = 1300
-            y = 650
-        elif i == 3:
-            x = 520
-            y = 200
-        else:   # i == 4
-            x = 1040
-            y = 200
-    else:   # total == 6
-        if i == 0:
-            x = 260
-            y = 650
-        elif i == 1:
-            x = 780
-            y = 650
-        elif i == 2:
-            x = 1300
-            y = 650
-        elif i == 3:
-            x = 260
-            y = 200
-        elif i == 4:
-            x = 780
-            y = 200
-        else:   # i == 5
-            x = 1300
-            y = 200
+            y = 425
+        elif total == 2:
+            y = 425
+            if i == 0:
+                x = 520
+            else:   # i == 1
+                x = 1040
+        elif total == 3:
+            if i == 0:
+                x = 520
+                y = 650
+            elif i == 1:
+                x = 1040
+                y = 650
+            else:   # i == 2
+                x = 780
+                y = 200
+        elif total == 4:
+            if i == 0:
+                x = 520
+                y = 650
+            elif i == 1:
+                x = 1040
+                y = 650
+            elif i == 2:
+                x = 520
+                y = 200
+            else:   # i == 3:
+                x = 1040
+                y = 200
+        elif total == 5:
+            if i == 0:
+                x = 260
+                y = 650
+            elif i == 1:
+                x = 780
+                y = 650
+            elif i == 2:
+                x = 1300
+                y = 650
+            elif i == 3:
+                x = 520
+                y = 200
+            else:   # i == 4
+                x = 1040
+                y = 200
+        else:   # total == 6
+            if i == 0:
+                x = 260
+                y = 650
+            elif i == 1:
+                x = 780
+                y = 650
+            elif i == 2:
+                x = 1300
+                y = 650
+            elif i == 3:
+                x = 260
+                y = 200
+            elif i == 4:
+                x = 780
+                y = 200
+            else:   # i == 5
+                x = 1300
+                y = 200"""
+
+    posicions = [
+        [(780, 425)],
+        [(520, 425), (1040, 425)],
+        [(520, 650), (1040, 650), (780, 200)],
+        [(520, 650), (1040, 650), (520, 200), (1040, 200)],
+        [(260, 650), (780, 650), (1300, 650), (520, 200), (1040, 200)],
+        [(260, 650), (780, 650), (1300, 650), (260, 200), (780, 200), (1300, 200)]
+    ]
+    x, y = posicions[total - 1][i]
 
     return x / C_SIZE[0], y / C_SIZE[1]
 

@@ -10,9 +10,6 @@ def generateLabel(qualifFinal, qualifMetriques, resultats, model, experiment_id,
     # Limitem el nombre de resultats que mostrem a l'EL a 6 màxim (que seran els que tinguis major pes)
     resultats_formatted = {}
     for metrica_id, qualificacio in list(qualifMetriques.items())[:6]:
-        imatge = None
-        if qualificacio is not None:
-            imatge = Interval.objects.get(metrica__id=metrica_id, qualificacio__id=qualifMetriques[metrica_id]).imatge.read()
         metrica = Metrica.objects.get(id=metrica_id)
         resultats_formatted[metrica.nom] = {
             'id': metrica_id,
