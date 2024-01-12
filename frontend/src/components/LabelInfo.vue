@@ -92,7 +92,12 @@
                 <h3 style="font-weight: bold;margin-bottom: 6px">{{info.nom}}</h3>
                 <p align="justify">{{ descripcions[metrica] }}</p>
                 <CustomSlider :marks="marks[metrica]" :max="inf[metrica]" :values="ranges[metrica]" :color="info.color"/>
-                <p align="justify">{{ recomanacions[metrica] }}</p>
+                <div v-if="recomanacions[metrica]">
+                    <h3>{{ $t('Recomandations to improve this result') }}</h3>
+                    <ul style="margin-left: 30px">
+                        <li v-for="(r, i) in recomanacions[metrica].split(';')" :key="i">{{ r }}</li>
+                    </ul>
+                </div>
             </el-col>
             <el-col :span="3" align="middle">
                 <p :style="{ fontSize: '35px', fontWeight: 'bold', color: info.color }">{{ info.qualificacio }}</p>
