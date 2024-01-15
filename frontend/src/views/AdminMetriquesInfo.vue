@@ -1,5 +1,9 @@
 <template>
     <h1>{{ $t("Metrics and additional information") }}</h1><br>
+
+    <p>{{ $t('This page allows you to handle metrics and additional information. Metrics are used to compute the energy \
+    efficiency result for trainings and inferences. On the ohter hand, additional information is asked to the user to complete the efficiency evaluation.') }}</p><br>
+
     <h2 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Training") }}</h2><br>
     <el-row justify="space-between">
         <el-col :span="6">

@@ -1,9 +1,14 @@
 <template>
     <h1>{{ $t("Energy label for") }} {{ fase }}</h1><br>
     <h2>{{ $t("Create label for dataset model") }}</h2><br>
+
+    <p style="font-size: 20px">{{ $t('This page allows you to consult the energy efficiency of a') }} {{ fase }} {{ $t(' of a model.') }}</p>
+    <br>
+
     <div>
         <el-form label-position="top">
-            <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Model") }}</h3><br>
+            <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Model") }}</h3>
+            <p>{{ $t('Please, indicate the model you are interested in.') }}</p><br>
             <el-form-item>
                 <el-select
                     v-model="selectedModel"
@@ -17,20 +22,21 @@
                     />
                 </el-select>
             </el-form-item><br>
-            <h3 style="color: var(--gaissa_green);font-weight: bold" v-show="selectedModel != null">{{ fase }}</h3><br>
-            <el-form-item
-                v-show="selectedModel != null"
-            >
-                <el-select
-                    v-model="selectedExperiment"
-                >
-                    <el-option
-                        v-for="(experiment, i) in experiments" :key="i"
-                        :value="experiment.id"
-                        :label="formatData(experiment.dataRegistre)"
-                    />
-                </el-select>
-            </el-form-item><br>
+            <div v-show="selectedModel != null">
+                <h3 style="color: var(--gaissa_green);font-weight: bold">{{ fase }}</h3>
+                <p>{{ $t('Now specify the') }} {{ fase }} {{ $t('from which you want to get the evaluation.') }}</p><br>
+                <el-form-item>
+                    <el-select
+                        v-model="selectedExperiment"
+                    >
+                        <el-option
+                            v-for="(experiment, i) in experiments" :key="i"
+                            :value="experiment.id"
+                            :label="formatData(experiment.dataRegistre)"
+                        />
+                    </el-select>
+                </el-form-item>
+            </div><br>
             <el-button
                 @click="mostrarEtiqueta"
                 color="var(--gaissa_green)"
