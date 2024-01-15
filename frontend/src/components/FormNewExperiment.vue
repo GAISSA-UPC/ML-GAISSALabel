@@ -93,11 +93,11 @@
 </template>
 
 <script>
-import models from '@/services/models'
-import metriques from '@/services/metriques'
-import informacions from "@/services/informacions";
-import inferencies from '@/services/inferencies'
-import trainings from '@/services/trainings'
+import models from '@/controllers/models'
+import metriques from '@/controllers/metriques'
+import informacions from "@/controllers/informacions";
+import inferencies from '@/controllers/inferencies'
+import trainings from '@/controllers/trainings'
 import DialogNewModel from "@/components/DialogNewModel.vue";
 export default {
     name: "FormNewExperiment",

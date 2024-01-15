@@ -185,8 +185,8 @@
 
 
 <script>
-import metriques from "@/services/metriques";
-import informacions from "@/services/informacions";
+import metriques from "@/controllers/metriques";
+import informacions from "@/controllers/informacions";
 
 export default {
     name: "AdminMetriquesInfo",

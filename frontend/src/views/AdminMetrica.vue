@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import metriques from "@/services/metriques";
+import metriques from "@/controllers/metriques";
 export default {
     name: "AdminMetrica",
     data() {
