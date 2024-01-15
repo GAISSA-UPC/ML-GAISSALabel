@@ -702,7 +702,7 @@ def performance_score(df):
 def preprocessing_rawData(df):
     pd.options.mode.chained_assignment = None
 
-    with open('proveidors/tags_metadata.yaml') as file:
+    with open('connectors/tags_metadata.yaml') as file:
         tags_metadata = yaml.safe_load(file)
 
 

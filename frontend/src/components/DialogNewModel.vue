@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import models from "@/services/models";
+import models from "@/controllers/models";
 
 export default {
     name: "DialogNewModel",

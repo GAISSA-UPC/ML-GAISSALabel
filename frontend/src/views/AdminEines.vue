@@ -55,7 +55,7 @@
 
 
 <script>
-import eines from "@/services/eines";
+import eines from "@/controllers/eines";
 
 export default {
     name: "AdminEines",

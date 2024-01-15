@@ -1,6 +1,6 @@
 from rest_framework import routers
 from django.urls import path, include
-from . import views
+from controllers import views
 
 router = routers.DefaultRouter()
 router.register(r'models', views.ModelsView, basename='models')
@@ -9,7 +9,7 @@ router.register(r'models/(?P<model_id>\d+)/inferencies', views.InferenciesView, 
 router.register(r'qualificacions', views.QualificacionsView, basename='qualificacions')
 router.register(r'metriques', views.MetriquesView, basename='metriques')
 router.register(r'informacions', views.InfoAddicionalsView, basename='informacions_addicionals')
-router.register(r'calculadors/inferencia', views.CalculadorInferenciaView, basename='calculador_inferencia')
+router.register(r'efficiency_calculators/inferencia', views.CalculadorInferenciaView, basename='calculador_inferencia')
 router.register(r'eines', views.EinesCalculView, basename='eines_calcul')
 router.register(r'login/admins', views.LoginAdminView, basename='login_admins')
 router.register(r'sincronitzacio', views.SincroView, basename='sincro')
