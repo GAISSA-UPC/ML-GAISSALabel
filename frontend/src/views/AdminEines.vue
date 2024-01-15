@@ -1,5 +1,8 @@
 <template>
     <h1>{{ $t("Calculation tools") }}</h1><br>
+
+    <p>{{ $t('This page allows you to handle the calculation tools that the users are offered. These tools will be shown as options in the generation of an efficiency study from a file.') }}</p>
+
     <el-row justify="end">
         <el-col :span="2">
             <el-button
