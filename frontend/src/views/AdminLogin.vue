@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import usuaris from '@/services/usuaris'
+import usuaris from '@/controllers/usuaris'
 export default {
     name: "AdminLogin",
     data() {

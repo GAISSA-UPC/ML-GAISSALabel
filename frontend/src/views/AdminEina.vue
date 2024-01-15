@@ -94,9 +94,9 @@
 </template>
 
 <script>
-import eines from "@/services/eines";
-import metriques from "@/services/metriques";
-import informacions from "@/services/informacions";
+import eines from "@/controllers/eines";
+import metriques from "@/controllers/metriques";
+import informacions from "@/controllers/informacions";
 export default {
     name: "AdminEina",
     data() {

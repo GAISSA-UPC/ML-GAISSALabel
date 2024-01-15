@@ -1,4 +1,4 @@
-import axios from "@/services/backend"
+import axios from "@/controllers/backend"
 
 export default {
     async listOrdered() {
