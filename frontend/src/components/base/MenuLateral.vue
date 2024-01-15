@@ -57,7 +57,7 @@
                 {{ $t('Calculation tools') }}
             </el-menu-item>
         </el-sub-menu>
-        <el-menu-item index="4">
+        <el-menu-item index="about" @click="$router.push({name: 'about'})">
             <font-awesome-icon :icon="['fas', 'people-group']" class="icon"/>
             <template #title>{{ $t('About') }}</template>
         </el-menu-item>

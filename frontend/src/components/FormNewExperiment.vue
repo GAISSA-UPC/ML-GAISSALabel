@@ -9,8 +9,12 @@
         <br>
     </div>
 
+    <p style="font-size: 20px">{{ $t('This page allows you to evaluate the energy efficiency of your models\'') }} {{ fase }}s. {{ $t('You may go through the following sections to provide the necessary information.') }}</p>
+    <br>
+
     <el-form label-position="top">
-        <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Model") }}</h3><br>
+        <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Model") }}</h3>
+        <p>{{ $t('First, please indicate the model you are working with. If it is a new one or not listed above, you can register a new model.') }}</p><br>
         <el-form-item>
             <el-select v-model="selectedModel" filterable>
                 <el-option
@@ -29,7 +33,8 @@
         </el-form-item>
         <br>
 
-        <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Metrics") }}</h3><br>
+        <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Metrics") }}</h3>
+        <p>{{ $t('Next, introduce the results for each of the metric you have described. Please, try to compute all of them, to accomplish a more accurate efficiency study.') }}</p><br>
         <el-form-item
             v-for="(metrica, i) in metriques" :key="i"
             :label="metrica.nom"
@@ -42,12 +47,13 @@
             />
             <p style="margin-left: 10px">{{ metrica.unitat }}</p>
             <el-alert v-if="metrica.calcul" type="info" show-icon :closable="false" style="margin-top: 10px">
-                <p>{{ metrica.calcul }}</p>
+                <p style="font-size: 14px">{{ metrica.calcul }}</p>
             </el-alert>
         </el-form-item>
         <br>
 
-        <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Additional information") }}</h3><br>
+        <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Additional information") }}</h3>
+        <p>{{ $t('Finally, if you want, you can add some additional information related to the experiment. This information will not be taken into account when generating the efficiency result, but may be interesting for you or other developers to know.') }}</p><br>
         <el-form-item
             v-for="(infoAdd, i) in informacions" :key="i"
             :label="infoAdd.nom"
@@ -179,4 +185,7 @@ export default {
 </script>
 
 <style>
+p {
+    font-size: 18px
+}
 </style>

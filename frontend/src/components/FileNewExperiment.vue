@@ -2,6 +2,9 @@
     <h1>{{ $t("Energy label for") }} {{ fase }}</h1><br>
     <h2>{{ $t("Register a new") }} {{ fase }}</h2><br>
 
+    <p style="font-size: 20px">{{ $t('This page allows you to evaluate the energy efficiency of your models\'') }} {{ fase }}s. {{ $t('You may upload the file or files that provide the information for the evaluation.') }}</p>
+    <br>
+
     <div>
         <el-form label-position="top">
             <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Files") }}</h3><br>
@@ -51,7 +54,34 @@
                 {{ $t('Generate label') }}
             </el-button>
         </el-form><br>
-    </div>
+    </div><br>
+
+    <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("How to obtain the files?") }}</h3><br>
+
+    <p style="font-size: 20px">{{ $t('There are many ways you can get the needed information. Here, we propose the following tools:') }}</p><br>
+
+    <p style="font-weight: bold">{{ $t('GAISSALabel plug-in') }}</p>
+    <p>{{ $t('We offer you a plug-in that runs on the terminal of your server. It will help you generate a file with the \
+        configuration parameters of your model. Specifically, it will provide the size of the model, the size of its file and the FLOPS.') }}</p>
+    <p>{{ $t('You can download it through this') }} <a href="https://drive.google.com/file/d/1oeYVYamzdtR6t4SV8U8Rd-9g-jm-u_ZU/view?usp=sharing" target="_blank">{{ $t('link') }}</a>.</p>
+    <p>{{ $t('Then, follow these steps:') }}</p>
+    <ol style="margin-left: 30px">
+        <li><p>{{ $t('Decompress the downloaded file') }}</p></li>
+        <li><p>{{ $t('Access your console and go inside the decompressed folder') }}</p></li>
+        <li><p>{{ $t('Create a python virtual environment using the command: # python -m venv env') }}</p></li>
+        <li><p>{{ $t('Activate the virtual environment: # source env/bin/activate') }}</p></li>
+        <li><p>{{ $t('Install the requirements: # pip install -r requirements.txt') }}</p></li>
+        <li><p>{{ $t('Run the script and follow the instructions of the plug-in: # python main_script.py') }}</p></li>
+    </ol><br>
+
+    <p style="font-weight: bold">{{ $t('CodeCarbon') }}</p>
+    <p>{{ $t('CodeCarbon will help you compute the information about the duration of your training or inference and the energy consumed.') }}</p>
+    <p>{{ $t('To install and use this tool, you may:') }}</p>
+    <ol style="margin-left: 30px">
+        <li><p>{{ $t('Download CodeCarbon using this') }} <a href="https://github.com/mlco2/codecarbon" target="_blank">{{ $t('link') }}</a>.</p></li>
+        <li><p>{{ $t('Follow the documentation of CodeCarbon to install and use the tool. The documentation is accessible') }} <a href="https://mlco2.github.io/codecarbon/" target="_blank">{{ $t('here') }}</a>.</p></li>
+    </ol><br>
+
 
 </template>
 
@@ -193,4 +223,7 @@ export default {
 </script>
 
 <style>
+p {
+    font-size: 18px
+}
 </style>
