@@ -108,10 +108,10 @@
 </template>
 
 <script>
-import trainings from '@/services/trainings'
-import inferencies from '@/services/inferencies'
-import metriques from "@/services/metriques";
-import models from '@/services/models'
+import trainings from '@/controllers/trainings'
+import inferencies from '@/controllers/inferencies'
+import metriques from "@/controllers/metriques";
+import models from '@/controllers/models'
 import EnergyLabel from "@/components/EnergyLabel.vue";
 import CustomSlider from "@/components/CustomSlider.vue";
 import {formatData} from '@/utils'

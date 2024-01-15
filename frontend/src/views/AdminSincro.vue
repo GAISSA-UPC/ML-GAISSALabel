@@ -43,7 +43,7 @@
 
 
 <script>
-import sincronitzacions from "@/services/sincronitzacions";
+import sincronitzacions from "@/controllers/sincronitzacions";
 import { ElLoading } from 'element-plus'
 
 export default {

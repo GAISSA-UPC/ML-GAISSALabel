@@ -8,7 +8,7 @@ from rest_framework.test import APITestCase
 from rest_framework.test import APIRequestFactory
 
 from django.contrib.auth.models import User
-from .models import Administrador, Qualificacio, Interval, Metrica, ResultatEntrenament, ResultatInferencia, Entrenament, \
+from api.models import Administrador, Qualificacio, Interval, Metrica, ResultatEntrenament, ResultatInferencia, Entrenament, \
     Inferencia, Model
 from . import permissions
 from gaissalabel import settings

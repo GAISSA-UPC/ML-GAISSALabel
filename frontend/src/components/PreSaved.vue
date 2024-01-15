@@ -49,9 +49,9 @@
 </template>
 
 <script>
-import models from '@/services/models'
-import trainings from '@/services/trainings'
-import inferencies from '@/services/inferencies'
+import models from '@/controllers/models'
+import trainings from '@/controllers/trainings'
+import inferencies from '@/controllers/inferencies'
 import {formatData} from '@/utils'
 export default {
     name: "PreSaved",

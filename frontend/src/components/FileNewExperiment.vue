@@ -87,7 +87,7 @@
 
 <script>
 import * as XLSX from "xlsx";
-import eines from "@/services/eines";
+import eines from "@/controllers/eines";
 export default {
     name: "FileNewExperiment",
     props: {

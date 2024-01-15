@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import estadistiques from "@/services/estadistiques";
+import estadistiques from "@/controllers/estadistiques";
 
 export default {
     name: "HomeView",
