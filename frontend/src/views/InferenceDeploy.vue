@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import calculadors from '@/services/calculadors'
+import calculadors from '@/controllers/calculadors'
 export default {
     name: "InferenceDeploy",
     data() {

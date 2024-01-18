@@ -8,18 +8,18 @@ from django.shortcuts import get_object_or_404
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, Interval, EinaCalcul, \
+from api.models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, Interval, EinaCalcul, \
     TransformacioMetrica, TransformacioInformacio, Administrador, Configuracio
-from .serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
+from api.serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
     EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer, \
     IntervalBasicSerializer, MetricaSerializer, EinaCalculBasicSerializer, EinaCalculSerializer, \
     TransformacioMetricaSerializer, TransformacioInformacioSerializer, LoginAdminSerializer
 
-from . import permissions
-from calculadors.rating_calculator import calculateRating
-from calculadors.label_generator import generateLabel
-from calculadors.efficiency_calculator import calculateEfficiency
-from proveidors import adaptador_huggingface
+from api import permissions
+from efficiency_calculators.rating_calculator import calculateRating
+from efficiency_calculators.label_generator import generateLabel
+from efficiency_calculators.efficiency_calculator import calculateEfficiency
+from connectors import adaptador_huggingface
 
 
 class ModelsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):

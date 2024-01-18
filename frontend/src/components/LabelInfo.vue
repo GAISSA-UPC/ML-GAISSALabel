@@ -93,7 +93,7 @@
                 <p align="justify">{{ descripcions[metrica] }}</p>
                 <CustomSlider :marks="marks[metrica]" :max="inf[metrica]" :values="ranges[metrica]" :color="info.color"/>
                 <div v-if="recomanacions[metrica]">
-                    <h3>{{ $t('Recomandations to improve this result') }}</h3>
+                    <h3>{{ $t('Recommendations to improve this result') }}</h3>
                     <ul style="margin-left: 30px">
                         <li v-for="(r, i) in recomanacions[metrica].split(';')" :key="i">{{ r }}</li>
                     </ul>
@@ -108,10 +108,10 @@
 </template>
 
 <script>
-import trainings from '@/services/trainings'
-import inferencies from '@/services/inferencies'
-import metriques from "@/services/metriques";
-import models from '@/services/models'
+import trainings from '@/controllers/trainings'
+import inferencies from '@/controllers/inferencies'
+import metriques from "@/controllers/metriques";
+import models from '@/controllers/models'
 import EnergyLabel from "@/components/EnergyLabel.vue";
 import CustomSlider from "@/components/CustomSlider.vue";
 import {formatData} from '@/utils'

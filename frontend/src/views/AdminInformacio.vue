@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import informacions from "@/services/informacions";
+import informacions from "@/controllers/informacions";
 export default {
     name: "AdminInformacio",
     data() {
