@@ -93,7 +93,7 @@
                 <p align="justify">{{ descripcions[metrica] }}</p>
                 <CustomSlider :marks="marks[metrica]" :max="inf[metrica]" :values="ranges[metrica]" :color="info.color"/>
                 <div v-if="recomanacions[metrica]">
-                    <h3>{{ $t('Recomandations to improve this result') }}</h3>
+                    <h3>{{ $t('Recommendations to improve this result') }}</h3>
                     <ul style="margin-left: 30px">
                         <li v-for="(r, i) in recomanacions[metrica].split(';')" :key="i">{{ r }}</li>
                     </ul>
