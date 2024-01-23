@@ -2,7 +2,7 @@ import axios from "@/controllers/backend"
 
 export default {
     async list() {
-        const responseInformacions = await axios.get(`/api/informacions`)
+        const responseInformacions = await axios.get(`/api/informacions/`)
         return responseInformacions
     },
     async listFilteredByPhase(phase) {
