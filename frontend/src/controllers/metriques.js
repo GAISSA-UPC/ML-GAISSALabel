@@ -18,7 +18,7 @@ export default {
         Si les qualificacions es poguessin modificar, potser seria més adequat crear un servei qualificacions.js
         Per ara, com que només necessitem aquesta operació, ho posem aquí.
          */
-        const responseQualificacions = await axios.get(`/api/qualificacions?ordering=ordre`, {
+        const responseQualificacions = await axios.get(`/api/qualificacions/?ordering=ordre`, {
             responseType: 'json'
         })
         return responseQualificacions
