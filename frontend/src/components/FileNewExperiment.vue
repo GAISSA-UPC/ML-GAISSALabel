@@ -121,6 +121,8 @@ export default {
                     const reader = new FileReader();
                     reader.onload = (event) => {
                         const contingut = event.target.result;
+                        console.log(file.tool)
+                        console.log(file.name)
                         const contingutFormatted = this.transformarContingut(this.parseExcelJSON(contingut), file.tool);
                         resolve(contingutFormatted);
                     };
