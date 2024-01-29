@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10532066.svg)](https://doi.org/10.5281/zenodo.10532066)
+
 # GAISSALabel
 
 GAISSALabel allows data scientists, software engineers, and end-users of AI models to analyze, understand, and contribute to improving the energy efficiency of artificial intelligence models during both training and inference stages.
