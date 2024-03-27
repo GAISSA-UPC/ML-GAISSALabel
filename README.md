@@ -21,6 +21,8 @@ Firstly, for both training and inference, a form is provided to collect results 
 
 Regardless of the chosen method, users have the ability to retrieve previous evaluations of training and inference. This includes all energy efficiency results calculated from the data collected from various artificial intelligence repositories.
 
+We have adopted the use of index values as proposed in [this study](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32019R2014) and used in [this tool](http://167.99.254.41). Indexing allows us to put all attribute values in relation to reference values, effectively dropping the units of the attributes and en- abling easier comparisons. The carbon efficiency classification system used in this study is based on the weighted mean of the quartiles of the model for each indexed attribute.
+
 ### Management
 On the other hand, GAISSALabel has sections restricted to certain tool QA Managers. These managers have access to three additional sections.
 
