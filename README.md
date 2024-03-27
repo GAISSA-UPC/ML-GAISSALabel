@@ -152,6 +152,10 @@ Would you like to download the repository locally and run it? Follow these steps
      npm run dev
      ```
 
+## Acknowledgements
+
+We acknowledge the raphischer/strep [repository](https://github.com/raphischer/strep) for its closely related work, particularly in the design of our energy efficiency labels. For transparency, the MIT license has been applied in line with this collaboration on the affected files. Explore [raphischer/strep](https://github.com/raphischer/strep) on GitHub for further details. Our approach to indexing and classification also draws upon industry standards, streamlining comparisons within our tool. We're thankful for these contributions that have shaped our project.
+
 ## About Us and How to Contribute
 
 GAISSALabel is a tool developed within the GAISSA project at the GESSI research group. It serves as a valuable resource for evaluating both the training and inference phases of machine learning models.
