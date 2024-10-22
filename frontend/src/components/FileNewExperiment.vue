@@ -63,7 +63,7 @@
     <p style="font-weight: bold">{{ $t('GAISSALabel plug-in') }}</p>
     <p>{{ $t('We offer you a plug-in that runs on the terminal of your server. It will help you generate a file with the \
         configuration parameters of your model. Specifically, it will provide the size of the model, the size of its file and the FLOPS.') }}</p>
-    <p>{{ $t('You can download it through this') }} <a href="https://drive.google.com/file/d/1oeYVYamzdtR6t4SV8U8Rd-9g-jm-u_ZU/view?usp=sharing" target="_blank">{{ $t('link') }}</a>.</p>
+    <p>{{ $t('You can download it through this') }} <a href="/GAISSALabel_plugin.zip" target="_blank">{{ $t('link') }}</a>.</p>
     <p>{{ $t('Then, follow these steps:') }}</p>
     <ol style="margin-left: 30px">
         <li><p>{{ $t('Decompress the downloaded file') }}</p></li>
