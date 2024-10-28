@@ -5,6 +5,19 @@ from tensorflow.python.framework.convert_to_constants import convert_variables_t
 import torch
 from fvcore.nn import FlopCountAnalysis
 
+def write_to_csv(output_path, values):
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    with open(output_path, 'w', newline='') as file:
+        writer = csv.writer(file)
+
+        # Write the header
+        writer.writerow(['model_size', 'file_size', 'flops'])
+
+        # Write the values
+        writer.writerow(values)
+
 def calculateH5(model_path, output_path):
     model = load_model(model_path)
 
@@ -32,17 +45,9 @@ def calculateH5(model_path, output_path):
     flops = tf.compat.v1.profiler.profile(
         graph=frozen_func.graph, run_meta=run_meta, cmd="scope", options=opts
     )
-    
-    
+
     # Writing to CSV
-    with open(output_path, 'w', newline='') as file:
-        writer = csv.writer(file)
-
-        # Write the header
-        writer.writerow(['model_size', 'file_size', 'flops'])
-
-        # Write the values
-        writer.writerow([num_params, model_size_mb, flops.total_float_ops])
+    write_to_csv(output_path, [num_params, model_size_mb, flops.total_float_ops])
 
 def calculateSavedModel(model_path, output_path, input_shape=None):
     # Load the model for inference compatibility
@@ -91,10 +96,7 @@ def calculateSavedModel(model_path, output_path, input_shape=None):
         )
 
     #### Write Results to CSV
-    with open(output_path, 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['model_size', 'file_size', 'flops'])
-        writer.writerow([num_params, model_size_mb, flops.total_float_ops if flops else 'N/A'])
+    write_to_csv(output_path, [num_params, model_size_mb, flops.total_float_ops])
 
 def calculatePyTorch(model_path, output_path, input_shape=None):
     model = torch.load(model_path)
@@ -125,7 +127,4 @@ def calculatePyTorch(model_path, output_path, input_shape=None):
         flops = "N/A"
 
     # Writing to CSV
-    with open(output_path, 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['model_size', 'file_size', 'flops'])
-        writer.writerow([num_params, model_size_mb, flops])
+    write_to_csv(output_path, [num_params, model_size_mb, flops])

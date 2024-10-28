@@ -1,11 +1,17 @@
 from gaissaplugin import PlugIn
+import os
 
 def main():
 
     # Get user input for model path and output directory and filename
     model_path = input("Enter the model's file path: ")
-    output_directory = input("Enter the output directory: ")
-    filename = input("Enter the filename: ")
+
+    default_output_directory = "./plugin_output"
+    output_directory = input(f"Enter the output directory (or continue to default: {default_output_directory}): ") or default_output_directory
+
+    model_name = os.path.splitext(os.path.basename(model_path))[0]
+    default_filename = f"{model_name}_output"
+    filename = input(f"Enter the filename (or continue to default: {default_filename}): ") or default_filename
 
     # Instantiate the plugin
     plugin = PlugIn()
