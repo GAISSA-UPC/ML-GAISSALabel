@@ -44,6 +44,58 @@ def calculateH5(model_path, output_path):
         # Write the values
         writer.writerow([num_params, model_size_mb, flops.total_float_ops])
 
+def calculateSavedModel(model_path, output_path, input_shape=None):
+    # Load the model for inference compatibility
+    model = tf.keras.layers.TFSMLayer(model_path, call_endpoint='serving_default')
+
+    #### MODEL SIZE (# parameters)
+    num_params = int(sum(tf.reduce_prod(var.shape) for var in model.trainable_variables))
+
+    #### MODEL FILE SIZE
+    model_size_bytes = sum(os.path.getsize(os.path.join(dirpath, filename))
+                           for dirpath, _, filenames in os.walk(model_path)
+                           for filename in filenames)
+    model_size_mb = model_size_bytes / (1024 * 1024)
+
+    #### FLOPS Calculation
+    # Use a default input shape if none is provided
+    if input_shape is None:
+        print("No input shape provided. Defaulting to image model input shape: (1, 224, 224, 3)")
+        input_shape = (1, 224, 224, 3)
+
+    # Convert the model to a frozen graph for profiling
+    concrete_func = tf.function(lambda x: model(x)).get_concrete_function(
+        tf.TensorSpec(input_shape, model.dtype)
+    )
+    frozen_func, _ = convert_variables_to_constants_v2_as_graph(concrete_func)
+
+    # Now that we have the frozen function, we can proceed with profiling
+    with tf.compat.v1.Session(graph=frozen_func.graph) as sess:
+        # Run metadata collection for FLOPS and parameter profiling
+        run_meta = tf.compat.v1.RunMetadata()
+        opts = tf.compat.v1.profiler.ProfileOptionBuilder.float_operation()    
+        flops = tf.compat.v1.profiler.profile(
+            graph=sess.graph,
+            run_meta=run_meta,
+            cmd="op",
+            options=opts
+        )
+
+        # Ensure the profiler has been applied correctly
+        opts_params = tf.compat.v1.profiler.ProfileOptionBuilder.trainable_variables_parameter()    
+        params = tf.compat.v1.profiler.profile(
+            graph=sess.graph,
+            run_meta=run_meta,
+            cmd="op",
+            options=opts_params
+        )
+
+    #### Write Results to CSV
+    with open(output_path, 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['model_size', 'file_size', 'flops'])
+        writer.writerow([num_params, model_size_mb, flops.total_float_ops if flops else 'N/A'])
+
 def calculatePyTorch(model_path, output_path, input_shape=None):
     model = torch.load(model_path)
     model.eval()
