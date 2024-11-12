@@ -77,6 +77,7 @@
         </el-form-item>
         <br>
         <el-button
+            ref="generateLabelButton"
             @click="mostrarEtiqueta"
             color="var(--gaissa_green)"
         >
