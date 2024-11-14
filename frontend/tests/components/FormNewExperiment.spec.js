@@ -39,7 +39,7 @@ describe('FormNewExperiment.vue', () => {
                     'font-awesome-icon': FontAwesomeIcon,
                 },
                 mocks: {
-                    $router: mockRouter
+                    $router: mockRouter,
                 },
             },
             props: {
