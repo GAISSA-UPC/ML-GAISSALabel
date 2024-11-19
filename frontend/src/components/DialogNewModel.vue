@@ -44,7 +44,7 @@ export default {
         async afegirModel() {
             const response = await models.create(this.newModel)
             if (response.status === 201) {
-                this.$emit('modelCreat-ok')
+                this.$emit('modelCreat-ok', response.data.id)
             }
         },
         async closeDialogNewModel() {

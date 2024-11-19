@@ -87,7 +87,7 @@
 
     <DialogNewModel v-model="dialogNewModel"
                     @cancel="dialogNewModel = false"
-                    @model-creat-ok="dialogNewModel = false;selectedModel = models.length; estat = 'modelCreat-ok'"
+                    @model-creat-ok="handleModelCreated" 
                     @model-creat-ko="dialogNewModel = false; estat = 'modelCreat-ko'"
     />
 
@@ -171,6 +171,12 @@ export default {
                 this.estat = 'select-model'
                 window.scrollTo({top:0})
             }
+        },
+        async handleModelCreated(newModelId) {
+            this.dialogNewModel = false;
+            await this.refrescaModels();
+            this.selectedModel = newModelId;
+            this.estat = 'modelCreat-ok';
         },
     },
     async mounted() {
