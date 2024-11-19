@@ -47,6 +47,7 @@
                 </ul>
             </el-form-item>
             <el-button
+                ref="generateLabelButton"
                 @click="gestioFitxers"
                 color="var(--gaissa_green)"
                 v-show="fileList.length !== 0"
