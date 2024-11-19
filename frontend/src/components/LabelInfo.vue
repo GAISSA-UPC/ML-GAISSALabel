@@ -163,6 +163,7 @@ export default {
         async calculateVariables() {
             this.metriques.forEach(metrica => {
                 if (metrica.id in this.resultats) {
+                    this.resultats[metrica.id].nom = metrica.nom
                     const intervals = metrica['intervals']
                     let marks = {0: '',}
                     let last = 0
