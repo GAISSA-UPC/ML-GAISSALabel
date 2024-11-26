@@ -25,6 +25,7 @@ export default defineConfig({
     environment: 'jsdom',
   },
   build: {
+    manifest: true,
     chunkSizeWarningLimit: 2000,
     rollupOptions: {
       output: {
@@ -39,6 +40,9 @@ export default defineConfig({
           ],
           vuetify: ['vuetify'],
         },
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name].[ext]' // Removes content hash
       },
     },
   },
