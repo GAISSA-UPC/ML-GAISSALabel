@@ -1,10 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-      <meta charset="UTF-8">
-      <link rel="icon" href="/gaissalogo.png">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>GAISSA Label</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GAISSA Label - Energy Efficiency Labeling Tool for AI Models">
+    <meta property="og:title" content="GAISSA Label">
+    <meta property="og:description" content="Evaluate and label the energy efficiency of your AI models">
+    <link rel="icon" href="/gaissalogo.png">
+    <title>GAISSA Label</title>
+    <!-- Preload critical assets -->
+    <link rel="preload" href="/src/assets/index.css" as="style">
+    
+    <!-- Async CSS -->
+    <link rel="stylesheet" href="/src/assets/index.css" media="print" onload="this.media='all'">
+    <noscript>
+      <link rel="stylesheet" href="/assets/index.css">
+    </noscript>
   </head>
   <body>
     <div id="app"></div>
