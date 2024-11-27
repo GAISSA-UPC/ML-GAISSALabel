@@ -2,11 +2,20 @@ import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import viteCompression from 'vite-plugin-compression';
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite';
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
+    AutoImport({
+      resolvers: [ElementPlusResolver()],
+    }),
+    Components({
+      resolvers: [ElementPlusResolver()],
+    }),
     // Gzip compression
     viteCompression({
       algorithm: 'gzip',
@@ -31,12 +40,9 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['vue', 'vue-router', 'vuex', 'axios'],
-          'element-plus': ['element-plus'],
           fontawesome: [
             '@fortawesome/fontawesome-svg-core',
-            '@fortawesome/free-regular-svg-icons',
             '@fortawesome/free-solid-svg-icons',
-            '@fortawesome/free-brands-svg-icons',
           ],
           vuetify: ['vuetify'],
         },
@@ -45,5 +51,6 @@ export default defineConfig({
         assetFileNames: 'assets/[name].[ext]' // Removes content hash
       },
     },
+    minify: 'terser',
   },
 });

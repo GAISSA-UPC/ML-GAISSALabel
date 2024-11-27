@@ -23,7 +23,6 @@
 </template>
 
 <script>
-import 'element-plus/theme-chalk/index.css'
 import { RouterView } from 'vue-router'
 import MenuLateral from "@/components/base/MenuLateral.vue";
 import BarraSuperior from "@/components/base/BarraSuperior.vue";
