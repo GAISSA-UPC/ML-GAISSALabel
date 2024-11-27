@@ -22,6 +22,11 @@ export default defineConfig({
       ext: '.gz',
       deleteOriginFile: false // Keep original uncompressed files
     }),
+    viteCompression({
+      algorithm: 'brotliCompress',
+      ext: '.br',
+      deleteOriginFile: false, 
+    }),
   ],
   resolve: {
     alias: {
