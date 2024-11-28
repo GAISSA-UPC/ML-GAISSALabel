@@ -87,14 +87,66 @@ export default {
 .el-menu-vertical:not(.el-menu--collapse) {
     width: 200px;
 }
+
 .el-menu-vertical {
     min-height: 95%;
 }
+
+.el-menu-vertical.mobile {
+    width: 100% !important;
+    min-height: auto;
+    margin: 0 !important;
+}
+
 .el-menu-item.is-active {
     color: var(--gaissa_green)
 }
+
 .icon {
     width: 20px;
     margin-right: 10px;
+}
+
+@media (max-width: 768px) {
+    .el-menu-vertical {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .el-menu-vertical .el-menu-item,
+    .el-menu-vertical .el-sub-menu__title {
+        width: auto;
+        min-width: 60px;
+        text-align: center;
+        padding: 0 20px;
+    }
+    .el-menu-vertical .el-menu-item .icon,
+    .el-menu-vertical .el-sub-menu__title .icon {
+        margin-right: 5px;
+    }
+
+    .el-menu-vertical .el-menu--popup {
+        min-width: 60px;
+    }
+
+    .el-menu-vertical .el-menu--popup .el-menu-item {
+        text-align: center;
+        padding: 0 20px;
+    }
+}
+
+@media (min-width: 769px) {
+    .el-menu-vertical {
+        display: block;
+    }
+
+    .el-menu-vertical.el-menu--collapse {
+        width: 64px !important;
+    }
+    
+    .el-menu-vertical:not(.el-menu--collapse) {
+        width: 200px;
+    }
 }
 </style>
