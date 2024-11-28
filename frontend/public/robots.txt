@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Disallow potential sensitive paths
+Disallow: /admin/
