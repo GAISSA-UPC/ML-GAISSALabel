@@ -1,6 +1,6 @@
 <template>
     <div class="common-layout">
-        <el-container>
+        <el-container class="app-container">
             <el-header style="display: flex; align-items: center">
                 <BarraSuperior
                     :collapsed = collapse
@@ -8,7 +8,7 @@
                     @expand =  "collapse=false"
                 />
             </el-header>
-            <el-container>
+            <el-container class="main-container">
                 <el-aside width="60">
                     <MenuLateral
                         :collapsed = collapse
@@ -29,7 +29,11 @@ import BarraSuperior from "@/components/base/BarraSuperior.vue";
 
 export default {
     name: "App",
-    components: {RouterView, MenuLateral, BarraSuperior},
+    components: {
+        RouterView, 
+        MenuLateral, 
+        BarraSuperior,
+    },
     data() {
         return {
             collapse: false
@@ -39,6 +43,16 @@ export default {
 </script>
 
 <style scoped>
+.app-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-container {
+    flex: 1;
+}
+
 header {
     line-height: 1.5;
 }
