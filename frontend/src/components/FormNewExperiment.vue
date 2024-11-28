@@ -16,20 +16,22 @@
         <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Model") }}</h3>
         <p>{{ $t('First, please indicate the model you are working with. If it is a new one or not listed above, you can register a new model.') }}</p><br>
         <el-form-item>
-            <el-select v-model="selectedModel" filterable>
-                <el-option
-                    v-for="(model, i) in models" :key="i"
-                    :value="model.id"
-                    :label="model.nom"
-                />
-            </el-select>
-            <el-button
-                style="margin-left: 10px"
-                @click="dialogNewModel = true"
-                class="action-button-light"
-            >
-                <font-awesome-icon :icon="['fas', 'plus']" />
-            </el-button>
+            <div style="display: flex; align-items: center">
+                <el-select v-model="selectedModel" filterable class="model-select">
+                    <el-option
+                        v-for="(model, i) in models" :key="i"
+                        :value="model.id"
+                        :label="model.nom"
+                    />
+                </el-select>
+                <el-button
+                    style="margin-left: 10px"
+                    @click="dialogNewModel = true"
+                    class="action-button-light"
+                >
+                    <font-awesome-icon :icon="['fas', 'plus']" />
+                </el-button>
+            </div>
         </el-form-item>
         <br>
 
@@ -194,5 +196,13 @@ export default {
 <style>
 p {
     font-size: 18px
+}
+
+.el-select {
+    width: 200px;
+}
+
+.model-select {
+  width: 300px;
 }
 </style>
