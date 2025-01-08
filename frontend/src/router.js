@@ -17,6 +17,9 @@ const InferenceFile = () => import('@/views/InferenceFile.vue')
 const InferenceDeploy = () => import('@/views/InferenceDeploy.vue')
 const InferenceLabelInfo = () => import('@/views/InferenceLabelInfo.vue')
 
+// ROI Inference Analysis routes
+const ROIInferencePreSaved = () => import('@/views/RoiInferencePreSaved.vue')
+
 // Admin routes
 const AdminMetriquesInfo = () => import('@/views/AdminMetriquesInfo.vue')
 const AdminMetrica = () => import('@/views/AdminMetrica.vue')
@@ -82,6 +85,11 @@ const router = createRouter({
       path: '/models/:id_model/inferences/:id_inference',
       name: 'Label info for inference',
       component: InferenceLabelInfo
+    },
+    {
+      path: '/ROIInferencePre',
+      name: 'ROI Inference PreSaved Consult',
+      component: ROIInferencePreSaved,
     },
     {
       path: '/admin/metriquesinfo',
