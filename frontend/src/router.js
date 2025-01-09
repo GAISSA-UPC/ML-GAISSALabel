@@ -18,7 +18,7 @@ const InferenceDeploy = () => import('@/views/InferenceDeploy.vue')
 const InferenceLabelInfo = () => import('@/views/InferenceLabelInfo.vue')
 
 // ROI Inference Analysis routes
-const ROIInferencePreSaved = () => import('@/views/RoiInferencePreSaved.vue')
+const ROIInferencePreSaved = () => import('@/views/ROIInferencePreSaved.vue')
 
 // Admin routes
 const AdminMetriquesInfo = () => import('@/views/AdminMetriquesInfo.vue')
