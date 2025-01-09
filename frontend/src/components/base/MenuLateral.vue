@@ -159,9 +159,5 @@ export default {
     .el-menu-vertical.el-menu--collapse {
         width: 64px !important;
     }
-
-    .el-menu-vertical:not(.el-menu--collapse) {
-        width: 200px;
-    }
 }
 </style>
