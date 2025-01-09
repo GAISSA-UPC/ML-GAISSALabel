@@ -19,6 +19,7 @@ const InferenceLabelInfo = () => import('@/views/InferenceLabelInfo.vue')
 
 // ROI Inference Analysis routes
 const ROIInferencePreSaved = () => import('@/views/ROIInferencePreSaved.vue')
+const ROIInferenceAnalysis = () => import("@/views/ROIInferenceAnalysis.vue")
 
 // Admin routes
 const AdminMetriquesInfo = () => import('@/views/AdminMetriquesInfo.vue')
@@ -87,9 +88,14 @@ const router = createRouter({
       component: InferenceLabelInfo
     },
     {
-      path: '/ROIInferencePre',
+      path: '/roi-inference-pre',
       name: 'ROI Inference PreSaved Consult',
       component: ROIInferencePreSaved,
+    },
+    {
+      path: "/roi-inference-analysis/:id_model/:optimization_technique/:technique_param/:id_experiment",
+      name: "ROI Inference Analysis",
+      component: ROIInferenceAnalysis,
     },
     {
       path: '/admin/metriquesinfo',
