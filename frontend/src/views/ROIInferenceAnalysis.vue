@@ -2,8 +2,8 @@
     <div class="roi-inference-analysis">
         <h1>{{ $t("ROI Inference Optimization Analysis") }}</h1>
 
-        <el-row :gutter="20">
-            <el-col :span="12">
+        <el-row :gutter="20" type="flex" :justify="center" class="row-bg">
+            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mobile-card">
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
                     <h2 class="section-title">{{ $t("Model Information") }}</h2>
                     <el-descriptions :column="1" border>
@@ -29,7 +29,7 @@
                 </el-card>
             </el-col>
 
-            <el-col :span="12">
+            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mobile-card">
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
                     <h2 class="section-title">{{ $t("ROI Chart") }}</h2>
                     <p class="chart-description">
@@ -40,18 +40,20 @@
                     </div>
                 </el-card>
             </el-col>
-        </el-row>
 
-        <el-card shadow="always" :body-style="{ padding: '20px' }" style="margin-top: 20px">
-            <h2 class="section-title">{{ $t("ROI Results") }}</h2>
-            <p class="results-description">
-                {{ $t("This table provides a detailed breakdown of the ROI analysis over the defined optimization strategy. It illustrates specific data about the potential benefits associated with the dynamic quantization strategy over a range of inferences.") }}
-            </p>
-            <el-table :data="roiResults" style="width: 100%">
-                <el-table-column prop="name" :label="$t('Metric')" />
-                <el-table-column prop="value" :label="$t('Value')" />
-            </el-table>
-        </el-card>
+            <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
+                <el-card shadow="always" :body-style="{ padding: '20px' }" style="margin-top: 20px">
+                    <h2 class="section-title">{{ $t("ROI Results") }}</h2>
+                    <p class="results-description">
+                        {{ $t("This table provides a detailed breakdown of the ROI analysis over the defined optimization strategy. It illustrates specific data about the potential benefits associated with the dynamic quantization strategy over a range of inferences.") }}
+                    </p>
+                    <el-table :data="roiResults" style="width: 100%">
+                        <el-table-column prop="name" :label="$t('Metric')" />
+                        <el-table-column prop="value" :label="$t('Value')" />
+                    </el-table>
+                </el-card>
+            </el-col>
+        </el-row>
     </div>
 </template>
 
@@ -92,7 +94,7 @@ export default {
                     type: 'value',
                     name: this.$t('Amount (€)'),
                     nameLocation: 'middle',
-                    nameGap: 30,
+                    nameGap: 35,
                 },
                 series: [
                     {
@@ -215,5 +217,15 @@ export default {
 .chart-container {
     width: 100%;
     height: 400px;
+}
+
+.mobile-card {
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .mobile-card {
+        margin-bottom: 20px;
+    }
 }
 </style>
