@@ -8,26 +8,22 @@ from django.contrib.auth.hashers import check_password
 
 from api.models import Model, Entrenament, Inferencia, Metrica, Qualificacio, Interval, ResultatEntrenament, \
     ResultatInferencia, InfoAddicional, ValorInfoEntrenament, ValorInfoInferencia, EinaCalcul, TransformacioMetrica, \
-    TransformacioInformacio, Administrador
-
+    TransformacioInformacio, Administrador, OptimizationTechnique, ROIAnalysis, ROICostMetrics
 
 class ModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Model
         fields = '__all__'
 
-
 class EntrenamentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Entrenament
         fields = '__all__'
 
-
 class InferenciaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Inferencia
         fields = '__all__'
-
 
 class MetricaSerializer(serializers.ModelSerializer):
     intervals = serializers.ListField(write_only=True)
@@ -47,18 +43,15 @@ class MetricaSerializer(serializers.ModelSerializer):
         model = Metrica
         fields = ('id', 'nom', 'fase', 'pes', 'unitat', 'influencia', 'descripcio', 'calcul', 'recomanacions', 'intervals')
 
-
 class QualificacioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Qualificacio
         fields = '__all__'
 
-
 class IntervalBasicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Interval
         fields = ('qualificacio', 'limitSuperior', 'limitInferior')
-
 
 class IntervalSerializer(IntervalBasicSerializer):
     limitSuperior = serializers.SerializerMethodField(read_only=True)
@@ -84,14 +77,12 @@ class IntervalSerializer(IntervalBasicSerializer):
         model = Interval
         fields = '__all__'
 
-
 class MetricaAmbLimitsSerializer(MetricaSerializer):
     intervals = IntervalBasicSerializer(many=True, read_only=True)
 
     class Meta:
         model = Metrica
         fields = '__all__'
-
 
 class EntrenamentAmbResultatSerializer(serializers.ModelSerializer):
     resultats = serializers.SerializerMethodField(read_only=True)
@@ -138,7 +129,6 @@ class EntrenamentAmbResultatSerializer(serializers.ModelSerializer):
         model = Entrenament
         fields = ('model', 'id', 'dataRegistre', 'resultats', 'resultats_info', 'infoAddicional', 'infoAddicional_valors')
 
-
 class InferenciaAmbResultatSerializer(serializers.ModelSerializer):
     resultats = serializers.SerializerMethodField(read_only=True)
     resultats_info = serializers.JSONField(write_only=True)
@@ -184,7 +174,6 @@ class InferenciaAmbResultatSerializer(serializers.ModelSerializer):
         model = Inferencia
         fields = ('model', 'id', 'dataRegistre', 'resultats', 'resultats_info', 'infoAddicional', 'infoAddicional_valors')
 
-
 class InfoAddicionalSerializer(serializers.ModelSerializer):
     opcions_list = serializers.SerializerMethodField(read_only=True)
 
@@ -197,7 +186,6 @@ class InfoAddicionalSerializer(serializers.ModelSerializer):
     class Meta:
         model = InfoAddicional
         fields = '__all__'
-
 
 class EinaCalculBasicSerializer(serializers.ModelSerializer):
     transformacionsMetriques = serializers.ListField(write_only=True, required=False)
@@ -224,7 +212,6 @@ class EinaCalculBasicSerializer(serializers.ModelSerializer):
         model = EinaCalcul
         fields = ('id', 'nom', 'descripcio', 'transformacionsMetriques', 'transformacionsInformacions')
 
-
 class EinaCalculSerializer(EinaCalculBasicSerializer):
     transformacionsMetriques = serializers.SerializerMethodField(read_only=True)
     transformacionsInformacions = serializers.SerializerMethodField(read_only=True)
@@ -245,18 +232,36 @@ class EinaCalculSerializer(EinaCalculBasicSerializer):
         model = EinaCalcul
         fields = ('id', 'nom', 'descripcio', 'transformacionsMetriques', 'transformacionsInformacions')
 
-
 class TransformacioMetricaSerializer(serializers.ModelSerializer):
     class Meta:
         model = TransformacioMetrica
         fields = '__all__'
-
 
 class TransformacioInformacioSerializer(serializers.ModelSerializer):
     class Meta:
         model = TransformacioInformacio
         fields = '__all__'
 
+# ROI Serializers
+class OptimizationTechniqueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OptimizationTechnique
+        fields = '__all__'
+
+class ROICostMetricsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ROICostMetrics
+        fields = ['value', 'type', 'total_packs', 'cost_per_pack', 'taxes', 'num_inferences']
+
+
+class ROIAnalysisSerializer(serializers.ModelSerializer):
+    model_name = serializers.CharField(source='model.nom', read_only=True)
+    optimization_technique_name = serializers.CharField(source='optimization_technique.name', read_only=True)
+    roi_cost_metrics = ROICostMetricsSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ROIAnalysis
+        fields = ['id', 'model', 'model_name', 'optimization_technique', 'optimization_technique_name', 'technique_param', 'registration_date', 'country', 'roi_cost_metrics']
 
 # LOGIN
 def validacioLogin(data):
@@ -274,13 +279,11 @@ def validacioLogin(data):
         raise serializers.ValidationError("Contrasenya incorrecta.")
     return user
 
-
 def creacioLogin(data, user):
     token, created = Token.objects.get_or_create(user=user)
     data['token'] = token.key
     data['created'] = created
     return data
-
 
 class LoginAdminSerializer(serializers.ModelSerializer):
     username = serializers.CharField()

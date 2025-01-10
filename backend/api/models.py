@@ -4,7 +4,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from solo.models import SingletonModel
 
-
 class Model(models.Model):
     id = models.AutoField(primary_key=True, verbose_name=_('Identificador'))
     nom = models.CharField(max_length=100, null=False, blank=False, verbose_name=_('Nom'))
@@ -12,12 +11,10 @@ class Model(models.Model):
     informacio = models.CharField(max_length=1000, null=True, blank=True, verbose_name=_('Informació'))
     dataCreacio = models.DateTimeField(auto_now_add=True, verbose_name=_('Data creació'))
 
-
 class Entrenament(models.Model):
     id = models.AutoField(primary_key=True, verbose_name=_('Identificador'))
     dataRegistre = models.DateTimeField(auto_now_add=True, verbose_name=_('Data registre'))
     model = models.ForeignKey(Model, related_name='entrenaments', null=False, on_delete=models.CASCADE, verbose_name=_('Model'))
-
 
 class Inferencia(models.Model):
     id = models.AutoField(primary_key=True, verbose_name=_('Identificador'))
@@ -26,7 +23,6 @@ class Inferencia(models.Model):
 
     class Meta:
         verbose_name_plural = _('Inferències')
-
 
 class Metrica(models.Model):
     TRAIN = 'T'
@@ -56,7 +52,6 @@ class Metrica(models.Model):
     class Meta:
         verbose_name_plural = _('Mètriques')
 
-
 class Qualificacio(models.Model):
     id = models.CharField(primary_key=True, max_length=100, verbose_name=_('Identificador'))
     # Color codificat en hexadecimal ('#' + 6 valors hexa)
@@ -66,7 +61,6 @@ class Qualificacio(models.Model):
     class Meta:
         verbose_name_plural = _('Qualificacions')
 
-
 class Interval(models.Model):
     id = models.AutoField(primary_key=True, verbose_name=_('Identificador'))
     metrica = models.ForeignKey(Metrica, related_name='intervals', null=False, on_delete=models.CASCADE, verbose_name=_('Mètrica'))
@@ -75,12 +69,10 @@ class Interval(models.Model):
     limitInferior = models.FloatField(null=False, blank=False, verbose_name=_('Límit inferior'))
     imatge = models.ImageField(null=True, blank=True, verbose_name=_('Imatge'))
 
-
 class ResultatEntrenament(models.Model):
     valor = models.FloatField(null=True, blank=True, verbose_name=_('Valor'))
     entrenament = models.ForeignKey(Entrenament, related_name='resultatsEntrenament', null=False, on_delete=models.CASCADE, verbose_name=_('Entrenament'))
     metrica = models.ForeignKey(Metrica, related_name='resultatsEntrenament', null=False, on_delete=models.CASCADE, verbose_name=_('Mètrica'))
-
 
 class ResultatInferencia(models.Model):
     valor = models.FloatField(null=True, blank=True, verbose_name=_('Valor'))
@@ -89,7 +81,6 @@ class ResultatInferencia(models.Model):
 
     class Meta:
         verbose_name_plural = _('Resultat Inferències')
-
 
 class InfoAddicional(models.Model):
     TRAIN = 'T'
@@ -106,12 +97,10 @@ class InfoAddicional(models.Model):
     # Opcions possibles (separades per ';'). Si null vol dir que és camp lliure
     opcions = models.CharField(max_length=10000, null=True, blank=True, verbose_name=_('Opcions'))
 
-
 class ValorInfoEntrenament(models.Model):
     valor = models.CharField(max_length=10000, null=False, blank=False, verbose_name=_('Valor'))
     entrenament = models.ForeignKey(Entrenament, related_name='informacionsEntrenament', null=False, on_delete=models.CASCADE, verbose_name=_('Entrenament'))
     infoAddicional = models.ForeignKey(InfoAddicional, related_name='informacionsEntrenament', null=False, on_delete=models.CASCADE, verbose_name=_('Informació'))
-
 
 class ValorInfoInferencia(models.Model):
     valor = models.CharField(max_length=10000, null=False, blank=False, verbose_name=_('Valor'))
@@ -121,7 +110,6 @@ class ValorInfoInferencia(models.Model):
     class Meta:
         verbose_name_plural = _('Valor info inferències')
 
-
 class EinaCalcul(models.Model):
     id = models.AutoField(primary_key=True, verbose_name=_('Identificador'))
     nom = models.CharField(max_length=100, null=False, blank=False, verbose_name=_('Nom'))
@@ -129,7 +117,6 @@ class EinaCalcul(models.Model):
 
     class Meta:
         verbose_name_plural = _('Eines càlcul')
-
 
 class TransformacioMetrica(models.Model):
     valor = models.CharField(max_length=100, null=False, blank=False, verbose_name=_('Valor'))
@@ -139,7 +126,6 @@ class TransformacioMetrica(models.Model):
     class Meta:
         verbose_name_plural = _('Transformació Mètriques')
 
-
 class TransformacioInformacio(models.Model):
     valor = models.CharField(max_length=100, null=False, blank=False, verbose_name=_('Valor'))
     informacio = models.ForeignKey(InfoAddicional, related_name='transformacions', null=False, on_delete=models.CASCADE, verbose_name=_('Informació addicional'))
@@ -148,10 +134,72 @@ class TransformacioInformacio(models.Model):
     class Meta:
         verbose_name_plural = _('Transformació Informacions')
 
-
 class Administrador(models.Model):
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE, verbose_name=_('User'))
 
+# ROI Models
+class OptimizationTechnique(models.Model):
+    name = models.CharField(max_length=255, unique=True, verbose_name=_('Optimization Technique'))
+
+    class Meta:
+        verbose_name = _('Optimization Technique')
+        verbose_name_plural = _('Optimization Techniques')
+
+    def __str__(self):
+        return self.name
+
+class ROIAnalysis(models.Model):
+    model = models.ForeignKey(Model, related_name='roi_analyses', on_delete=models.CASCADE, verbose_name=_('Model'))
+    optimization_technique = models.ForeignKey(OptimizationTechnique, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Optimization Technique'))
+    technique_param = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Technique Parameters'))
+    registration_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Registration Date'))
+    country = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Country of Deployment'))
+
+    class Meta:
+        verbose_name = _('ROI Analysis')
+        verbose_name_plural = _('ROI Analyses')
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        metrics = self.roi_cost_metrics.all()
+        types_found = {m.type for m in metrics}
+        required_types = {'optimization', 'original', 'new'}
+
+        if len(metrics) != 3 or types_found != required_types:
+            raise ValidationError(_('Each ROIAnalysis must have exactly 3 ROICostMetrics, one of each type (optimization, original, new).'))
+
+    def __str__(self):
+        return f"ROI Analysis {self.id} - {self.model.nom}"
+    
+class ROICostMetrics(models.Model):
+    roi_analysis = models.ForeignKey(ROIAnalysis, related_name='roi_cost_metrics', on_delete=models.CASCADE, verbose_name=_('ROI Analysis'))
+    type = models.CharField(
+        max_length=50,
+        choices=[
+            ('optimization', 'OptimizationCosts'),
+            ('original', 'OriginalInferenceCosts'),
+            ('new', 'NewInferenceCosts')
+        ],
+        null=False,
+        blank=False,
+        verbose_name=_('Cost Type')
+    )
+    total_packs = models.IntegerField(null=False, blank=False, verbose_name=_('Total Packs'))
+    cost_per_pack = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False, verbose_name=_('Cost per Pack'))
+    taxes = models.DecimalField(max_digits=5, decimal_places=2, null=False, blank=False, verbose_name=_('Taxes'))
+    num_inferences = models.IntegerField(null=True, blank=True, verbose_name=_('Number of Inferences'))
+
+    class Meta:
+        verbose_name = _('ROI Cost Metrics')
+        verbose_name_plural = _('ROI Cost Metrics')
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if self.type != 'optimization' and self.num_inferences is None:
+            raise ValidationError(_('num_inferences is required for OriginalInferenceCosts or NewInferenceCosts.'))
+
+    def __str__(self):
+        return f"{self.name} - {self.roi_analysis}"
 
 class Configuracio(SingletonModel):
     ultimaSincronitzacio = models.DateTimeField(verbose_name=_('Última sincronització'))

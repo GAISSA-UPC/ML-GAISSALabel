@@ -9,18 +9,17 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 
 from api.models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, Interval, EinaCalcul, \
-    TransformacioMetrica, TransformacioInformacio, Administrador, Configuracio
+    TransformacioMetrica, TransformacioInformacio, Administrador, Configuracio, OptimizationTechnique, ROIAnalysis, ROICostMetrics
 from api.serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
     EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer, \
     IntervalBasicSerializer, MetricaSerializer, EinaCalculBasicSerializer, EinaCalculSerializer, \
-    TransformacioMetricaSerializer, TransformacioInformacioSerializer, LoginAdminSerializer
+    TransformacioMetricaSerializer, TransformacioInformacioSerializer, LoginAdminSerializer, OptimizationTechniqueSerializer, ROIAnalysisSerializer, ROICostMetricsSerializer
 
 from api import permissions
 from efficiency_calculators.rating_calculator import calculateRating
 from efficiency_calculators.label_generator import generateLabel
 from efficiency_calculators.efficiency_calculator import calculateEfficiency
 from connectors import adaptador_huggingface
-
 
 class ModelsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Model.objects.all()
@@ -34,7 +33,6 @@ class ModelsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Create
     }
     search_fields = ['nom']
     ordering_fields = ['nom', 'dataCreacio']
-
 
 class EntrenamentsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     models = Entrenament
@@ -89,7 +87,6 @@ class EntrenamentsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-
 class InferenciesView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     models = Inferencia
     serializer_class = InferenciaSerializer
@@ -143,7 +140,6 @@ class InferenciesView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.C
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-
 class QualificacionsView(mixins.ListModelMixin, viewsets.GenericViewSet):
     models = Qualificacio
     serializer_class = QualificacioSerializer
@@ -151,7 +147,6 @@ class QualificacionsView(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     ordering_fields = ['ordre']
-
 
 class MetriquesView(viewsets.ModelViewSet):
     models = Metrica
@@ -195,7 +190,6 @@ class MetriquesView(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-
 class InfoAddicionalsView(viewsets.ModelViewSet):
     model = InfoAddicional
     serializer_class = InfoAddicionalSerializer
@@ -211,7 +205,6 @@ class InfoAddicionalsView(viewsets.ModelViewSet):
     search_fields = ['nom', 'fase']
     ordering_fields = ['id', 'nom', 'fase']
 
-
 class CalculadorInferenciaView(mixins.CreateModelMixin, viewsets.GenericViewSet):
     def get_serializer_class(self):
         pass
@@ -223,7 +216,6 @@ class CalculadorInferenciaView(mixins.CreateModelMixin, viewsets.GenericViewSet)
             return Response("Cal donar els atributs endpoint i input!", status=status.HTTP_400_BAD_REQUEST)
         resultats = calculateEfficiency(endpoint, data)
         return Response(resultats, status=status.HTTP_201_CREATED)
-
 
 class EinesCalculView(viewsets.ModelViewSet):
     models = EinaCalcul
@@ -271,12 +263,10 @@ class EinesCalculView(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-
 class LoginAdminView(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Administrador.objects.all()
     serializer_class = LoginAdminSerializer
     models = Administrador
-
 
 class SincroView(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     permission_classes = [permissions.IsAdmin]
@@ -298,7 +288,6 @@ class SincroView(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.Generi
         else:
             return Response({'Created models': creats, 'Updated models': actualitzats}, status=status.HTTP_200_OK)
 
-
 class EstadistiquesView(mixins.ListModelMixin, viewsets.GenericViewSet):
     def get_serializer_class(self):
         pass
@@ -310,3 +299,40 @@ class EstadistiquesView(mixins.ListModelMixin, viewsets.GenericViewSet):
             "numInferencies": Inferencia.objects.count(),
         }
         return Response(data, status=status.HTTP_200_OK)
+
+# ROI Views
+class OptimizationTechniqueView(viewsets.ModelViewSet):
+    queryset = OptimizationTechnique.objects.all()
+    serializer_class = OptimizationTechniqueSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+
+class ROIAnalysisView(viewsets.ModelViewSet):
+    queryset = ROIAnalysis.objects.all()
+    serializer_class = ROIAnalysisSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        model_id = self.request.query_params.get('model_id')
+        optimization_technique_id = self.request.query_params.get('optimization_technique_id')
+
+        if model_id:
+            queryset = queryset.filter(model=model_id)
+        if optimization_technique_id:
+            queryset = queryset.filter(optimization_technique=optimization_technique_id)
+
+        return queryset
+
+class ROICostMetricsView(viewsets.ModelViewSet):
+    queryset = ROICostMetrics.objects.all()
+    serializer_class = ROICostMetricsSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        roi_analysis_id = self.request.query_params.get('roi_analysis_id')
+
+        if roi_analysis_id:
+            queryset = queryset.filter(roi_analysis=roi_analysis_id)
+
+        return queryset
