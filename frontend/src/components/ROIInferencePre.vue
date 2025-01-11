@@ -100,7 +100,7 @@ export default {
     },
     methods: {
         async refrescaModels() {
-            const response = await models.list();
+            const response = await models.list({ has_roi_analysis: "true" });
             this.models = response.data;
         },
         async refrescaExperiments() {

@@ -34,6 +34,13 @@ class ModelsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Create
     search_fields = ['nom']
     ordering_fields = ['nom', 'dataCreacio']
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        has_roi_analysis = self.request.query_params.get('has_roi_analysis')
+        if has_roi_analysis == 'true':
+            queryset = queryset.filter(roi_analyses__isnull=False).distinct()
+        return queryset
+
 class EntrenamentsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     models = Entrenament
     serializer_class = EntrenamentSerializer
@@ -305,6 +312,17 @@ class OptimizationTechniqueView(viewsets.ModelViewSet):
     queryset = OptimizationTechnique.objects.all()
     serializer_class = OptimizationTechniqueSerializer
     permission_classes = [permissions.IsAdminEditOthersRead]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['id', 'name']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        model_id = self.request.query_params.get('model_id')
+
+        if model_id:
+            queryset = queryset.filter(roianalysis__model_id=model_id).distinct()
+
+        return queryset
 
 class ROIAnalysisView(viewsets.ModelViewSet):
     queryset = ROIAnalysis.objects.all()

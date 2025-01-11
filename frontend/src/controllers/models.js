@@ -1,8 +1,8 @@
 import axios from "@/controllers/backend"
 
 export default {
-    async list() {
-        const responseModels = await axios.get(`/api/models.json`)
+    async list(filters = {}) {
+        const responseModels = await axios.get("/api/models/", { params: filters });
         return responseModels
     },
     async retrieve(id) {
