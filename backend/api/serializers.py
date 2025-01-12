@@ -251,7 +251,7 @@ class OptimizationTechniqueSerializer(serializers.ModelSerializer):
 class ROICostMetricsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ROICostMetrics
-        fields = ['value', 'type', 'total_packs', 'cost_per_pack', 'taxes', 'num_inferences']
+        fields = ['type', 'total_packs', 'cost_per_pack', 'taxes', 'num_inferences']
 
 
 class ROIAnalysisSerializer(serializers.ModelSerializer):
