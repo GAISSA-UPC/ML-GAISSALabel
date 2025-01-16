@@ -100,15 +100,15 @@ export default {
         },
     },
     methods: {
-        async refrescaModels() {
+        async refreshModels() {
             const response = await models.list({ has_roi_analysis: "true" });
             this.models = response.data;
         },
-        async refrescaOptimizationTechniques() {
+        async refreshOptimizationTechniques() {
             const response = await optimizationTechniques.list({ model_id: this.selectedModel });
             this.optimizationTechniques = response.data;
         },
-        async refrescaExperiments() {
+        async refreshExperiments() {
             const response = await inferencies.listByModel(this.selectedModel);
             this.experiments = response.data;
         },
@@ -119,16 +119,8 @@ export default {
             this.experiments = [];
             this.selectedExperiment = null;
 
-            await this.refrescaOptimizationTechniques();
-            await this.refrescaExperiments();
-
-            // Fetch optimization techniques for the selected model (replace with your actual API call)
-            // Example:
-            // this.optimizationTechniques = [
-            //     { id: "dynamic_quantization", name: "Dynamic Quantization" },
-            //     { id: "local_pruning", name: "Local Pruning" },
-            //     { id: "global_pruning", name: "Global Pruning" },
-            // ];
+            await this.refreshOptimizationTechniques();
+            await this.refreshExperiments();
 
             this.techniqueParameters = [
                     {
@@ -181,7 +173,7 @@ export default {
         formatData,
     },
     async mounted() {
-        await this.refrescaModels();
+        await this.refreshModels();
     },
 };
 </script>
