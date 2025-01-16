@@ -324,22 +324,34 @@ class OptimizationTechniqueView(viewsets.ModelViewSet):
 
         return queryset
 
-class ROIAnalysisView(viewsets.ModelViewSet):
+class ROIAnalysesView(viewsets.ModelViewSet):
     queryset = ROIAnalysis.objects.all()
     serializer_class = ROIAnalysisSerializer
     permission_classes = [permissions.IsAdminEditOthersRead]
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        model_id = self.request.query_params.get('model_id')
-        optimization_technique_id = self.request.query_params.get('optimization_technique_id')
+        model_id = self.kwargs['model_id']
+        model = get_object_or_404(Model, pk=model_id)
+        queryset = ROIAnalysis.objects.filter(model=model)
 
-        if model_id:
-            queryset = queryset.filter(model=model_id)
+        # Filter by optimization technique ID
+        optimization_technique_id = self.request.query_params.get('optimization_technique_id')
         if optimization_technique_id:
-            queryset = queryset.filter(optimization_technique=optimization_technique_id)
+            optimization_technique = get_object_or_404(OptimizationTechnique, pk=optimization_technique_id)
+            queryset = queryset.filter(optimization_technique=optimization_technique)
 
         return queryset
+
+    def list(self, request, model_id=None):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None, model_id=None):
+        queryset = self.get_queryset()
+        roi_analysis = get_object_or_404(queryset, pk=pk)
+        serializer = self.get_serializer(roi_analysis)
+        return Response(serializer.data)
 
 class ROICostMetricsView(viewsets.ModelViewSet):
     queryset = ROICostMetrics.objects.all()

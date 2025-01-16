@@ -15,7 +15,7 @@ router.register(r'login/admins', views.LoginAdminView, basename='login_admins')
 router.register(r'sincronitzacio', views.SincroView, basename='sincro')
 router.register(r'estadistiques', views.EstadistiquesView, basename='estadistiques')
 router.register(r'optimization-techniques', views.OptimizationTechniqueView, basename='optimization_techniques')
-router.register(r'roi-analyses', views.ROIAnalysisView, basename='roi_analyses')
+router.register(r'models/(?P<model_id>\d+)/roi-analyses', views.ROIAnalysesView, basename='roi_analyses')
 router.register(r'roi-cost-metrics', views.ROICostMetricsView, basename='roi_cost_metrics')
 
 urlpatterns = [

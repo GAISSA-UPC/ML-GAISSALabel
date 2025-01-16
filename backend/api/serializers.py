@@ -261,7 +261,7 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ROIAnalysis
-        fields = ['id', 'model', 'model_name', 'optimization_technique', 'optimization_technique_name', 'technique_param', 'registration_date', 'country', 'roi_cost_metrics']
+        fields = ['id', 'model', 'model_name', 'optimization_technique', 'optimization_technique_name', 'registration_date', 'country', 'roi_cost_metrics']
 
 # LOGIN
 def validacioLogin(data):
