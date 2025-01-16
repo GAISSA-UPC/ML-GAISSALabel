@@ -51,7 +51,7 @@
                     <el-select v-model="selectedExperiment" placeholder="Select"
                         class="full-width">
                         <el-option v-for="(experiment, i) in experiments" :key="i" :value="experiment.id"
-                            :label="formatData(experiment.dataRegistre)" />
+                            :label="formatData(experiment.registration_date)" />
                     </el-select>
                 </el-form-item>
             </div>
@@ -70,6 +70,7 @@
 import models from "@/controllers/models";
 import inferencies from "@/controllers/inferencies";
 import optimizationTechniques from "@/controllers/optimizationTechniques";
+import roiAnalyses from "@/controllers/roiAnalyses";
 import { formatData } from "@/utils";
 
 export default {
@@ -109,7 +110,9 @@ export default {
             this.optimizationTechniques = response.data;
         },
         async refreshExperiments() {
-            const response = await inferencies.listByModel(this.selectedModel);
+            const response = await roiAnalyses.listByModel(this.selectedModel, {
+                optimization_technique_id: this.selectedOptimizationTechnique,
+            });
             this.experiments = response.data;
         },
         async onModelChange() {
@@ -120,7 +123,6 @@ export default {
             this.selectedExperiment = null;
 
             await this.refreshOptimizationTechniques();
-            await this.refreshExperiments();
 
             this.techniqueParameters = [
                     {
@@ -138,6 +140,8 @@ export default {
             this.selectedParameter = null;
             this.experiments = this.experiments//.filter(experiment => experiment.optimization_technique === this.selectedOptimizationTechnique);
             this.selectedExperiment = null;
+
+            await this.refreshExperiments();
 
             if (this.selectedOptimizationTechnique === "local_pruning" || this.selectedOptimizationTechnique === "global_pruning") {
                 this.techniqueParameters = [
@@ -160,13 +164,17 @@ export default {
             this.selectedExperiment = null;
         },
         async calculateROI() {
+            // Fetch the complete analysis data using the new API structure
+            const analysisData = await roiAnalyses.getAnalysis(
+                this.selectedModel,
+                this.selectedExperiment
+            );
+        
+            // Navigate to the analysis page and pass the data
             this.$router.push({
                 name: "ROI Inference Analysis",
                 params: {
-                    id_model: this.selectedModel,
-                    optimization_technique: this.selectedOptimizationTechnique,
-                    technique_param: this.selectedParameter,
-                    id_experiment: this.selectedExperiment,
+                    analysisData: analysisData,
                 },
             });
         },
