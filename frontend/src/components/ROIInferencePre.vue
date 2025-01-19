@@ -68,7 +68,6 @@
 
 <script>
 import models from "@/controllers/models";
-import inferencies from "@/controllers/inferencies";
 import optimizationTechniques from "@/controllers/optimizationTechniques";
 import roiAnalyses from "@/controllers/roiAnalyses";
 import { formatData } from "@/utils";
@@ -164,17 +163,11 @@ export default {
             this.selectedExperiment = null;
         },
         async calculateROI() {
-            // Fetch the complete analysis data using the new API structure
-            const analysisData = await roiAnalyses.getAnalysis(
-                this.selectedModel,
-                this.selectedExperiment
-            );
-        
-            // Navigate to the analysis page and pass the data
             this.$router.push({
                 name: "ROI Inference Analysis",
                 params: {
-                    analysisData: analysisData,
+                    id_model: this.selectedModel,
+                    id_experiment: this.selectedExperiment,
                 },
             });
         },

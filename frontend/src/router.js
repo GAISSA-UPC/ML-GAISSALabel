@@ -93,7 +93,7 @@ const router = createRouter({
       component: ROIInferencePreSaved,
     },
     {
-      path: "/roi-inference-analysis/:id_model/:optimization_technique/:technique_param/:id_experiment",
+      path: "/models/:id_model/roi-inference-analysis/:id_experiment",
       name: "ROI Inference Analysis",
       component: ROIInferenceAnalysis,
     },
