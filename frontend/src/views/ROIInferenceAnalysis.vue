@@ -6,26 +6,24 @@
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mobile-card">
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
                     <h2 class="section-title">{{ $t("Model Information") }}</h2>
-                    <el-descriptions :column="1" border>
+                    <el-descriptions v-if="analysisData" :column="1" border>
                         <el-descriptions-item :label="$t('Model name')">
-                            {{ modelInfo.name }}
+                            {{ analysisData.model_name }}
                         </el-descriptions-item>
                         <el-descriptions-item :label="$t('Model optimization')">
-                            {{ modelInfo.optimizationTechnique }}
-                        </el-descriptions-item>
-                        <el-descriptions-item :label="$t('Model creation date')">
-                            {{ formatData(modelInfo.creationDate) }}
+                            {{ analysisData.optimization_technique_name }}
                         </el-descriptions-item>
                         <el-descriptions-item :label="$t('Analysis identifier')">
-                            {{ analysisInfo.id }}
+                            {{ analysisData.id }}
                         </el-descriptions-item>
                         <el-descriptions-item :label="$t('Analysis registration date')">
-                            {{ formatData(analysisInfo.registrationDate) }}
+                            {{ formatData(analysisData.registration_date) }}
                         </el-descriptions-item>
                         <el-descriptions-item :label="$t('Country deploy')">
-                            {{ analysisInfo.country }}
+                            {{ analysisData.country }}
                         </el-descriptions-item>
                     </el-descriptions>
+                    <p v-else>{{ $t("Loading model information...") }}</p>
                 </el-card>
             </el-col>
 
@@ -47,10 +45,11 @@
                     <p class="results-description">
                         {{ $t("This table provides a detailed breakdown of the ROI analysis over the defined optimization strategy. It illustrates specific data about the potential benefits associated with the dynamic quantization strategy over a range of inferences.") }}
                     </p>
-                    <el-table :data="roiResults" style="width: 100%">
+                    <el-table v-if="roiResults.length" :data="roiResults" style="width: 100%">
                         <el-table-column prop="name" :label="$t('Metric')" />
                         <el-table-column prop="value" :label="$t('Value')" />
                     </el-table>
+                    <p v-else>{{ $t("Loading ROI results...") }}</p>
                 </el-card>
             </el-col>
         </el-row>
@@ -60,28 +59,14 @@
 <script>
 import { formatData } from "@/utils";
 import * as echarts from 'echarts';
+import roiAnalyses from "@/controllers/roiAnalyses";
 
 export default {
     name: "ROIInferenceAnalysis",
     data() {
         return {
-            modelInfo: {
-                name: "GPT-2",
-                optimizationTechnique: "Dynamic quantization",
-                creationDate: "2023-11-21 17:59",
-            },
-            analysisInfo: {
-                id: 4,
-                registrationDate: "2023-12-24 19:06",
-                country: "Catalunya",
-            },
-            roiResults: [
-                { name: "Optimization Cost", value: "79.72 €" },
-                { name: "New Cost Per Inference", value: "3.0e-05 €" },
-                { name: "Old Cost Per Inference", value: "1.24e-04 €" },
-                { name: "ROI", value: "-0.999882" },
-                { name: "Break-Even Point", value: "1,256,452 inferences" },
-            ],
+            analysisData: null,
+            roiResults: [],
             chart: null,
             chartOptions: {
                 xAxis: {
@@ -162,24 +147,14 @@ export default {
             this.chart = echarts.init(chartContainer);
             this.chart.setOption(this.chartOptions);
         },
-        loadAnalysisData() {
-            const { id_model, optimization_technique, technique_param, id_experiment } = this.$route.params;
+        async loadAnalysisData() {
+            const { id_model, id_experiment } = this.$route.params;
 
-            // Fetch data from the API using the parameters
-            // const data = await roiAnalysis.getAnalysis(id_model, optimization_technique, technique_param, id_experiment);
-
-            // For now, mock data is used:
-            this.modelInfo = {
-                name: "GPT-2",
-                optimizationTechnique: optimization_technique,
-                creationDate: "2023-11-21 17:59",
-            };
-
-            this.analysisInfo = {
-                id: id_experiment,
-                registrationDate: "2023-12-24 19:06",
-                country: "Catalunya",
-            };
+            // Fetch the analysis data
+            this.analysisData = await roiAnalyses.getAnalysis(
+                id_model,
+                id_experiment
+            );
 
             this.roiResults = [
                 { name: "Optimization Cost", value: "79.72 €" },
