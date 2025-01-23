@@ -183,7 +183,7 @@ class ROICostMetrics(models.Model):
         blank=False,
         verbose_name=_('Cost Type')
     )
-    total_packs = models.IntegerField(null=False, blank=False, verbose_name=_('Total Packs'))
+    total_packs = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False, verbose_name=_('Total Packs'))
     cost_per_pack = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False, verbose_name=_('Cost per Pack'))
     taxes = models.DecimalField(max_digits=5, decimal_places=2, null=False, blank=False, verbose_name=_('Taxes'))
     num_inferences = models.IntegerField(null=True, blank=True, verbose_name=_('Number of Inferences'))
