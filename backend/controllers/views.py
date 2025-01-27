@@ -19,6 +19,7 @@ from api import permissions
 from efficiency_calculators.rating_calculator import calculateRating
 from efficiency_calculators.label_generator import generateLabel
 from efficiency_calculators.efficiency_calculator import calculateEfficiency
+from efficiency_calculators.roi_calculator import ROICalculator
 from connectors import adaptador_huggingface
 
 class ModelsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -350,8 +351,41 @@ class ROIAnalysesView(viewsets.ModelViewSet):
     def retrieve(self, request, pk=None, model_id=None):
         queryset = self.get_queryset()
         roi_analysis = get_object_or_404(queryset, pk=pk)
+
+        # Get related data
+        model = roi_analysis.model
+        optimization_technique = roi_analysis.optimization_technique
+        roi_cost_metrics = roi_analysis.roi_cost_metrics.all()
+
+        calculator = ROICalculator()
+
+        optimization_cost_data = roi_cost_metrics.filter(type='optimization').first()
+        original_cost_data = roi_cost_metrics.filter(type='original').first()
+        new_cost_data = roi_cost_metrics.filter(type='new').first()
+
+        if not all([optimization_cost_data, original_cost_data, new_cost_data]):
+            return Response({"error": "Missing ROI cost metrics data."}, status=status.HTTP_400_BAD_REQUEST)
+
+        num_inferences = int(request.query_params.get('num_inferences', 100))
+
+        # Calculate ROI and Positive-ROI Point
+        roi = calculator.calculate_roi_from_metrics(optimization_cost_data, original_cost_data, new_cost_data, num_inferences)
+        positive_roi_point = calculator.calculate_positive_roi_from_metrics(optimization_cost_data, original_cost_data, new_cost_data)
+
+        roi_results = [
+            {"name": "Optimization Cost", "value": f"{calculator._calculate_total_cost(optimization_cost_data):.2f} €"},
+            {"name": "New Cost Per Inference", "value": f"{calculator._calculate_cost_per_inference(new_cost_data):.5f} €"},
+            {"name": "Original Cost Per Inference", "value": f"{calculator._calculate_cost_per_inference(original_cost_data):.5f} €"},
+            {"name": f"ROI (for {num_inferences} inferences)", "value": f"{roi:.6f}"},
+            {"name": "Positive-ROI Point", "value": f"{positive_roi_point} inferences"},
+        ]
+
+        # Add the calculated ROI results to the response
         serializer = self.get_serializer(roi_analysis)
-        return Response(serializer.data)
+        response_data = serializer.data
+        response_data['roi_results'] = roi_results
+
+        return Response(response_data)
 
 class ROICostMetricsView(viewsets.ModelViewSet):
     queryset = ROICostMetrics.objects.all()
