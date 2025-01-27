@@ -41,11 +41,11 @@
                         <!-- Chart will be rendered here -->
                     </div>
                     <p>
-                        <strong>ROI &lt; 0:</strong> When the red "Costs" line is above the green "Benefits" line, your ROI is negative. This means you've spent more on optimization and inferences than you've saved.
+                        <strong>ROI &lt; 0:</strong> When the "Costs" line is above the "Benefits" line, your ROI is negative. This means you've spent more on optimization and inferences than you've saved.
                         <br>
                         <strong>ROI = 0 (Positive-ROI Point):</strong> The point where the "Costs" line and "Benefits" line intersect is the positive-ROI point. At this point, your total savings equal your total costs.
                         <br>
-                        <strong>ROI &gt; 0:</strong> When the green "Benefits" line is above the red "Costs" line, your ROI is positive. You've saved more than you've spent.
+                        <strong>ROI &gt; 0:</strong> When the "Benefits" line is above the "Costs" line, your ROI is positive. You've saved more than you've spent.
                     </p>
                 </el-card>
             </el-col>
@@ -92,7 +92,6 @@ export default {
                     name: this.$t('Amount (€)'),
                     nameLocation: 'middle',
                     nameGap: 35,
-                    min: 0,
                 },
                 series: [
                     {
@@ -137,7 +136,7 @@ export default {
                                 },
                                 {
                                     offset: 1,
-                                    color: 'rgba(255, 0, 0, 0)' // Transparent at bottom
+                                    color: 'rgba(255, 0, 0, 0.05)' // Transparent at bottom
                                 }
                             ])
                         }
@@ -179,19 +178,65 @@ export default {
             const optimizationCost = parseFloat(this.roiResults.find(r => r.name === 'Optimization Cost')?.value) || 0;
             const newCostPerInference = parseFloat(this.roiResults.find(r => r.name === 'New Cost Per Inference')?.value) || 0;
             const oldCostPerInference = parseFloat(this.roiResults.find(r => r.name === 'Original Cost Per Inference')?.value) || 0;
-            const positiveRoiPoint = parseFloat(this.roiResults.find(r => r.name === 'Positive-ROI Point')?.value) || 0;
+            const positiveRoiPointValue = this.roiResults.find(r => r.name === 'Positive-ROI Point')?.value;
+            const positiveRoiPoint = !isFinite(parseFloat(positiveRoiPointValue)) ? Infinity : parseFloat(positiveRoiPointValue) || 0;
 
-            // Data points for the chart
+            // Chart points when positiveRoiPoint is NEGATIVE or INFINITE 
+            if (!isFinite(positiveRoiPoint) || positiveRoiPoint < 0) {
+                const maxInferences = 2000000;
+
+                const maxCost = (maxInferences * newCostPerInference) + optimizationCost;
+
+                const benefitsData = [[0, 0], [maxInferences, (maxInferences * (oldCostPerInference - newCostPerInference))]];
+                const costsData = [[0, optimizationCost], [maxInferences, maxCost]];
+
+                this.chartOptions.xAxis.max = maxInferences;
+
+                // Set chart with new data
+                this.chartOptions.series[0].data = benefitsData;
+                this.chartOptions.series[1].data = costsData;
+                // Color under the Benefits line
+                this.chartOptions.series[0].areaStyle.color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    {
+                        offset: 0,
+                        color: 'rgba(255, 165, 0, 0.2)' // Light orange at top
+                    },
+                    {
+                        offset: 1,
+                        color: 'rgba(255, 165, 0, 0.05)' // Transparent at bottom
+                    }
+                ]);
+                this.chartOptions.series[0].lineStyle.color = 'orange';
+                this.chartOptions.series[0].itemStyle.color = 'orange';
+                this.chart.setOption(this.chartOptions, true);
+                return;
+            }
+
+            // Chart points when positiveRoiPoint is POSITIVE 
             const maxInferences = positiveRoiPoint * 2; // Extend the chart beyond the Positive-ROI Point in a defined range
             const maxCost = (maxInferences * newCostPerInference) + optimizationCost;
 
             const benefitsData = [[0, 0], [maxInferences, (maxInferences * (oldCostPerInference - newCostPerInference))]];
             const costsData = [[0, optimizationCost], [maxInferences, maxCost]];
 
+            this.chartOptions.xAxis.max = maxInferences;
+
             // Set chart with new data
             this.chartOptions.series[0].data = benefitsData;
             this.chartOptions.series[1].data = costsData;
-
+            // Color under the Benefits line
+            this.chartOptions.series[0].areaStyle.color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                {
+                    offset: 0,
+                    color: 'rgba(0, 255, 0, 0.2)' // Light green at top
+                },
+                {
+                    offset: 1,
+                    color: 'rgba(0, 255, 0, 0)' // Transparent at bottom
+                }
+            ]);
+            this.chartOptions.series[0].lineStyle.color = 'green';
+            this.chartOptions.series[0].itemStyle.color = 'green';
             this.chart.setOption(this.chartOptions, true);
         },
     },
