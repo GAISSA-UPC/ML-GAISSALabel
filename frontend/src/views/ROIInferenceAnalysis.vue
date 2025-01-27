@@ -29,13 +29,24 @@
 
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mobile-card">
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
-                    <h2 class="section-title">{{ $t("ROI Chart") }}</h2>
+                    <h2 class="section-title">{{ $t("Costs/Benefits Chart") }}</h2>
                     <p class="chart-description">
                         {{ $t("This chart illustrates the evolution of costs and benefits associated with dynamic quantization over a range of inferences.") }}
+                    </p>
+                    <p>
+                        <strong>Benefits:</strong> how much money you save cumulatively as you perform more inferences<br>
+                        <strong>Costs:</strong> total expenses, which include the initial optimization cost plus the new cost per inference
                     </p>
                     <div ref="chartContainer" class="chart-container">
                         <!-- Chart will be rendered here -->
                     </div>
+                    <p>
+                        <strong>ROI &lt; 0:</strong> When the red "Costs" line is above the green "Benefits" line, your ROI is negative. This means you've spent more on optimization and inferences than you've saved.
+                        <br>
+                        <strong>ROI = 0 (Positive-ROI Point):</strong> The point where the "Costs" line and "Benefits" line intersect is the positive-ROI point. At this point, your total savings equal your total costs.
+                        <br>
+                        <strong>ROI &gt; 0:</strong> When the green "Benefits" line is above the red "Costs" line, your ROI is positive. You've saved more than you've spent.
+                    </p>
                 </el-card>
             </el-col>
 
@@ -74,18 +85,20 @@ export default {
                     name: this.$t('Number of Inferences'),
                     nameLocation: 'middle',
                     nameGap: 30,
+                    min: 0,
                 },
                 yAxis: {
                     type: 'value',
                     name: this.$t('Amount (€)'),
                     nameLocation: 'middle',
                     nameGap: 35,
+                    min: 0,
                 },
                 series: [
                     {
                         name: this.$t('Benefits'),
                         type: 'line',
-                        data: [[0, 0], [2000000, 185]],
+                        data: [],
                         itemStyle: {
                             color: 'green'
                         },
@@ -109,7 +122,7 @@ export default {
                     {
                         name: this.$t('Costs'),
                         type: 'line',
-                        data: [[0, 80], [2000000, 145]], // Replace with actual data
+                        data: [],
                         itemStyle: {
                             color: 'red'
                         },
@@ -156,18 +169,41 @@ export default {
                 id_experiment
             );
 
-            this.roiResults = [
-                { name: "Optimization Cost", value: "79.72 €" },
-                { name: "New Cost Per Inference", value: "3.0e-05 €" },
-                { name: "Old Cost Per Inference", value: "1.24e-04 €" },
-                { name: "ROI", value: "-0.999882" },
-                { name: "Break-Even Point", value: "1,256,452 inferences" },
-            ];
+            this.roiResults = this.analysisData.roi_results;
+        },
+        updateChartData() {
+            if (!this.roiResults || this.roiResults.length === 0) {
+                return;
+            }
+
+            const optimizationCost = parseFloat(this.roiResults.find(r => r.name === 'Optimization Cost')?.value) || 0;
+            const newCostPerInference = parseFloat(this.roiResults.find(r => r.name === 'New Cost Per Inference')?.value) || 0;
+            const oldCostPerInference = parseFloat(this.roiResults.find(r => r.name === 'Original Cost Per Inference')?.value) || 0;
+            const positiveRoiPoint = parseFloat(this.roiResults.find(r => r.name === 'Positive-ROI Point')?.value) || 0;
+
+            // Data points for the chart
+            const maxInferences = positiveRoiPoint * 2; // Extend the chart beyond the Positive-ROI Point in a defined range
+            const maxCost = (maxInferences * newCostPerInference) + optimizationCost;
+
+            const benefitsData = [[0, 0], [maxInferences, (maxInferences * (oldCostPerInference - newCostPerInference))]];
+            const costsData = [[0, optimizationCost], [maxInferences, maxCost]];
+
+            // Set chart with new data
+            this.chartOptions.series[0].data = benefitsData;
+            this.chartOptions.series[1].data = costsData;
+
+            this.chart.setOption(this.chartOptions, true);
         },
     },
     mounted() {
         this.loadAnalysisData();
         this.initializeChart();
+    },
+    watch: {
+        roiResults: {
+            handler: 'updateChartData',
+            deep: true
+        }
     },
 };
 </script>
