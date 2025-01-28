@@ -210,12 +210,12 @@ export default {
             // Initialize the Costs/Benefits Chart
             const chartContainer = this.$refs.chartContainer;
             this.chart = echarts.init(chartContainer);
-            this.chart.setOption(this.chartOptions);
+            this.chart.setOption(this.chartOptions, false);
 
             // Initialize the ROI Evolution Chart
             const roiChartContainer = this.$refs.roiChartContainer;
             this.roiChart = echarts.init(roiChartContainer);
-            this.roiChart.setOption(this.roiChartOptions);
+            this.roiChart.setOption(this.roiChartOptions, false);
         },
         async loadAnalysisData() {
             const { id_model, id_experiment } = this.$route.params;
@@ -266,7 +266,7 @@ export default {
                 ]);
                 this.chartOptions.series[0].lineStyle.color = 'orange';
                 this.chartOptions.series[0].itemStyle.color = 'orange';
-                this.chart.setOption(this.chartOptions, true);
+                this.chart.setOption(this.chartOptions, false);
                 return;
             }
 
@@ -295,7 +295,7 @@ export default {
             ]);
             this.chartOptions.series[0].lineStyle.color = 'green';
             this.chartOptions.series[0].itemStyle.color = 'green';
-            this.chart.setOption(this.chartOptions, true);
+            this.chart.setOption(this.chartOptions, false);
         },
         updateROIChartData() {
             if (!this.analysisData || !this.analysisData.roi_evolution_chart_data) {
@@ -307,12 +307,20 @@ export default {
             const roiEvolutionData = this.analysisData.roi_evolution_chart_data.map(item => [item.inferences, item.roi]);
             this.roiChartOptions.series[0].data = roiEvolutionData;
 
-            this.roiChart.setOption(this.roiChartOptions, true);
+            this.roiChart.setOption(this.roiChartOptions, false);
+        },
+        resizeCharts() {
+            if (this.chart) this.chart.resize();
+            if (this.roiChart) this.roiChart.resize();
         },
     },
     mounted() {
+        window.addEventListener('resize', this.resizeCharts);
         this.loadAnalysisData();
         this.initializeChart();
+    },
+    beforeDestroy() {
+        window.removeEventListener('resize', this.resizeCharts);
     },
     watch: {
         roiResults: {
