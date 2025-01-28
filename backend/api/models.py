@@ -150,7 +150,7 @@ class OptimizationTechnique(models.Model):
 
 class ROIAnalysis(models.Model):
     model = models.ForeignKey(Model, related_name='roi_analyses', on_delete=models.CASCADE, verbose_name=_('Model'))
-    optimization_technique = models.ForeignKey(OptimizationTechnique, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Optimization Technique'))
+    optimization_technique = models.ForeignKey(OptimizationTechnique, on_delete=models.PROTECT, null=False, blank=False, verbose_name=_('Optimization Technique'))
     registration_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Registration Date'))
     country = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Country of Deployment'))
 

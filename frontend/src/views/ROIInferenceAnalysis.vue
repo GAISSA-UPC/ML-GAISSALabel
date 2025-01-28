@@ -159,7 +159,10 @@ export default {
                     }
                 ],
                 tooltip: {
-                    trigger: 'axis'
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    },
                 },
                 legend: {
                     data: [this.$t('Income'), this.$t('Costs')],
@@ -195,7 +198,10 @@ export default {
                     }
                 ],
                 tooltip: {
-                    trigger: 'axis'
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    },
                 },
                 legend: {
                     data: [this.$t('ROI Evolution')],
