@@ -44,23 +44,23 @@
 
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mobile-card">
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
-                    <h2 class="section-title">{{ $t("Costs/Benefits Chart") }}</h2>
+                    <h2 class="section-title">{{ $t("Income/Costs Chart") }}</h2>
                     <p class="chart-description">
-                        {{ $t("This chart illustrates the evolution of costs and benefits over a range of inferences for the specified technique.") }}
+                        {{ $t("This chart illustrates the evolution of income and costs over a range of inferences for the specified technique.") }}
                     </p>
                     <p>
-                        <strong>Benefits:</strong> how much money you save cumulatively as you perform more inferences<br>
-                        <strong>Costs:</strong> total expenses, which include the initial optimization cost plus the new cost per inference
+                        <strong>Income:</strong> how much money you would spend on inferences if you didn't optimize your model.<br>
+                        <strong>Costs:</strong> total expenses, which include the initial optimization cost plus the new cost per inference.
                     </p>
-                    <div ref="chartContainer" class="chart-container">
+                    <div ref="incomeCostsChartContainer" class="chart-container">
                         <!-- Chart will be rendered here -->
                     </div>
                     <p>
-                        <strong>ROI &lt; 0:</strong> When the "Costs" line is above the "Benefits" line, your ROI is negative. This means you've spent more on optimization and inferences than you've saved.
+                        <strong>ROI &lt; 0:</strong> When the "Costs" line is above the "Income" line, your ROI is negative. This means you've spent more on optimization and inferences than you would have if you hadn't optimized your model.
                         <br>
-                        <strong>ROI = 0 (Positive-ROI Point):</strong> The point where the "Costs" line and "Benefits" line intersect is the positive-ROI point. At this point, your total savings equal your total costs.
+                        <strong>ROI = 0 (Break-Even Point):</strong> The point where the "Costs" line and "Income" line intersect is the Break-Even point. At this point, your total savings equal your total costs.
                         <br>
-                        <strong>ROI &gt; 0:</strong> When the "Benefits" line is above the "Costs" line, your ROI is positive. You've saved more than you've spent.
+                        <strong>ROI &gt; 0:</strong> When the "Income" line is above the "Costs" line, your ROI is positive. This means you've spent less than you would have if you hadn't optimized your model. This means you are saving money.
                     </p>
                 </el-card>
             </el-col>
@@ -93,9 +93,9 @@ export default {
         return {
             analysisData: null,
             roiResults: [],
-            chart: null,
+            incomeCostsChart: null,
             roiChart: null,
-            chartOptions: {
+            incomeCostsChartOptions: {
                 xAxis: {
                     type: 'value',
                     name: this.$t('Number of Inferences'),
@@ -111,7 +111,7 @@ export default {
                 },
                 series: [
                     {
-                        name: this.$t('Benefits'),
+                        name: this.$t('Income'),
                         type: 'line',
                         data: [],
                         itemStyle: {
@@ -162,7 +162,7 @@ export default {
                     trigger: 'axis'
                 },
                 legend: {
-                    data: [this.$t('Benefits'), this.$t('Costs')],
+                    data: [this.$t('Income'), this.$t('Costs')],
                     bottom: 0,
                 }
             },
@@ -206,11 +206,11 @@ export default {
     },
     methods: {
         formatData,
-        initializeChart() {
-            // Initialize the Costs/Benefits Chart
-            const chartContainer = this.$refs.chartContainer;
-            this.chart = echarts.init(chartContainer);
-            this.chart.setOption(this.chartOptions, false);
+        initializeIncomeCostsChart() {
+            // Initialize the Income/Costs Chart
+            const incomeCostsChartContainer = this.$refs.incomeCostsChartContainer;
+            this.incomeCostsChart = echarts.init(incomeCostsChartContainer);
+            this.incomeCostsChart.setOption(this.incomeCostsChartOptions, false);
 
             // Initialize the ROI Evolution Chart
             const roiChartContainer = this.$refs.roiChartContainer;
@@ -228,7 +228,7 @@ export default {
 
             this.roiResults = this.analysisData.roi_results;
         },
-        updateChartData() {
+        updateIncomeCostsChartData() {
             if (!this.roiResults || this.roiResults.length === 0) {
                 return;
             }
@@ -236,25 +236,25 @@ export default {
             const optimizationCost = parseFloat(this.roiResults.find(r => r.name === 'Optimization Cost')?.value) || 0;
             const newCostPerInference = parseFloat(this.roiResults.find(r => r.name === 'New Cost Per Inference')?.value) || 0;
             const oldCostPerInference = parseFloat(this.roiResults.find(r => r.name === 'Original Cost Per Inference')?.value) || 0;
-            const positiveRoiPointValue = this.roiResults.find(r => r.name === 'Positive-ROI Point')?.value;
-            const positiveRoiPoint = !isFinite(parseFloat(positiveRoiPointValue)) ? Infinity : parseFloat(positiveRoiPointValue) || 0;
+            const breakEvenPointValue = this.roiResults.find(r => r.name === 'Break-Even Point')?.value;
+            const breakEvenPoint = !isFinite(parseFloat(breakEvenPointValue)) ? Infinity : parseFloat(breakEvenPointValue) || 0;
 
-            // Chart points when positiveRoiPoint is NEGATIVE or INFINITE 
-            if (!isFinite(positiveRoiPoint) || positiveRoiPoint < 0) {
+            // Chart points when breakEvenPoint is NEGATIVE or INFINITE 
+            if (!isFinite(breakEvenPoint) || breakEvenPoint < 0) {
                 const maxInferences = 2000000;
 
                 const maxCost = (maxInferences * newCostPerInference) + optimizationCost;
 
-                const benefitsData = [[0, 0], [maxInferences, (maxInferences * (oldCostPerInference - newCostPerInference))]];
+                const incomeData = [[0, 0], [maxInferences, (maxInferences * oldCostPerInference)]];
                 const costsData = [[0, optimizationCost], [maxInferences, maxCost]];
 
-                this.chartOptions.xAxis.max = maxInferences;
+                this.incomeCostsChartOptions.xAxis.max = maxInferences;
 
                 // Set chart with new data
-                this.chartOptions.series[0].data = benefitsData;
-                this.chartOptions.series[1].data = costsData;
-                // Color under the Benefits line
-                this.chartOptions.series[0].areaStyle.color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                this.incomeCostsChartOptions.series[0].data = incomeData;
+                this.incomeCostsChartOptions.series[1].data = costsData;
+                // Color under the Income line
+                this.incomeCostsChartOptions.series[0].areaStyle.color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                     {
                         offset: 0,
                         color: 'rgba(255, 165, 0, 0.2)' // Light orange at top
@@ -264,26 +264,26 @@ export default {
                         color: 'rgba(255, 165, 0, 0.05)' // Transparent at bottom
                     }
                 ]);
-                this.chartOptions.series[0].lineStyle.color = 'orange';
-                this.chartOptions.series[0].itemStyle.color = 'orange';
-                this.chart.setOption(this.chartOptions, false);
+                this.incomeCostsChartOptions.series[0].lineStyle.color = 'orange';
+                this.incomeCostsChartOptions.series[0].itemStyle.color = 'orange';
+                this.incomeCostsChart.setOption(this.incomeCostsChartOptions, false);
                 return;
             }
 
-            // Chart points when positiveRoiPoint is POSITIVE 
-            const maxInferences = positiveRoiPoint * 2; // Extend the chart beyond the Positive-ROI Point in a defined range
+            // Chart points when breakEvenPoint is POSITIVE 
+            const maxInferences = breakEvenPoint * 2; // Extend the chart beyond the Break-Even Point in a defined range
             const maxCost = (maxInferences * newCostPerInference) + optimizationCost;
 
-            const benefitsData = [[0, 0], [maxInferences, (maxInferences * (oldCostPerInference - newCostPerInference))]];
+            const incomeData = [[0, 0], [maxInferences, (maxInferences * oldCostPerInference)]];
             const costsData = [[0, optimizationCost], [maxInferences, maxCost]];
 
-            this.chartOptions.xAxis.max = maxInferences;
+            this.incomeCostsChartOptions.xAxis.max = maxInferences;
 
             // Set chart with new data
-            this.chartOptions.series[0].data = benefitsData;
-            this.chartOptions.series[1].data = costsData;
-            // Color under the Benefits line
-            this.chartOptions.series[0].areaStyle.color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            this.incomeCostsChartOptions.series[0].data = incomeData;
+            this.incomeCostsChartOptions.series[1].data = costsData;
+            // Color under the Income line
+            this.incomeCostsChartOptions.series[0].areaStyle.color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                 {
                     offset: 0,
                     color: 'rgba(0, 255, 0, 0.2)' // Light green at top
@@ -293,9 +293,9 @@ export default {
                     color: 'rgba(0, 255, 0, 0)' // Transparent at bottom
                 }
             ]);
-            this.chartOptions.series[0].lineStyle.color = 'green';
-            this.chartOptions.series[0].itemStyle.color = 'green';
-            this.chart.setOption(this.chartOptions, false);
+            this.incomeCostsChartOptions.series[0].lineStyle.color = 'green';
+            this.incomeCostsChartOptions.series[0].itemStyle.color = 'green';
+            this.incomeCostsChart.setOption(this.incomeCostsChartOptions, false);
         },
         updateROIChartData() {
             if (!this.analysisData || !this.analysisData.roi_evolution_chart_data) {
@@ -310,21 +310,21 @@ export default {
             this.roiChart.setOption(this.roiChartOptions, false);
         },
         resizeCharts() {
-            if (this.chart) this.chart.resize();
+            if (this.incomeCostsChart) this.incomeCostsChart.resize();
             if (this.roiChart) this.roiChart.resize();
         },
     },
     mounted() {
         window.addEventListener('resize', this.resizeCharts);
         this.loadAnalysisData();
-        this.initializeChart();
+        this.initializeIncomeCostsChart();
     },
     beforeDestroy() {
         window.removeEventListener('resize', this.resizeCharts);
     },
     watch: {
         roiResults: {
-            handler: 'updateChartData',
+            handler: 'updateIncomeCostsChartData',
             deep: true
         },
         analysisData: {

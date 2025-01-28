@@ -1,27 +1,29 @@
 class ROICalculator:
     """
-    Calculates ROI based on provided cost and benefit data.
+    Calculates ROI based on provided cost and income data.
     """
 
-    def calculate_roi(self, optimization_cost, new_cost_per_inference, original_cost_per_inference, num_inferences):
-        total_cost_savings = (original_cost_per_inference - new_cost_per_inference) * num_inferences
+    def calculate_roi(self, optimization_cost, new_cost_per_inference, original_cost_per_inference, num_inferences):        
+        if num_inferences == float('inf'):
+            return (original_cost_per_inference - new_cost_per_inference) / new_cost_per_inference
+        
+        total_cost_old = original_cost_per_inference * num_inferences
         total_costs_new = new_cost_per_inference * num_inferences + optimization_cost
-        roi = (total_cost_savings - total_costs_new) / total_costs_new
+        roi = (total_cost_old - total_costs_new) / total_costs_new
         return roi
 
-    def calculate_positive_roi(self, optimization_cost, new_cost_per_inference, original_cost_per_inference):
+    def calculate_break_even_point(self, optimization_cost, new_cost_per_inference, original_cost_per_inference):
         """
         Calculates the number of inferences needed for a positive ROI
 
-        Benefits must exceed costs for positive ROI
-        CostSavingsPerInference * number_inferences > OptimizationCost + new_CostPerInference * number_inferences
-        number_inferences > OptimizationCost / (CostSavingsPerInference - new_CostPerInference)
-        number_inferences > OptimizationCost / ((original_CostPerInference - new_CostPerInference) - new_CostPerInference)
+        Income must exceed costs for positive ROI
+        original_CostPerInference * number_inferences > OptimizationCost + new_CostPerInference * number_inferences
+        number_inferences > OptimizationCost / (original_CostPerInference - new_CostPerInference)
         """
         if new_cost_per_inference >= original_cost_per_inference:
             return float('inf')
 
-        break_even_point = optimization_cost / (original_cost_per_inference - 2 * new_cost_per_inference)
+        break_even_point = optimization_cost / (original_cost_per_inference - new_cost_per_inference)
         return int(break_even_point)
     
     def calculate_roi_from_metrics(self, optimization_cost_metrics, original_cost_metrics, new_cost_metrics, num_inferences=100):
@@ -34,15 +36,15 @@ class ROICalculator:
 
         return self.calculate_roi(optimization_cost, new_cost_per_inference, original_cost_per_inference, num_inferences)
 
-    def calculate_positive_roi_from_metrics(self, optimization_cost_metrics, original_cost_metrics, new_cost_metrics):
+    def calculate_break_even_point_from_metrics(self, optimization_cost_metrics, original_cost_metrics, new_cost_metrics):
         """
-        Calculates the positive ROI point using ROICostMetrics objects.
+        Calculates the break-even point using ROICostMetrics objects.
         """
         optimization_cost = self._calculate_total_cost(optimization_cost_metrics)
         new_cost_per_inference = self._calculate_cost_per_inference(new_cost_metrics)
         original_cost_per_inference = self._calculate_cost_per_inference(original_cost_metrics)
 
-        return self.calculate_positive_roi(optimization_cost, new_cost_per_inference, original_cost_per_inference)
+        return self.calculate_break_even_point(optimization_cost, new_cost_per_inference, original_cost_per_inference)
 
     def _calculate_total_cost(self, cost_metrics):
         """
@@ -65,12 +67,12 @@ class ROICalculator:
         original_cost_per_inference = self._calculate_cost_per_inference(original_cost_metrics)
 
         if inference_numbers is None:
-            positive_roi_point = self.calculate_positive_roi_from_metrics(optimization_cost_metrics, original_cost_metrics, new_cost_metrics)
-            if positive_roi_point == float('inf') or positive_roi_point < 0:
+            break_even_point = self.calculate_break_even_point_from_metrics(optimization_cost_metrics, original_cost_metrics, new_cost_metrics)
+            if break_even_point == float('inf') or break_even_point < 0:
                 # If no positive ROI, default inference range
                 inference_numbers = range(0, 2000001, 10000)
             else:
-                max_inference = int(positive_roi_point * 20)
+                max_inference = int(break_even_point * 20)
                 inference_numbers = range(0, max_inference + 1, max_inference//200)
 
         roi_evolution = []

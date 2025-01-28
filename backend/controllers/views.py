@@ -368,16 +368,18 @@ class ROIAnalysesView(viewsets.ModelViewSet):
 
         num_inferences = int(request.query_params.get('num_inferences', 100))
 
-        # Calculate ROI and Positive-ROI Point
+        # Calculate ROI and Break-Even Point
         roi = calculator.calculate_roi_from_metrics(optimization_cost_data, original_cost_data, new_cost_data, num_inferences)
-        positive_roi_point = calculator.calculate_positive_roi_from_metrics(optimization_cost_data, original_cost_data, new_cost_data)
+        roi_infinite = calculator.calculate_roi_from_metrics(optimization_cost_data, original_cost_data, new_cost_data, float('inf'))
+        break_even_point = calculator.calculate_break_even_point_from_metrics(optimization_cost_data, original_cost_data, new_cost_data)
 
         roi_results = [
-            {"name": "Optimization Cost", "value": f"{calculator._calculate_total_cost(optimization_cost_data):.2f} €"},
-            {"name": "New Cost Per Inference", "value": f"{calculator._calculate_cost_per_inference(new_cost_data):.5f} €"},
-            {"name": "Original Cost Per Inference", "value": f"{calculator._calculate_cost_per_inference(original_cost_data):.5f} €"},
+            {"name": "Optimization Cost", "value": f"{calculator._calculate_total_cost(optimization_cost_data):.4f} €"},
+            {"name": "New Cost Per Inference", "value": f"{calculator._calculate_cost_per_inference(new_cost_data):.8f} €"},
+            {"name": "Original Cost Per Inference", "value": f"{calculator._calculate_cost_per_inference(original_cost_data):.8f} €"},
             {"name": f"ROI (for {num_inferences} inferences)", "value": f"{roi:.6f}"},
-            {"name": "Positive-ROI Point", "value": f"{positive_roi_point} inferences"},
+            {"name": "ROI (for infinite inferences)", "value": f"{roi_infinite:.6f}"},
+            {"name": "Break-Even Point", "value": f"{break_even_point} inferences"},
         ]
 
         # Calculate ROI Evolution
