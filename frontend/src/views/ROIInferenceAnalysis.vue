@@ -25,13 +25,26 @@
                     </el-descriptions>
                     <p v-else>{{ $t("Loading model information...") }}</p>
                 </el-card>
+
+                <el-card :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mobile-card">
+                    <h2 class="section-title">{{ $t("ROI Evolution Chart") }}</h2>
+                    <p class="chart-description">
+                        {{ $t("This chart illustrates the evolution of the Return on Investment (ROI) of the specified technique over a range of inferences.") }}
+                    </p>
+                    <div ref="roiChartContainer" class="chart-container">
+                        <!-- Chart will be rendered here -->
+                    </div>
+                    <p>
+                        The ROI Evolution Chart shows the evolution of the Return on Investment (ROI) over a range of inferences. A positive ROI indicates that you've saved more money than you've spent on optimization and inferences. A negative ROI means you've spent more than you've saved. For example, a positive ROI of 0.5 means that for every €1 you've spent, you've earned/saved €0.5.
+                    </p>
+                </el-card>
             </el-col>
 
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mobile-card">
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
                     <h2 class="section-title">{{ $t("Costs/Benefits Chart") }}</h2>
                     <p class="chart-description">
-                        {{ $t("This chart illustrates the evolution of costs and benefits associated with dynamic quantization over a range of inferences.") }}
+                        {{ $t("This chart illustrates the evolution of costs and benefits over a range of inferences for the specified technique.") }}
                     </p>
                     <p>
                         <strong>Benefits:</strong> how much money you save cumulatively as you perform more inferences<br>
@@ -79,6 +92,7 @@ export default {
             analysisData: null,
             roiResults: [],
             chart: null,
+            roiChart: null,
             chartOptions: {
                 xAxis: {
                     type: 'value',
@@ -149,15 +163,57 @@ export default {
                     data: [this.$t('Benefits'), this.$t('Costs')],
                     bottom: 0,
                 }
+            },
+            roiChartOptions: {
+                xAxis: {
+                    type: 'value',
+                    name: this.$t('Number of Inferences'),
+                    nameLocation: 'middle',
+                    nameGap: 30,
+                },
+                yAxis: {
+                    type: 'value',
+                    name: this.$t('ROI'),
+                    nameLocation: 'middle',
+                    nameGap: 35,
+                },
+                series: [
+                    {
+                        name: this.$t('ROI Evolution'),
+                        type: 'line',
+                        smooth: true,
+                        showSymbol: false,
+                        data: [],
+                        itemStyle: {
+                            color: 'rgb(0, 71, 171)',
+                        },
+                        lineStyle: {
+                            color: 'rgb(0, 71, 171)',
+                        },
+                    }
+                ],
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: [this.$t('ROI Evolution')],
+                    bottom: 0,
+                }
             }
         };
     },
     methods: {
         formatData,
         initializeChart() {
+            // Initialize the Costs/Benefits Chart
             const chartContainer = this.$refs.chartContainer;
             this.chart = echarts.init(chartContainer);
             this.chart.setOption(this.chartOptions);
+
+            // Initialize the ROI Evolution Chart
+            const roiChartContainer = this.$refs.roiChartContainer;
+            this.roiChart = echarts.init(roiChartContainer);
+            this.roiChart.setOption(this.roiChartOptions);
         },
         async loadAnalysisData() {
             const { id_model, id_experiment } = this.$route.params;
@@ -239,6 +295,18 @@ export default {
             this.chartOptions.series[0].itemStyle.color = 'green';
             this.chart.setOption(this.chartOptions, true);
         },
+        updateROIChartData() {
+            if (!this.analysisData || !this.analysisData.roi_evolution_chart_data) {
+                return;
+            }
+
+            this.roiChartOptions.xAxis.max = Math.max(...this.analysisData.roi_evolution_chart_data.map(item => item.inferences));
+
+            const roiEvolutionData = this.analysisData.roi_evolution_chart_data.map(item => [item.inferences, item.roi]);
+            this.roiChartOptions.series[0].data = roiEvolutionData;
+
+            this.roiChart.setOption(this.roiChartOptions, true);
+        },
     },
     mounted() {
         this.loadAnalysisData();
@@ -247,6 +315,10 @@ export default {
     watch: {
         roiResults: {
             handler: 'updateChartData',
+            deep: true
+        },
+        analysisData: {
+            handler: 'updateROIChartData',
             deep: true
         }
     },

@@ -380,10 +380,15 @@ class ROIAnalysesView(viewsets.ModelViewSet):
             {"name": "Positive-ROI Point", "value": f"{positive_roi_point} inferences"},
         ]
 
+        # Calculate ROI Evolution
+        roi_evolution_data = calculator.calculate_roi_evolution(optimization_cost_data, original_cost_data, new_cost_data)
+        roi_evolution_chart_data = [{"inferences": inferences, "roi": roi} for inferences, roi in roi_evolution_data]
+
         # Add the calculated ROI results to the response
         serializer = self.get_serializer(roi_analysis)
         response_data = serializer.data
         response_data['roi_results'] = roi_results
+        response_data['roi_evolution_chart_data'] = roi_evolution_chart_data
 
         return Response(response_data)
 

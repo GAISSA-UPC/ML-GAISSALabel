@@ -55,3 +55,27 @@ class ROICalculator:
         Calculates the cost per inference.
         """
         return self._calculate_total_cost(cost_metrics) / cost_metrics.num_inferences
+
+    def calculate_roi_evolution(self, optimization_cost_metrics, original_cost_metrics, new_cost_metrics, inference_numbers=None):
+        """
+        Calculates ROI for a range of inference numbers.
+        """
+        optimization_cost = self._calculate_total_cost(optimization_cost_metrics)
+        new_cost_per_inference = self._calculate_cost_per_inference(new_cost_metrics)
+        original_cost_per_inference = self._calculate_cost_per_inference(original_cost_metrics)
+
+        if inference_numbers is None:
+            positive_roi_point = self.calculate_positive_roi_from_metrics(optimization_cost_metrics, original_cost_metrics, new_cost_metrics)
+            if positive_roi_point == float('inf') or positive_roi_point < 0:
+                # If no positive ROI, default inference range
+                inference_numbers = range(0, 2000001, 10000)
+            else:
+                max_inference = int(positive_roi_point * 20)
+                inference_numbers = range(0, max_inference + 1, max_inference//200)
+
+        roi_evolution = []
+        for num_inferences in inference_numbers:
+            roi = self.calculate_roi(optimization_cost, new_cost_per_inference, original_cost_per_inference, num_inferences)
+            roi_evolution.append((num_inferences, roi))
+
+        return roi_evolution
