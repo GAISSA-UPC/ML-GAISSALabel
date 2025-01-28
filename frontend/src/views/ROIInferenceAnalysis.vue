@@ -26,7 +26,9 @@
                     <p v-else>{{ $t("Loading model information...") }}</p>
                 </el-card>
 
-                <el-card :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mobile-card">
+                <div style="margin-bottom: 20px"></div>
+
+                <el-card shadow="always" :body-style="{ padding: '20px' }">
                     <h2 class="section-title">{{ $t("ROI Evolution Chart") }}</h2>
                     <p class="chart-description">
                         {{ $t("This chart illustrates the evolution of the Return on Investment (ROI) of the specified technique over a range of inferences.") }}
@@ -64,7 +66,7 @@
             </el-col>
 
             <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-                <el-card shadow="always" :body-style="{ padding: '20px' }" style="margin-top: 20px">
+                <el-card shadow="always" :body-style="{ padding: '20px' }">
                     <h2 class="section-title">{{ $t("ROI Results") }}</h2>
                     <p class="results-description">
                         {{ $t("This table provides a detailed breakdown of the ROI analysis over the defined optimization strategy. It illustrates specific data about the potential benefits associated with the dynamic quantization strategy over a range of inferences.") }}
