@@ -8,7 +8,7 @@ from django.contrib.auth.hashers import check_password
 
 from api.models import Model, Entrenament, Inferencia, Metrica, Qualificacio, Interval, ResultatEntrenament, \
     ResultatInferencia, InfoAddicional, ValorInfoEntrenament, ValorInfoInferencia, EinaCalcul, TransformacioMetrica, \
-    TransformacioInformacio, Administrador, OptimizationTechnique, ROIAnalysis, ROICostMetrics
+    TransformacioInformacio, Administrador, OptimizationTechnique, ROIAnalysis, ROICostMetrics, TechniqueParameter
 
 class ModelSerializer(serializers.ModelSerializer):
     class Meta:
@@ -243,7 +243,13 @@ class TransformacioInformacioSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 # ROI Serializers
+class TechniqueParameterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TechniqueParameter
+        fields = ["id", "name", "optimization_technique"]
+
 class OptimizationTechniqueSerializer(serializers.ModelSerializer):
+    technique_parameters = TechniqueParameterSerializer(many=True, read_only=True)
     class Meta:
         model = OptimizationTechnique
         fields = '__all__'
@@ -256,12 +262,48 @@ class ROICostMetricsSerializer(serializers.ModelSerializer):
 
 class ROIAnalysisSerializer(serializers.ModelSerializer):
     model_name = serializers.CharField(source='model.nom', read_only=True)
-    optimization_technique_name = serializers.CharField(source='optimization_technique.name', read_only=True)
+    optimization_technique_id = serializers.PrimaryKeyRelatedField(
+        queryset=OptimizationTechnique.objects.all(),
+        write_only=True,
+        source='optimization_technique',
+    )
+    technique_parameter_id = serializers.PrimaryKeyRelatedField(
+        queryset=TechniqueParameter.objects.all(),
+        write_only=True,
+        source='technique_parameter',
+        allow_null=True
+    )
     roi_cost_metrics = ROICostMetricsSerializer(many=True, read_only=True)
 
     class Meta:
         model = ROIAnalysis
-        fields = ['id', 'model', 'model_name', 'optimization_technique', 'optimization_technique_name', 'registration_date', 'country', 'roi_cost_metrics']
+        fields = ['id', 'model', 'model_name', 'optimization_technique_id', 'optimization_technique', 'technique_parameter_id', 'technique_parameter', 'registration_date', 'country', 'roi_cost_metrics']
+        read_only_fields = ['optimization_technique', 'technique_parameter']
+
+    def validate(self, data):
+        """
+        Validates that the technique_parameter belongs to the selected optimization_technique.
+        """
+        optimization_technique = data.get("optimization_technique")
+        technique_parameter = data.get("technique_parameter") 
+
+        if technique_parameter and technique_parameter.optimization_technique != optimization_technique:
+            raise serializers.ValidationError(
+                {
+                    "technique_parameter": "The selected parameter does not belong to the chosen optimization technique."
+                }
+            )
+
+        return data
+    
+    def to_representation(self, instance):
+        """
+        Modify the representation to include the full optimization_technique object.
+        """
+        representation = super().to_representation(instance)
+        representation['optimization_technique'] = OptimizationTechniqueSerializer(instance.optimization_technique).data
+        representation['technique_parameter'] = TechniqueParameterSerializer(instance.technique_parameter).data if instance.technique_parameter else None
+        return representation
 
 # LOGIN
 def validacioLogin(data):

@@ -9,11 +9,12 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 
 from api.models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, Interval, EinaCalcul, \
-    TransformacioMetrica, TransformacioInformacio, Administrador, Configuracio, OptimizationTechnique, ROIAnalysis, ROICostMetrics
+    TransformacioMetrica, TransformacioInformacio, Administrador, Configuracio, OptimizationTechnique, ROIAnalysis, ROICostMetrics, TechniqueParameter
 from api.serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
     EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer, \
     IntervalBasicSerializer, MetricaSerializer, EinaCalculBasicSerializer, EinaCalculSerializer, \
-    TransformacioMetricaSerializer, TransformacioInformacioSerializer, LoginAdminSerializer, OptimizationTechniqueSerializer, ROIAnalysisSerializer, ROICostMetricsSerializer
+    TransformacioMetricaSerializer, TransformacioInformacioSerializer, LoginAdminSerializer, OptimizationTechniqueSerializer, \
+    ROIAnalysisSerializer, ROICostMetricsSerializer, TechniqueParameterSerializer
 
 from api import permissions
 from efficiency_calculators.rating_calculator import calculateRating
@@ -309,6 +310,26 @@ class EstadistiquesView(mixins.ListModelMixin, viewsets.GenericViewSet):
         return Response(data, status=status.HTTP_200_OK)
 
 # ROI Views
+class TechniqueParameterView(viewsets.ModelViewSet):
+    queryset = TechniqueParameter.objects.all()
+    serializer_class = TechniqueParameterSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['id', 'name']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        technique_id = self.request.query_params.get('optimization_technique_id')
+        model_id = self.request.query_params.get('model_id')
+
+        if technique_id:
+            queryset = queryset.filter(optimization_technique_id=technique_id)
+
+        if model_id:
+            queryset = queryset.filter(roianalysis__model_id=model_id).distinct()
+
+        return queryset
+
 class OptimizationTechniqueView(viewsets.ModelViewSet):
     queryset = OptimizationTechnique.objects.all()
     serializer_class = OptimizationTechniqueSerializer
@@ -328,7 +349,6 @@ class OptimizationTechniqueView(viewsets.ModelViewSet):
 class ROIAnalysesView(viewsets.ModelViewSet):
     queryset = ROIAnalysis.objects.all()
     serializer_class = ROIAnalysisSerializer
-    permission_classes = [permissions.IsAdminEditOthersRead]
 
     def get_queryset(self):
         model_id = self.kwargs['model_id']
@@ -340,6 +360,11 @@ class ROIAnalysesView(viewsets.ModelViewSet):
         if optimization_technique_id:
             optimization_technique = get_object_or_404(OptimizationTechnique, pk=optimization_technique_id)
             queryset = queryset.filter(optimization_technique=optimization_technique)
+
+        technique_parameter_id = self.request.query_params.get('technique_parameter_id')
+        if technique_parameter_id:
+            technique_parameter = get_object_or_404(TechniqueParameter, pk=technique_parameter_id)
+            queryset = queryset.filter(technique_parameter = technique_parameter)
 
         return queryset
 
@@ -396,7 +421,7 @@ class ROIAnalysesView(viewsets.ModelViewSet):
         response_data['roi_evolution_chart_data'] = roi_evolution_chart_data
 
         return Response(response_data)
-
+    
 class ROICostMetricsView(viewsets.ModelViewSet):
     queryset = ROICostMetrics.objects.all()
     serializer_class = ROICostMetricsSerializer

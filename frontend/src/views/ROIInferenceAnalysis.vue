@@ -11,7 +11,10 @@
                             {{ analysisData.model_name }}
                         </el-descriptions-item>
                         <el-descriptions-item :label="$t('Model optimization')">
-                            {{ analysisData.optimization_technique_name }}
+                            {{ analysisData.optimization_technique.name }}
+                        </el-descriptions-item>
+                        <el-descriptions-item v-if="analysisData.technique_parameter" :label="$t('Technique parameter')">
+                            {{ analysisData.technique_parameter.name }}
                         </el-descriptions-item>
                         <el-descriptions-item :label="$t('Analysis identifier')">
                             {{ analysisData.id }}

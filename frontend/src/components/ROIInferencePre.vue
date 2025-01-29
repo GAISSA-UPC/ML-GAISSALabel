@@ -29,27 +29,25 @@
                     </el-select>
                 </el-form-item>
             </div>
-
-            <div v-if="selectedOptimizationTechnique !== null && techniqueParameters.length > 0">
+            <div v-if="selectedOptimizationTechnique !== null && optimizationTechniqueParameters.length > 0">
                 <h3 class="section-title">{{ $t("Technique Parameters") }}</h3>
                 <p class="field-description">{{ $t("Please, specify the parameters for the chosen technique.") }}</p>
                 <el-form-item>
-                    <el-select v-model="selectedParameter" @change="onParameterChange" placeholder="Select"
-                        class="full-width">
-                        <el-option v-for="(option, i) in techniqueParameters[0].options" :key="i" :value="option.value"
-                            :label="option.label" />
+                    <el-select v-model="selectedOptimizationParameter" @change="onOptimizationParameterChange"
+                        placeholder="Select a parameter" class="full-width">
+                        <el-option v-for="parameter in optimizationTechniqueParameters" :key="parameter.id"
+                            :value="parameter.id" :label="parameter.name" />
                     </el-select>
                 </el-form-item>
             </div>
 
-            <div v-if="selectedModel !== null && (techniqueParameters.length === 0 || selectedParameter !== null)">
+            <div v-if="selectedOptimizationTechnique !== null && (optimizationTechniqueParameters.length === 0 || selectedOptimizationParameter !== null)">
                 <h3 class="section-title">{{ $t("Analysis") }}</h3>
                 <p class="field-description">
                     {{ $t('Now specify the') }} {{ fase }} {{ $t('from which you want to get the evaluation.') }}
                 </p>
                 <el-form-item>
-                    <el-select v-model="selectedExperiment" placeholder="Select"
-                        class="full-width">
+                    <el-select v-model="selectedExperiment" placeholder="Select" class="full-width">
                         <el-option v-for="(experiment, i) in experiments" :key="i" :value="experiment.id"
                             :label="formatData(experiment.registration_date)" />
                     </el-select>
@@ -69,6 +67,7 @@
 <script>
 import models from "@/controllers/models";
 import optimizationTechniques from "@/controllers/optimizationTechniques";
+import techniqueParameters from "@/controllers/techniqueParameters";
 import roiAnalyses from "@/controllers/roiAnalyses";
 import { formatData } from "@/utils";
 
@@ -83,10 +82,10 @@ export default {
             selectedModel: null,
             optimizationTechniques: [],
             selectedOptimizationTechnique: null,
-            techniqueParameters: [],
-            selectedParameter: null,
             experiments: [],
             selectedExperiment: null,
+            optimizationTechniqueParameters: [],
+            selectedOptimizationParameter: null,
         };
     },
     computed: {
@@ -94,7 +93,7 @@ export default {
             return (
                 this.selectedModel !== null &&
                 this.selectedOptimizationTechnique !== null &&
-                (this.techniqueParameters.length === 0 || this.selectedParameter !== null) &&
+                (this.optimizationTechniqueParameters.length === 0 || this.selectedOptimizationParameter !== null) &&
                 this.selectedExperiment !== null
             );
         },
@@ -108,59 +107,47 @@ export default {
             const response = await optimizationTechniques.list({ model_id: this.selectedModel });
             this.optimizationTechniques = response.data;
         },
-        async refreshExperiments() {
-            const response = await roiAnalyses.listByModel(this.selectedModel, {
-                optimization_technique_id: this.selectedOptimizationTechnique,
-            });
-            this.experiments = response.data;
+        async refreshOptimizationTechniqueParameters() {
+            const response = await techniqueParameters.list({ model_id: this.selectedModel, optimization_technique_id: this.selectedOptimizationTechnique });
+            this.optimizationTechniqueParameters = response.data;
         },
         async onModelChange() {
             this.selectedOptimizationTechnique = null;
-            this.techniqueParameters = [];
-            this.selectedParameter = null;
+            this.optimizationTechniqueParameters = [];
+            this.selectedOptimizationParameter = null;
+            this.experiments = [];
+            this.selectedExperiment = null;
+            await this.refreshOptimizationTechniques();
+        },
+        async onOptimizationTechniqueChange() {
+            this.selectedOptimizationParameter = null;
             this.experiments = [];
             this.selectedExperiment = null;
 
-            await this.refreshOptimizationTechniques();
+            await this.refreshOptimizationTechniqueParameters();
 
-            this.techniqueParameters = [
-                    {
-                        id: "temp",
-                        label: "temp",
-                        options: [
-                            { label: "25%", value: 0.25 },
-                            { label: "50%", value: 0.5 },
-                            { label: "75%", value: 0.75 },
-                        ],
-                    },
-                ];
-        },
-        async onOptimizationTechniqueChange() {
-            this.selectedParameter = null;
-            this.experiments = this.experiments//.filter(experiment => experiment.optimization_technique === this.selectedOptimizationTechnique);
-            this.selectedExperiment = null;
-
-            await this.refreshExperiments();
-
-            if (this.selectedOptimizationTechnique === "local_pruning" || this.selectedOptimizationTechnique === "global_pruning") {
-                this.techniqueParameters = [
-                    {
-                        id: "pruning_percentage",
-                        label: "Pruning Percentage",
-                        options: [
-                            { label: "25%", value: 0.25 },
-                            { label: "50%", value: 0.5 },
-                            { label: "75%", value: 0.75 },
-                        ],
-                    },
-                ];
-            } else {
-                this.techniqueParameters = [];
+            if (this.optimizationTechniqueParameters.length === 0) {
+                await this.refreshExperiments();
             }
         },
-        async onParameterChange() {
-            this.experiments = this.experiments//.filter(experiment => experiment.parameter === this.selectedParameter);
+        async onOptimizationParameterChange() {
+            this.experiments = [];
             this.selectedExperiment = null;
+            await this.refreshExperiments();
+        },
+        async refreshExperiments() {
+            let params = {
+                optimization_technique_id: this.selectedOptimizationTechnique,
+            };
+            if (this.selectedOptimizationParameter) {
+                params.technique_parameter_id = this.selectedOptimizationParameter;
+            }
+            if (this.selectedModel && this.selectedOptimizationTechnique) {
+                const response = await roiAnalyses.listByModel(this.selectedModel, params);
+                this.experiments = response.data;
+            } else {
+                this.experiments = [];
+            }
         },
         async calculateROI() {
             this.$router.push({

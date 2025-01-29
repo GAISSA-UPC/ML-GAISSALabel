@@ -147,10 +147,24 @@ class OptimizationTechnique(models.Model):
 
     def __str__(self):
         return self.name
+    
+class TechniqueParameter(models.Model):
+    id = models.AutoField(primary_key=True)
+    optimization_technique = models.ForeignKey(OptimizationTechnique, related_name='technique_parameters', on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, verbose_name=_('Parameter Name'), null=False, blank=False)
+
+    class Meta:
+        verbose_name = _('Technique Parameter')
+        verbose_name_plural = _('Technique Parameters')
+        unique_together = ('optimization_technique', 'name')
+
+    def __str__(self):
+        return f"{self.optimization_technique.name} - {self.name}"
 
 class ROIAnalysis(models.Model):
     model = models.ForeignKey(Model, related_name='roi_analyses', on_delete=models.CASCADE, verbose_name=_('Model'))
     optimization_technique = models.ForeignKey(OptimizationTechnique, on_delete=models.PROTECT, null=False, blank=False, verbose_name=_('Optimization Technique'))
+    technique_parameter = models.ForeignKey(TechniqueParameter, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Technique Parameter'))
     registration_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Registration Date'))
     country = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Country of Deployment'))
 
