@@ -108,7 +108,7 @@ export default {
             this.optimizationTechniques = response.data;
         },
         async refreshOptimizationTechniqueParameters() {
-            const response = await techniqueParameters.list({ model_id: this.selectedModel, optimization_technique_id: this.selectedOptimizationTechnique });
+            const response = await techniqueParameters.list(this.selectedOptimizationTechnique, { model_id: this.selectedModel });
             this.optimizationTechniqueParameters = response.data;
         },
         async onModelChange() {

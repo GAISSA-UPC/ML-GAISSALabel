@@ -244,6 +244,7 @@ class TransformacioInformacioSerializer(serializers.ModelSerializer):
 
 # ROI Serializers
 class TechniqueParameterSerializer(serializers.ModelSerializer):
+    optimization_technique = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = TechniqueParameter
         fields = ["id", "name", "optimization_technique"]
@@ -278,7 +279,7 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
     class Meta:
         model = ROIAnalysis
         fields = ['id', 'model', 'model_name', 'optimization_technique_id', 'optimization_technique', 'technique_parameter_id', 'technique_parameter', 'registration_date', 'country', 'roi_cost_metrics']
-        read_only_fields = ['optimization_technique', 'technique_parameter']
+        read_only_fields = ['model', 'optimization_technique', 'technique_parameter']
 
     def validate(self, data):
         """

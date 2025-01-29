@@ -313,13 +313,12 @@ class EstadistiquesView(mixins.ListModelMixin, viewsets.GenericViewSet):
 class TechniqueParameterView(viewsets.ModelViewSet):
     queryset = TechniqueParameter.objects.all()
     serializer_class = TechniqueParameterSerializer
-    permission_classes = [permissions.IsAdminEditOthersRead]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['id', 'name']
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        technique_id = self.request.query_params.get('optimization_technique_id')
+        technique_id = self.kwargs.get('optimization_technique_id')
         model_id = self.request.query_params.get('model_id')
 
         if technique_id:
@@ -329,6 +328,15 @@ class TechniqueParameterView(viewsets.ModelViewSet):
             queryset = queryset.filter(roianalysis__model_id=model_id).distinct()
 
         return queryset
+    
+    def perform_create(self, serializer):
+        # Automatically set the optimization_technique based on the URL
+        if 'optimization_technique_id' in self.kwargs:
+            optimization_technique_id = self.kwargs['optimization_technique_id']
+            optimization_technique = get_object_or_404(OptimizationTechnique, pk=optimization_technique_id)
+            serializer.save(optimization_technique=optimization_technique)
+        else:
+            serializer.save()
 
 class OptimizationTechniqueView(viewsets.ModelViewSet):
     queryset = OptimizationTechnique.objects.all()
@@ -421,6 +429,15 @@ class ROIAnalysesView(viewsets.ModelViewSet):
         response_data['roi_evolution_chart_data'] = roi_evolution_chart_data
 
         return Response(response_data)
+    
+    def perform_create(self, serializer):
+        # Automatically set the model based on the URL
+        if 'model_id' in self.kwargs:
+            model_id = self.kwargs['model_id']
+            model = get_object_or_404(Model, pk=model_id)
+            serializer.save(model=model)
+        else:
+            serializer.save()
     
 class ROICostMetricsView(viewsets.ModelViewSet):
     queryset = ROICostMetrics.objects.all()
