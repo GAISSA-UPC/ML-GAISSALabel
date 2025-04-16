@@ -11,7 +11,7 @@ export default {
         values: Object, // Values to show in the slider: [min, max]
         marks: Object,  // Points to show in the slider: {0: 'Low', 50: 'Medium', 100: 'High'}
         max: Number,    // Maximum value of the slider: 100
-        color: Object
+        color: String
     },
     data() {
         return {

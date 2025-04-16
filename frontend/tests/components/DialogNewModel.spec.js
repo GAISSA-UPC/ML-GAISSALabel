@@ -27,7 +27,6 @@ describe('DialogNewModel.vue', () => {
     it('renders dialog with correct form fields', async () => {
         await wrapper.vm.$nextTick();
         const formItems = wrapper.findAllComponents({ name: 'el-form-item' });
-        console.log(wrapper.html());
         expect(formItems).toHaveLength(3);
         
         expect(formItems[0].props('label')).toBe('Name');

@@ -2,6 +2,8 @@ import { mount } from '@vue/test-utils';
 import FileNewExperiment from '@/tools/gaissalabel/components/FileNewExperiment.vue';
 import ElementPlus from 'element-plus';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faCloudArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { i18n } from '@/i18n';
 import XLSX from "xlsx";
 import eines from '@/tools/gaissalabel/services/eines';
@@ -9,6 +11,8 @@ import flushPromises from 'flush-promises';
 
 vi.mock('@/tools/gaissalabel/services/eines');
 vi.mock('xlsx');
+
+library.add(faCloudArrowUp);
 
 describe('FileNewExperiment.vue', () => {
     let wrapper;
@@ -60,7 +64,6 @@ describe('FileNewExperiment.vue', () => {
     
         // Find all the tool dropdowns
         const dropdowns = wrapper.findAllComponents({ name: 'el-select' });
-        console.log("hola" + dropdowns);
         expect(dropdowns).toHaveLength(2);
     
         // Verify that each dropdown contains the expected options

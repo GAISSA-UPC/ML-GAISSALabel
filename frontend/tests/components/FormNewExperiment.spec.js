@@ -2,6 +2,8 @@ import { mount } from '@vue/test-utils';
 import FormNewExperiment from '@/tools/gaissalabel/components/FormNewExperiment.vue';
 import ElementPlus from 'element-plus';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { i18n } from '@/i18n';
 import models from '@/tools/gaissalabel/services/models';
 import metriques from '@/tools/gaissalabel/services/metriques';
@@ -14,6 +16,11 @@ vi.mock('@/tools/gaissalabel/services/models');
 vi.mock('@/tools/gaissalabel/services/metriques');
 vi.mock('@/tools/gaissalabel/services/informacions');
 vi.mock('@/tools/gaissalabel/services/trainings');
+
+library.add(faPlus);
+
+// Mocks window.scrollTo
+window.scrollTo = vi.fn();
 
 // Mocks to return a specific response structure
 import { mockModelsData, mockMetriquesData, mockInformacionsData } from '@tests/components/FormNewExperiment.mock'; 

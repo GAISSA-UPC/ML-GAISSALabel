@@ -42,9 +42,9 @@
             :label="metrica.nom"
         >
             <el-input-number
-                step="0.01"
+                :step="0.01"
                 v-model="metrica.valor"
-                min="0"
+                :min="0"
                 style="width: 200px"
             />
             <p style="margin-left: 10px">{{ metrica.unitat }}</p>

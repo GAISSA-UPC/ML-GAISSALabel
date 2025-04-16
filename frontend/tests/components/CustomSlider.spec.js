@@ -8,7 +8,7 @@ describe('CustomSlider.vue', () => {
         values: [20, 80],
         marks: { 0: '', 50: '', 100: '' },
         max: 100,
-        color: '#ff0000'
+        color: '#ff0000',
     };
 
     beforeEach(() => {

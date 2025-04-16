@@ -2,6 +2,16 @@ import { mount } from '@vue/test-utils';
 import LabelInfo from '@/tools/gaissalabel/components/LabelInfo.vue';
 import ElementPlus from 'element-plus';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core'; 
+import {
+    faIdCardClip,
+    faCircleInfo,
+    faCalendarDays,
+    faDumbbell,
+    faUser, 
+    faBullseye
+} from '@fortawesome/free-solid-svg-icons';
+
 import { i18n } from '@/i18n';
 import trainings from '@/tools/gaissalabel/services/trainings';
 import inferencies from '@/tools/gaissalabel/services/inferencies';
@@ -16,6 +26,8 @@ vi.mock('@/tools/gaissalabel/services/trainings');
 vi.mock('@/tools/gaissalabel/services/inferencies');
 vi.mock('@/tools/gaissalabel/services/metriques');
 vi.mock('@/tools/gaissalabel/services/models');
+
+library.add(faIdCardClip, faCircleInfo, faCalendarDays, faDumbbell, faUser, faBullseye);
 
 // Mock route params
 const mockRouteParams = {
@@ -40,7 +52,7 @@ vi.mock('@/tools/gaissalabel/components/EnergyLabel.vue', () => ({
         marks: Object,
         max: Number,
         values: Object,
-        color: Object,
+        color: String,
       },
       template: '<div class="mock-custom-slider"></div>'
     }
