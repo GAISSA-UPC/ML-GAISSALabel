@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import CustomSlider from '@/components/CustomSlider.vue';
+import CustomSlider from '@/tools/gaissalabel/components/CustomSlider.vue';
 import ElementPlus from 'element-plus';
 
 describe('CustomSlider.vue', () => {

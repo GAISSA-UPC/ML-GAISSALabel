@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import ROIInferencePre from "@/components/ROIInferencePre.vue";
+import ROIInferencePre from "@/tools/gaissaroianalyzer/components/ROIInferencePre.vue";
 export default {
     name: "ROIInferencePreSaved",
     components: { ROIInferencePre }

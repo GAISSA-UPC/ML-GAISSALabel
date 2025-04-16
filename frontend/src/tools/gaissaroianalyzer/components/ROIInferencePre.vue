@@ -65,10 +65,10 @@
 </template>
 
 <script>
-import models from "@/controllers/models";
-import optimizationTechniques from "@/controllers/optimizationTechniques";
-import techniqueParameters from "@/controllers/techniqueParameters";
-import roiAnalyses from "@/controllers/roiAnalyses";
+import models from "@/tools/gaissalabel/services/models";
+import optimizationTechniques from "@/tools/gaissaroianalyzer/services/optimizationTechniques";
+import techniqueParameters from "@/tools/gaissaroianalyzer/services/techniqueParameters";
+import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
 import { formatData } from "@/utils";
 
 export default {

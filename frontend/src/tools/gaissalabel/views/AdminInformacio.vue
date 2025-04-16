@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import informacions from "@/controllers/informacions";
+import informacions from "@/tools/gaissalabel/services/informacions";
 export default {
     name: "AdminInformacio",
     data() {

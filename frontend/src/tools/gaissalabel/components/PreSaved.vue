@@ -49,9 +49,9 @@
 </template>
 
 <script>
-import models from '@/controllers/models'
-import trainings from '@/controllers/trainings'
-import inferencies from '@/controllers/inferencies'
+import models from '@/tools/gaissalabel/services/models'
+import trainings from '@/tools/gaissalabel/services/trainings'
+import inferencies from '@/tools/gaissalabel/services/inferencies'
 import {formatData} from '@/utils'
 export default {
     name: "PreSaved",

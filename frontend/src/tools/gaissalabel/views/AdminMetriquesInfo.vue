@@ -185,8 +185,8 @@
 
 
 <script>
-import metriques from "@/controllers/metriques";
-import informacions from "@/controllers/informacions";
+import metriques from "@/tools/gaissalabel/services/metriques";
+import informacions from "@/tools/gaissalabel/services/informacions";
 
 export default {
     name: "AdminMetriquesInfo",

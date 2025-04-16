@@ -1,6 +1,6 @@
 // EnergyLabel.spec.js
 import { mount } from '@vue/test-utils';
-import EnergyLabel from '@/components/EnergyLabel.vue';
+import EnergyLabel from '@/tools/gaissalabel/components/EnergyLabel.vue';
 import flushPromises from 'flush-promises';
 
 describe('EnergyLabel.vue', () => {

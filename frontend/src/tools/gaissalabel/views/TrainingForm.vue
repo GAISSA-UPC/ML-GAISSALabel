@@ -3,7 +3,7 @@
 </template>
 
 <script>
-    import FormNewExperiment from "@/components/FormNewExperiment.vue";
+    import FormNewExperiment from "@/tools/gaissalabel/components/FormNewExperiment.vue";
     export default {
         name: "TrainingForm",
         components: {FormNewExperiment},

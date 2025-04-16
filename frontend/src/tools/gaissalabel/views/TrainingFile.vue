@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import FileNewExperiment from "@/components/FileNewExperiment.vue";
+import FileNewExperiment from "@/tools/gaissalabel/components/FileNewExperiment.vue";
 export default {
     name: "TrainingFile",
     components: {FileNewExperiment}

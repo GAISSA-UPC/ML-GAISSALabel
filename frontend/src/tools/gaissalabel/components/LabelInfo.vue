@@ -108,12 +108,12 @@
 </template>
 
 <script>
-import trainings from '@/controllers/trainings'
-import inferencies from '@/controllers/inferencies'
-import metriques from "@/controllers/metriques";
-import models from '@/controllers/models'
-import EnergyLabel from "@/components/EnergyLabel.vue";
-import CustomSlider from "@/components/CustomSlider.vue";
+import trainings from '@/tools/gaissalabel/services/trainings'
+import inferencies from '@/tools/gaissalabel/services/inferencies'
+import metriques from "@/tools/gaissalabel/services/metriques";
+import models from '@/tools/gaissalabel/services/models'
+import EnergyLabel from "@/tools/gaissalabel/components/EnergyLabel.vue";
+import CustomSlider from "@/tools/gaissalabel/components/CustomSlider.vue";
 import {formatData} from '@/utils'
 export default {
     name: "LabelInfo",

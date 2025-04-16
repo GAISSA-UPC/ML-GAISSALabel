@@ -43,7 +43,7 @@
 
 
 <script>
-import sincronitzacions from "@/controllers/sincronitzacions";
+import sincronitzacions from "@/tools/gaissalabel/services/sincronitzacions";
 import { ElLoading } from 'element-plus'
 
 export default {

@@ -94,9 +94,9 @@
 </template>
 
 <script>
-import eines from "@/controllers/eines";
-import metriques from "@/controllers/metriques";
-import informacions from "@/controllers/informacions";
+import eines from "@/tools/gaissalabel/services/eines";
+import metriques from "@/tools/gaissalabel/services/metriques";
+import informacions from "@/tools/gaissalabel/services/informacions";
 export default {
     name: "AdminEina",
     data() {

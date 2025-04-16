@@ -88,7 +88,7 @@
 <script>
 import { formatData } from "@/utils";
 import * as echarts from 'echarts';
-import roiAnalyses from "@/controllers/roiAnalyses";
+import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
 
 export default {
     name: "ROIInferenceAnalysis",

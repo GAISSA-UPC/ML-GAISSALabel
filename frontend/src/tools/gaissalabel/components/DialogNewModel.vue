@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import models from "@/controllers/models";
+import models from "@/tools/gaissalabel/services/models";
 
 export default {
     name: "DialogNewModel",

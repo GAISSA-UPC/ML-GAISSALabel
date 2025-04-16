@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import calculadors from '@/controllers/calculadors'
+import calculadors from '@/tools/gaissalabel/services/calculadors'
 export default {
     name: "InferenceDeploy",
     data() {

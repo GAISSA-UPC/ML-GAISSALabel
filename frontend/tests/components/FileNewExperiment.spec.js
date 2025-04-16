@@ -1,13 +1,13 @@
 import { mount } from '@vue/test-utils';
-import FileNewExperiment from '@/components/FileNewExperiment.vue';
+import FileNewExperiment from '@/tools/gaissalabel/components/FileNewExperiment.vue';
 import ElementPlus from 'element-plus';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { i18n } from '@/i18n';
 import XLSX from "xlsx";
-import eines from '@/controllers/eines';
+import eines from '@/tools/gaissalabel/services/eines';
 import flushPromises from 'flush-promises';
 
-vi.mock('@/controllers/eines');
+vi.mock('@/tools/gaissalabel/services/eines');
 vi.mock('xlsx');
 
 describe('FileNewExperiment.vue', () => {

@@ -1,9 +1,9 @@
 <template>
-    <LabelInfo :fase="$t('Training')"/>
+    <LabelInfo :fase="$t('Inference')"/>
 </template>
 
 <script>
-import LabelInfo from "@/components/LabelInfo.vue";
+import LabelInfo from "@/tools/gaissalabel/components/LabelInfo.vue";
 export default {
     name: "TrainingLabelInfo",
     components: {LabelInfo}

@@ -1,21 +1,21 @@
 import { mount } from '@vue/test-utils';
-import LabelInfo from '@/components/LabelInfo.vue';
+import LabelInfo from '@/tools/gaissalabel/components/LabelInfo.vue';
 import ElementPlus from 'element-plus';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { i18n } from '@/i18n';
-import trainings from '@/controllers/trainings';
-import inferencies from '@/controllers/inferencies';
-import metriques from '@/controllers/metriques';
-import models from '@/controllers/models';
-import EnergyLabel from '@/components/EnergyLabel.vue'
-import CustomSlider from '@/components/CustomSlider.vue'
+import trainings from '@/tools/gaissalabel/services/trainings';
+import inferencies from '@/tools/gaissalabel/services/inferencies';
+import metriques from '@/tools/gaissalabel/services/metriques';
+import models from '@/tools/gaissalabel/services/models';
+import EnergyLabel from '@/tools/gaissalabel/components/EnergyLabel.vue'
+import CustomSlider from '@/tools/gaissalabel/components/CustomSlider.vue'
 import flushPromises from 'flush-promises';
 
 // Mock the controllers
-vi.mock('@/controllers/trainings');
-vi.mock('@/controllers/inferencies');
-vi.mock('@/controllers/metriques');
-vi.mock('@/controllers/models');
+vi.mock('@/tools/gaissalabel/services/trainings');
+vi.mock('@/tools/gaissalabel/services/inferencies');
+vi.mock('@/tools/gaissalabel/services/metriques');
+vi.mock('@/tools/gaissalabel/services/models');
 
 // Mock route params
 const mockRouteParams = {
@@ -23,7 +23,7 @@ const mockRouteParams = {
     id_training: '1'
 };
 
-vi.mock('@/components/EnergyLabel.vue', () => ({
+vi.mock('@/tools/gaissalabel/components/EnergyLabel.vue', () => ({
     default: {
       name: 'EnergyLabel',
       props: {
@@ -33,7 +33,7 @@ vi.mock('@/components/EnergyLabel.vue', () => ({
     }
   }));
   
-  vi.mock('@/components/CustomSlider.vue', () => ({
+  vi.mock('@/tools/gaissalabel/components/CustomSlider.vue', () => ({
     default: {
       name: 'CustomSlider',
       props: {

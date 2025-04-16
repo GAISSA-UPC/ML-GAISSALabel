@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import metriques from "@/controllers/metriques";
+import metriques from "@/tools/gaissalabel/services/metriques";
 export default {
     name: "AdminMetrica",
     data() {

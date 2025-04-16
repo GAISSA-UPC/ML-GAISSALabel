@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import PreSaved from "@/components/PreSaved.vue";
+import PreSaved from "@/tools/gaissalabel/components/PreSaved.vue";
 export default {
     name: "InferencePreSaved",
     components: {PreSaved}

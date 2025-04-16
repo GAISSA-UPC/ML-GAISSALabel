@@ -96,12 +96,12 @@
 </template>
 
 <script>
-import models from '@/controllers/models'
-import metriques from '@/controllers/metriques'
-import informacions from "@/controllers/informacions";
-import inferencies from '@/controllers/inferencies'
-import trainings from '@/controllers/trainings'
-import DialogNewModel from "@/components/DialogNewModel.vue";
+import models from '@/tools/gaissalabel/services/models'
+import metriques from '@/tools/gaissalabel/services/metriques'
+import informacions from "@/tools/gaissalabel/services/informacions";
+import inferencies from '@/tools/gaissalabel/services/inferencies'
+import trainings from '@/tools/gaissalabel/services/trainings'
+import DialogNewModel from "@/tools/gaissalabel/components/DialogNewModel.vue";
 export default {
     name: "FormNewExperiment",
     components: {DialogNewModel},

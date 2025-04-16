@@ -55,7 +55,7 @@
 
 
 <script>
-import eines from "@/controllers/eines";
+import eines from "@/tools/gaissalabel/services/eines";
 
 export default {
     name: "AdminEines",
