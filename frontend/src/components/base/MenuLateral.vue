@@ -45,9 +45,9 @@
         <el-sub-menu index="3">
             <template #title>
                 <font-awesome-icon :icon="['fas', 'chart-line']" class="icon"/>
-                <span class="wrap-title">{{ $t('ROI Inference Calculator') }}</span>
+                <span class="wrap-title">{{ $t('GAISSA ROI Analyzer') }}</span>
             </template>
-            <el-menu-item index="ROI Inference PreSaved Consult" @click="$router.push({name: 'ROI Inference PreSaved Consult'})">
+            <el-menu-item index="GAISSA ROI Analyzer PreSaved Consult" @click="$router.push({name: 'GAISSA ROI Analyzer PreSaved Consult'})">
                 {{ $t('Consult') }}
             </el-menu-item>
         </el-sub-menu>

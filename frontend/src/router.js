@@ -17,9 +17,9 @@ const InferenceFile = () => import('@/tools/gaissalabel/views/InferenceFile.vue'
 const InferenceDeploy = () => import('@/tools/gaissalabel/views/InferenceDeploy.vue')
 const InferenceLabelInfo = () => import('@/tools/gaissalabel/views/InferenceLabelInfo.vue')
 
-// ROI Inference Analysis routes
-const ROIInferencePreSaved = () => import('@/tools/gaissaroianalyzer/views/ROIInferencePreSaved.vue')
-const ROIInferenceAnalysis = () => import("@/tools/gaissaroianalyzer/views/ROIInferenceAnalysis.vue")
+// GAISSA ROI Analyzer routes
+const GAISSAROIAnalyzerPreSaved = () => import('@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzerPreSaved.vue')
+const GAISSAROIAnalyzer = () => import("@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzer.vue")
 
 // Admin routes
 const AdminMetriquesInfo = () => import('@/tools/gaissalabel/views/AdminMetriquesInfo.vue')
@@ -88,14 +88,14 @@ const router = createRouter({
       component: InferenceLabelInfo
     },
     {
-      path: '/roi-inference-pre',
-      name: 'ROI Inference PreSaved Consult',
-      component: ROIInferencePreSaved,
+      path: '/gaissa-roi-analyzer-pre',
+      name: 'GAISSA ROI Analyzer PreSaved Consult',
+      component: GAISSAROIAnalyzerPreSaved,
     },
     {
-      path: "/models/:id_model/roi-inference-analysis/:id_experiment",
-      name: "ROI Inference Analysis",
-      component: ROIInferenceAnalysis,
+      path: "/models/:id_model/gaissa-roi-analyzer/:id_experiment",
+      name: "GAISSA ROI Analyzer",
+      component: GAISSAROIAnalyzer,
     },
     {
       path: '/admin/metriquesinfo',

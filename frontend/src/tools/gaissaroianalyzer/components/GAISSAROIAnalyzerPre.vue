@@ -1,6 +1,6 @@
 <template>
-    <div class="roi-inference-pre">
-        <h1>{{ $t("ROI Inference Optimization Calculator") }}</h1>
+    <div class="gaissa-roi-analyzer-pre">
+        <h1>{{ $t("GAISSA ROI Analyzer") }}</h1>
         <h2>{{ $t("Consult a new ROI Analysis") }}</h2>
 
         <p class="description">
@@ -72,7 +72,7 @@ import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
 import { formatData } from "@/utils";
 
 export default {
-    name: "ROIInferencePre",
+    name: "GAISSAROIAnalyzerPre",
     props: {
         fase: { required: true, type: String },
     },
@@ -151,7 +151,7 @@ export default {
         },
         async calculateROI() {
             this.$router.push({
-                name: "ROI Inference Analysis",
+                name: "GAISSA ROI Analyzer",
                 params: {
                     id_model: this.selectedModel,
                     id_experiment: this.selectedExperiment,

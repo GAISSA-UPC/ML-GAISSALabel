@@ -9,12 +9,12 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 
 from api.models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, Interval, EinaCalcul, \
-    TransformacioMetrica, TransformacioInformacio, Administrador, Configuracio, OptimizationTechnique, ROIAnalysis, ROICostMetrics, TechniqueParameter
+    TransformacioMetrica, TransformacioInformacio, Administrador, Configuracio, OptimizationTechnique, GAISSAROIAnalysis, GAISSAROICostMetrics, TechniqueParameter
 from api.serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
     EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer, \
     IntervalBasicSerializer, MetricaSerializer, EinaCalculBasicSerializer, EinaCalculSerializer, \
     TransformacioMetricaSerializer, TransformacioInformacioSerializer, LoginAdminSerializer, OptimizationTechniqueSerializer, \
-    ROIAnalysisSerializer, ROICostMetricsSerializer, TechniqueParameterSerializer
+    GAISSAROIAnalysisSerializer, GAISSAROICostMetricsSerializer, TechniqueParameterSerializer
 
 from api import permissions
 from efficiency_calculators.rating_calculator import calculateRating
@@ -40,7 +40,7 @@ class ModelsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Create
         queryset = super().get_queryset()
         has_roi_analysis = self.request.query_params.get('has_roi_analysis')
         if has_roi_analysis == 'true':
-            queryset = queryset.filter(roi_analyses__isnull=False).distinct()
+            queryset = queryset.filter(gaissa_roi_analyses__isnull=False).distinct()
         return queryset
 
 class EntrenamentsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -325,7 +325,7 @@ class TechniqueParameterView(viewsets.ModelViewSet):
             queryset = queryset.filter(optimization_technique_id=technique_id)
 
         if model_id:
-            queryset = queryset.filter(roianalysis__model_id=model_id).distinct()
+            queryset = queryset.filter(gaissaroianalysis__model_id=model_id).distinct()
 
         return queryset
     
@@ -350,18 +350,18 @@ class OptimizationTechniqueView(viewsets.ModelViewSet):
         model_id = self.request.query_params.get('model_id')
 
         if model_id:
-            queryset = queryset.filter(roianalysis__model_id=model_id).distinct()
+            queryset = queryset.filter(gaissaroianalysis__model_id=model_id).distinct()
 
         return queryset
 
-class ROIAnalysesView(viewsets.ModelViewSet):
-    queryset = ROIAnalysis.objects.all()
-    serializer_class = ROIAnalysisSerializer
+class GAISSAROIAnalysesView(viewsets.ModelViewSet):
+    queryset = GAISSAROIAnalysis.objects.all()
+    serializer_class = GAISSAROIAnalysisSerializer
 
     def get_queryset(self):
         model_id = self.kwargs['model_id']
         model = get_object_or_404(Model, pk=model_id)
-        queryset = ROIAnalysis.objects.filter(model=model)
+        queryset = GAISSAROIAnalysis.objects.filter(model=model)
 
         # Filter by optimization technique ID
         optimization_technique_id = self.request.query_params.get('optimization_technique_id')
@@ -383,21 +383,21 @@ class ROIAnalysesView(viewsets.ModelViewSet):
 
     def retrieve(self, request, pk=None, model_id=None):
         queryset = self.get_queryset()
-        roi_analysis = get_object_or_404(queryset, pk=pk)
+        gaissa_roi_analysis = get_object_or_404(queryset, pk=pk)
 
         # Get related data
-        model = roi_analysis.model
-        optimization_technique = roi_analysis.optimization_technique
-        roi_cost_metrics = roi_analysis.roi_cost_metrics.all()
+        model = gaissa_roi_analysis.model
+        optimization_technique = gaissa_roi_analysis.optimization_technique
+        gaissa_roi_cost_metrics = gaissa_roi_analysis.gaissa_roi_cost_metrics.all()
 
         calculator = ROICalculator()
 
-        optimization_cost_data = roi_cost_metrics.filter(type='optimization').first()
-        original_cost_data = roi_cost_metrics.filter(type='original').first()
-        new_cost_data = roi_cost_metrics.filter(type='new').first()
+        optimization_cost_data = gaissa_roi_cost_metrics.filter(type='optimization').first()
+        original_cost_data = gaissa_roi_cost_metrics.filter(type='original').first()
+        new_cost_data = gaissa_roi_cost_metrics.filter(type='new').first()
 
         if not all([optimization_cost_data, original_cost_data, new_cost_data]):
-            return Response({"error": "Missing ROI cost metrics data."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Missing GAISSA ROI cost metrics data."}, status=status.HTTP_400_BAD_REQUEST)
 
         num_inferences = int(request.query_params.get('num_inferences', 100))
 
@@ -423,7 +423,7 @@ class ROIAnalysesView(viewsets.ModelViewSet):
         roi_evolution_chart_data = [{"inferences": inferences, "roi": roi} for inferences, roi in roi_evolution_data]
 
         # Add the calculated ROI results to the response
-        serializer = self.get_serializer(roi_analysis)
+        serializer = self.get_serializer(gaissa_roi_analysis)
         response_data = serializer.data
         response_data['roi_results'] = roi_results
         response_data['roi_evolution_chart_data'] = roi_evolution_chart_data
@@ -439,16 +439,16 @@ class ROIAnalysesView(viewsets.ModelViewSet):
         else:
             serializer.save()
     
-class ROICostMetricsView(viewsets.ModelViewSet):
-    queryset = ROICostMetrics.objects.all()
-    serializer_class = ROICostMetricsSerializer
+class GAISSAROICostMetricsView(viewsets.ModelViewSet):
+    queryset = GAISSAROICostMetrics.objects.all()
+    serializer_class = GAISSAROICostMetricsSerializer
     permission_classes = [permissions.IsAdminEditOthersRead]
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        roi_analysis_id = self.request.query_params.get('roi_analysis_id')
+        gaissa_roi_analysis_id = self.request.query_params.get('gaissa_roi_analysis_id')
 
-        if roi_analysis_id:
-            queryset = queryset.filter(roi_analysis=roi_analysis_id)
+        if gaissa_roi_analysis_id:
+            queryset = queryset.filter(gaissa_roi_analysis=gaissa_roi_analysis_id)
 
         return queryset

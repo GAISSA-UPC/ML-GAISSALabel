@@ -1,6 +1,6 @@
 <template>
-    <div class="roi-inference-analysis">
-        <h1>{{ $t("ROI Inference Optimization Analysis") }}</h1>
+    <div class="gaissa-roi-analyzer">
+        <h1>{{ $t("GAISSA ROI Analyzer") }}</h1>
 
         <el-row :gutter="20" type="flex" :justify="center" class="row-bg">
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mobile-card">
@@ -91,7 +91,7 @@ import * as echarts from 'echarts';
 import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
 
 export default {
-    name: "ROIInferenceAnalysis",
+    name: "GAISSAROIAnalyzer",
     data() {
         return {
             analysisData: null,
@@ -345,7 +345,7 @@ export default {
 </script>
 
 <style scoped>
-.roi-inference-analysis {
+.gaissa-roi-analyzer {
     padding: 20px;
 }
 

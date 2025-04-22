@@ -28,7 +28,7 @@ class ROICalculator:
     
     def calculate_roi_from_metrics(self, optimization_cost_metrics, original_cost_metrics, new_cost_metrics, num_inferences=100):
         """
-        Calculates ROI using ROICostMetrics objects.
+        Calculates ROI using GAISSAROICostMetrics objects.
         """
         optimization_cost = self._calculate_total_cost(optimization_cost_metrics)
         new_cost_per_inference = self._calculate_cost_per_inference(new_cost_metrics)
@@ -38,7 +38,7 @@ class ROICalculator:
 
     def calculate_break_even_point_from_metrics(self, optimization_cost_metrics, original_cost_metrics, new_cost_metrics):
         """
-        Calculates the break-even point using ROICostMetrics objects.
+        Calculates the break-even point using GAISSAROICostMetrics objects.
         """
         optimization_cost = self._calculate_total_cost(optimization_cost_metrics)
         new_cost_per_inference = self._calculate_cost_per_inference(new_cost_metrics)

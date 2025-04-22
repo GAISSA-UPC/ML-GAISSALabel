@@ -161,31 +161,32 @@ class TechniqueParameter(models.Model):
     def __str__(self):
         return f"{self.optimization_technique.name} - {self.name}"
 
-class ROIAnalysis(models.Model):
-    model = models.ForeignKey(Model, related_name='roi_analyses', on_delete=models.CASCADE, verbose_name=_('Model'))
+class GAISSAROIAnalysis(models.Model):
+    model = models.ForeignKey(Model, related_name='gaissa_roi_analyses', on_delete=models.CASCADE, verbose_name=_('Model'))
     optimization_technique = models.ForeignKey(OptimizationTechnique, on_delete=models.PROTECT, null=False, blank=False, verbose_name=_('Optimization Technique'))
     technique_parameter = models.ForeignKey(TechniqueParameter, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Technique Parameter'))
     registration_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Registration Date'))
     country = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Country of Deployment'))
 
     class Meta:
-        verbose_name = _('ROI Analysis')
-        verbose_name_plural = _('ROI Analyses')
+        verbose_name = _('GAISSA ROI Analysis')
+        verbose_name_plural = _('GAISSA ROI Analyses')
 
     def clean(self):
         from django.core.exceptions import ValidationError
-        metrics = self.roi_cost_metrics.all()
+        metrics = self.gaissa_roi_cost_metrics.all()
         types_found = {m.type for m in metrics}
         required_types = {'optimization', 'original', 'new'}
 
         if len(metrics) != 3 or types_found != required_types:
-            raise ValidationError(_('Each ROIAnalysis must have exactly 3 ROICostMetrics, one of each type (optimization, original, new).'))
+            raise ValidationError(_('Each GAISSAROIAnalysis must have exactly 3 GAISSAROICostMetrics, one of each type (optimization, original, new).'))
 
     def __str__(self):
-        return f"ROI Analysis {self.id} - {self.model.nom}"
-    
-class ROICostMetrics(models.Model):
-    roi_analysis = models.ForeignKey(ROIAnalysis, related_name='roi_cost_metrics', on_delete=models.CASCADE, verbose_name=_('ROI Analysis'))
+        return f"GAISSA ROI Analysis {self.id} - {self.model.nom}"
+
+
+class GAISSAROICostMetrics(models.Model):
+    gaissa_roi_analysis = models.ForeignKey(GAISSAROIAnalysis, related_name='gaissa_roi_cost_metrics', on_delete=models.CASCADE, verbose_name=_('GAISSA ROI Analysis'))
     type = models.CharField(
         max_length=50,
         choices=[
@@ -203,8 +204,8 @@ class ROICostMetrics(models.Model):
     num_inferences = models.IntegerField(null=True, blank=True, verbose_name=_('Number of Inferences'))
 
     class Meta:
-        verbose_name = _('ROI Cost Metrics')
-        verbose_name_plural = _('ROI Cost Metrics')
+        verbose_name = _('GAISSA ROI Cost Metrics')
+        verbose_name_plural = _('GAISSA ROI Cost Metrics')
 
     def clean(self):
         from django.core.exceptions import ValidationError
@@ -212,7 +213,7 @@ class ROICostMetrics(models.Model):
             raise ValidationError(_('num_inferences is required for OriginalInferenceCosts or NewInferenceCosts.'))
 
     def __str__(self):
-        return f"{self.name} - {self.roi_analysis}"
+        return f"{self.name} - {self.gaissa_roi_analysis}"
 
 class Configuracio(SingletonModel):
     ultimaSincronitzacio = models.DateTimeField(verbose_name=_('Última sincronització'))
