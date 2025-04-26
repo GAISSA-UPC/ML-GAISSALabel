@@ -138,83 +138,140 @@ class Administrador(models.Model):
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE, verbose_name=_('User'))
 
 # ROI Models
-class OptimizationTechnique(models.Model):
-    name = models.CharField(max_length=255, unique=True, verbose_name=_('Optimization Technique'))
+
+class ModelArchitecture(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255, unique=True, verbose_name=_('Architecture Name'))
+    information = models.TextField(null=True, blank=True, verbose_name=_('Information'))
 
     class Meta:
-        verbose_name = _('Optimization Technique')
-        verbose_name_plural = _('Optimization Techniques')
+        verbose_name = _('Model Architecture')
+        verbose_name_plural = _('Model Architectures')
 
     def __str__(self):
         return self.name
-    
-class TechniqueParameter(models.Model):
+
+class TacticSource(models.Model):
     id = models.AutoField(primary_key=True)
-    optimization_technique = models.ForeignKey(OptimizationTechnique, related_name='technique_parameters', on_delete=models.CASCADE)
-    name = models.CharField(max_length=255, verbose_name=_('Parameter Name'), null=False, blank=False)
+    title = models.CharField(max_length=255, verbose_name=_('Source Title'))
+    url = models.URLField(max_length=500, verbose_name=_('Source URL'))
 
     class Meta:
-        verbose_name = _('Technique Parameter')
-        verbose_name_plural = _('Technique Parameters')
-        unique_together = ('optimization_technique', 'name')
+        verbose_name = _('Tactic Source')
+        verbose_name_plural = _('Tactic Sources')
 
     def __str__(self):
-        return f"{self.optimization_technique.name} - {self.name}"
+        return self.title
 
-class GAISSAROIAnalysis(models.Model):
-    model = models.ForeignKey(Model, related_name='gaissa_roi_analyses', on_delete=models.CASCADE, verbose_name=_('Model'))
-    optimization_technique = models.ForeignKey(OptimizationTechnique, on_delete=models.PROTECT, null=False, blank=False, verbose_name=_('Optimization Technique'))
-    technique_parameter = models.ForeignKey(TechniqueParameter, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Technique Parameter'))
-    registration_date = models.DateTimeField(auto_now_add=True, verbose_name=_('Registration Date'))
+class MLTactic(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255, unique=True, verbose_name=_('Tactic Name'))
+    information = models.TextField(null=True, blank=True, verbose_name=_('Information'))
+    sources = models.ManyToManyField(TacticSource, related_name='tactics', blank=False, verbose_name=_('Sources'))
+
+    class Meta:
+        verbose_name = _('ML Tactic')
+        verbose_name_plural = _('ML Tactics')
+
+    def __str__(self):
+        return self.name
+
+class TacticParameterOption(models.Model):
+    id = models.AutoField(primary_key=True)
+    tactic = models.ForeignKey(MLTactic, related_name='parameter_options', on_delete=models.CASCADE, verbose_name=_('Tactic'))
+    name = models.CharField(max_length=255, verbose_name=_('Parameter Name'))
+    value = models.CharField(max_length=255, verbose_name=_('Parameter Value'))
+
+    class Meta:
+        verbose_name = _('Tactic Parameter Option')
+        verbose_name_plural = _('Tactic Parameter Options')
+        unique_together = ('tactic', 'name', 'value')
+
+    def __str__(self):
+        return f"{self.tactic.name} - {self.name}: {self.value}"
+
+class ROIAnalysis(models.Model):
+    id = models.AutoField(primary_key=True)
+    model_architecture = models.ForeignKey(ModelArchitecture, related_name='roi_analyses', on_delete=models.PROTECT, verbose_name=_('Model Architecture'))
+    tactic_parameter_option = models.ForeignKey(TacticParameterOption, related_name='roi_analyses', on_delete=models.PROTECT, verbose_name=_('Tactic Parameter Option'))
+    # Implicit link to MLTactic via TacticParameterOption
+
+    class Meta:
+        verbose_name = _('ROI Analysis')
+        verbose_name_plural = _('ROI Analyses')
+
+    def clean(self):
+        # Constraint 1: Check compatibility between MLTactic and ModelArchitecture (to be done)
+        pass
+
+    def __str__(self):
+        return f"ROI Analysis {self.id} for {self.model_architecture.name} with {self.tactic_parameter_option}"
+
+# Inheritance for the analysis subtypes
+class ROIAnalysisCalculation(ROIAnalysis):
+    dateRegistration = models.DateTimeField(auto_now_add=True, verbose_name=_('Registration Date'))
     country = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Country of Deployment'))
 
     class Meta:
-        verbose_name = _('GAISSA ROI Analysis')
-        verbose_name_plural = _('GAISSA ROI Analyses')
+        verbose_name = _('ROI Analysis Calculation')
+        verbose_name_plural = _('ROI Analysis Calculations')
 
-    def clean(self):
-        from django.core.exceptions import ValidationError
-        metrics = self.gaissa_roi_cost_metrics.all()
-        types_found = {m.type for m in metrics}
-        required_types = {'optimization', 'original', 'new'}
-
-        if len(metrics) != 3 or types_found != required_types:
-            raise ValidationError(_('Each GAISSAROIAnalysis must have exactly 3 GAISSAROICostMetrics, one of each type (optimization, original, new).'))
-
-    def __str__(self):
-        return f"GAISSA ROI Analysis {self.id} - {self.model.nom}"
-
-
-class GAISSAROICostMetrics(models.Model):
-    gaissa_roi_analysis = models.ForeignKey(GAISSAROIAnalysis, related_name='gaissa_roi_cost_metrics', on_delete=models.CASCADE, verbose_name=_('GAISSA ROI Analysis'))
-    type = models.CharField(
-        max_length=50,
-        choices=[
-            ('optimization', 'OptimizationCosts'),
-            ('original', 'OriginalInferenceCosts'),
-            ('new', 'NewInferenceCosts')
-        ],
-        null=False,
-        blank=False,
-        verbose_name=_('Cost Type')
-    )
-    total_packs = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False, verbose_name=_('Total Packs'))
-    cost_per_pack = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False, verbose_name=_('Cost per Pack'))
-    taxes = models.DecimalField(max_digits=5, decimal_places=2, null=False, blank=False, verbose_name=_('Taxes'))
-    num_inferences = models.IntegerField(null=True, blank=True, verbose_name=_('Number of Inferences'))
+class ROIAnalysisResearch(ROIAnalysis):
+    source = models.ForeignKey(TacticSource, related_name='roi_analysis_researches', on_delete=models.PROTECT, verbose_name=_('Source'))
 
     class Meta:
-        verbose_name = _('GAISSA ROI Cost Metrics')
-        verbose_name_plural = _('GAISSA ROI Cost Metrics')
+        verbose_name = _('ROI Analysis Research')
+        verbose_name_plural = _('ROI Analysis Researches')
 
-    def clean(self):
-        from django.core.exceptions import ValidationError
-        if self.type != 'optimization' and self.num_inferences is None:
-            raise ValidationError(_('num_inferences is required for OriginalInferenceCosts or NewInferenceCosts.'))
+
+class ROIMetric(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255, unique=True, verbose_name=_('Metric Name'))
+    description = models.TextField(null=True, blank=True, verbose_name=_('Description'))
+    unit = models.CharField(max_length=50, null=True, blank=True, verbose_name=_('Unit'))
+
+    class Meta:
+        verbose_name = _('ROI Metric')
+        verbose_name_plural = _('ROI Metrics')
 
     def __str__(self):
-        return f"{self.name} - {self.gaissa_roi_analysis}"
+        return self.name
 
+class AnalysisMetricValue(models.Model):
+    id = models.AutoField(primary_key=True)
+    analysis = models.ForeignKey(ROIAnalysis, related_name='metric_values', on_delete=models.CASCADE, verbose_name=_('ROI Analysis'))
+    metric = models.ForeignKey(ROIMetric, related_name='analysis_values', on_delete=models.PROTECT, verbose_name=_('ROI Metric'))
+    baselineValue = models.FloatField(verbose_name=_('Baseline Value'))
+
+    class Meta:
+        verbose_name = _('Analysis Metric Value')
+        verbose_name_plural = _('Analysis Metric Values')
+        unique_together = ('analysis', 'metric')
+
+    def clean(self):
+        # Constraint 3: Check if the metric is associated with the analysis' tactic (to be done)
+        pass
+
+    def __str__(self):
+        return f"{self.analysis} - {self.metric.name}: {self.baselineValue}"
+
+class ExpectedMetricReduction(models.Model):
+    id = models.AutoField(primary_key=True)
+    model_architecture = models.ForeignKey(ModelArchitecture, on_delete=models.CASCADE, verbose_name=_('Model Architecture'))
+    tactic_parameter_option = models.ForeignKey(TacticParameterOption, on_delete=models.CASCADE, verbose_name=_('Tactic Parameter Option'))
+    metric = models.ForeignKey(ROIMetric, on_delete=models.CASCADE, verbose_name=_('ROI Metric'))
+    expectedReductionValue = models.FloatField(verbose_name=_('Expected Reduction Value')) # Assuming percentage or absolute value
+
+    class Meta:
+        verbose_name = _('Expected Metric Reduction')
+        verbose_name_plural = _('Expected Metric Reductions')
+        unique_together = ('model_architecture', 'tactic_parameter_option', 'metric') # Constraint 2 implied here
+
+    def __str__(self):
+        return f"Reduction for {self.metric.name} on {self.model_architecture.name} with {self.tactic_parameter_option}"
+
+
+# Configuracio model
 class Configuracio(SingletonModel):
     ultimaSincronitzacio = models.DateTimeField(verbose_name=_('Última sincronització'))
 

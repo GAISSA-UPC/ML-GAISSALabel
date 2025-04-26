@@ -9,18 +9,21 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 
 from api.models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, Interval, EinaCalcul, \
-    TransformacioMetrica, TransformacioInformacio, Administrador, Configuracio, OptimizationTechnique, GAISSAROIAnalysis, GAISSAROICostMetrics, TechniqueParameter
+    TransformacioMetrica, TransformacioInformacio, Administrador, Configuracio, \
+    ModelArchitecture, TacticSource, MLTactic, TacticParameterOption, ROIAnalysis, ROIAnalysisCalculation, \
+    ROIAnalysisResearch, ROIMetric, AnalysisMetricValue, ExpectedMetricReduction
 from api.serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
     EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer, \
     IntervalBasicSerializer, MetricaSerializer, EinaCalculBasicSerializer, EinaCalculSerializer, \
-    TransformacioMetricaSerializer, TransformacioInformacioSerializer, LoginAdminSerializer, OptimizationTechniqueSerializer, \
-    GAISSAROIAnalysisSerializer, GAISSAROICostMetricsSerializer, TechniqueParameterSerializer
+    TransformacioMetricaSerializer, TransformacioInformacioSerializer, LoginAdminSerializer, \
+    ModelArchitectureSerializer, TacticSourceSerializer, MLTacticSerializer, TacticParameterOptionSerializer, \
+    ROIAnalysisSerializer, ROIAnalysisCalculationSerializer, ROIAnalysisResearchSerializer, ROIMetricSerializer, \
+    AnalysisMetricValueSerializer, ExpectedMetricReductionSerializer
 
 from api import permissions
 from efficiency_calculators.rating_calculator import calculateRating
 from efficiency_calculators.label_generator import generateLabel
 from efficiency_calculators.efficiency_calculator import calculateEfficiency
-from efficiency_calculators.roi_calculator import ROICalculator
 from connectors import adaptador_huggingface
 
 class ModelsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -309,146 +312,101 @@ class EstadistiquesView(mixins.ListModelMixin, viewsets.GenericViewSet):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-# ROI Views
-class TechniqueParameterView(viewsets.ModelViewSet):
-    queryset = TechniqueParameter.objects.all()
-    serializer_class = TechniqueParameterSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['id', 'name']
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        technique_id = self.kwargs.get('optimization_technique_id')
-        model_id = self.request.query_params.get('model_id')
-
-        if technique_id:
-            queryset = queryset.filter(optimization_technique_id=technique_id)
-
-        if model_id:
-            queryset = queryset.filter(gaissaroianalysis__model_id=model_id).distinct()
-
-        return queryset
-    
-    def perform_create(self, serializer):
-        # Automatically set the optimization_technique based on the URL
-        if 'optimization_technique_id' in self.kwargs:
-            optimization_technique_id = self.kwargs['optimization_technique_id']
-            optimization_technique = get_object_or_404(OptimizationTechnique, pk=optimization_technique_id)
-            serializer.save(optimization_technique=optimization_technique)
-        else:
-            serializer.save()
-
-class OptimizationTechniqueView(viewsets.ModelViewSet):
-    queryset = OptimizationTechnique.objects.all()
-    serializer_class = OptimizationTechniqueSerializer
+# GAISSA ROI Analyzer Views
+class ModelArchitectureView(viewsets.ModelViewSet):
+    queryset = ModelArchitecture.objects.all()
+    serializer_class = ModelArchitectureSerializer
     permission_classes = [permissions.IsAdminEditOthersRead]
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['id', 'name']
+    search_fields = ['name', 'information']
+    ordering_fields = ['name']
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        model_id = self.request.query_params.get('model_id')
-
-        if model_id:
-            queryset = queryset.filter(gaissaroianalysis__model_id=model_id).distinct()
-
-        return queryset
-
-class GAISSAROIAnalysesView(viewsets.ModelViewSet):
-    queryset = GAISSAROIAnalysis.objects.all()
-    serializer_class = GAISSAROIAnalysisSerializer
-
-    def get_queryset(self):
-        model_id = self.kwargs['model_id']
-        model = get_object_or_404(Model, pk=model_id)
-        queryset = GAISSAROIAnalysis.objects.filter(model=model)
-
-        # Filter by optimization technique ID
-        optimization_technique_id = self.request.query_params.get('optimization_technique_id')
-        if optimization_technique_id:
-            optimization_technique = get_object_or_404(OptimizationTechnique, pk=optimization_technique_id)
-            queryset = queryset.filter(optimization_technique=optimization_technique)
-
-        technique_parameter_id = self.request.query_params.get('technique_parameter_id')
-        if technique_parameter_id:
-            technique_parameter = get_object_or_404(TechniqueParameter, pk=technique_parameter_id)
-            queryset = queryset.filter(technique_parameter = technique_parameter)
-
-        return queryset
-
-    def list(self, request, model_id=None):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-    def retrieve(self, request, pk=None, model_id=None):
-        queryset = self.get_queryset()
-        gaissa_roi_analysis = get_object_or_404(queryset, pk=pk)
-
-        # Get related data
-        model = gaissa_roi_analysis.model
-        optimization_technique = gaissa_roi_analysis.optimization_technique
-        gaissa_roi_cost_metrics = gaissa_roi_analysis.gaissa_roi_cost_metrics.all()
-
-        calculator = ROICalculator()
-
-        optimization_cost_data = gaissa_roi_cost_metrics.filter(type='optimization').first()
-        original_cost_data = gaissa_roi_cost_metrics.filter(type='original').first()
-        new_cost_data = gaissa_roi_cost_metrics.filter(type='new').first()
-
-        if not all([optimization_cost_data, original_cost_data, new_cost_data]):
-            return Response({"error": "Missing GAISSA ROI cost metrics data."}, status=status.HTTP_400_BAD_REQUEST)
-
-        num_inferences = int(request.query_params.get('num_inferences', 100))
-
-        # Calculate ROI and Break-Even Point
-        new_cost_per_inference = calculator._calculate_cost_per_inference(new_cost_data)
-        original_cost_per_inference = calculator._calculate_cost_per_inference(original_cost_data)
-        roi = calculator.calculate_roi_from_metrics(optimization_cost_data, original_cost_data, new_cost_data, num_inferences)
-        roi_infinite = calculator.calculate_roi_from_metrics(optimization_cost_data, original_cost_data, new_cost_data, float('inf'))
-        break_even_point = calculator.calculate_break_even_point_from_metrics(optimization_cost_data, original_cost_data, new_cost_data)
-
-        roi_results = [
-            {"name": "Optimization Cost", "value": f"{calculator._calculate_total_cost(optimization_cost_data):.4f} €"},
-            {"name": "New Cost Per Inference", "value": f"{new_cost_per_inference:.8f} €"},
-            {"name": "Original Cost Per Inference", "value": f"{original_cost_per_inference:.8f} €"},
-            {"name": "Cost Savings Per Inference", "value": f"{original_cost_per_inference - new_cost_per_inference:.8f} €"},
-            {"name": f"ROI (for {num_inferences} inferences)", "value": f"{roi:.6f}"},
-            {"name": "ROI (for infinite inferences)", "value": f"{roi_infinite:.6f}"},
-            {"name": "Break-Even Point", "value": f"{break_even_point} inferences"},
-        ]
-
-        # Calculate ROI Evolution
-        roi_evolution_data = calculator.calculate_roi_evolution(optimization_cost_data, original_cost_data, new_cost_data)
-        roi_evolution_chart_data = [{"inferences": inferences, "roi": roi} for inferences, roi in roi_evolution_data]
-
-        # Add the calculated ROI results to the response
-        serializer = self.get_serializer(gaissa_roi_analysis)
-        response_data = serializer.data
-        response_data['roi_results'] = roi_results
-        response_data['roi_evolution_chart_data'] = roi_evolution_chart_data
-
-        return Response(response_data)
-    
-    def perform_create(self, serializer):
-        # Automatically set the model based on the URL
-        if 'model_id' in self.kwargs:
-            model_id = self.kwargs['model_id']
-            model = get_object_or_404(Model, pk=model_id)
-            serializer.save(model=model)
-        else:
-            serializer.save()
-    
-class GAISSAROICostMetricsView(viewsets.ModelViewSet):
-    queryset = GAISSAROICostMetrics.objects.all()
-    serializer_class = GAISSAROICostMetricsSerializer
+class TacticSourceView(viewsets.ModelViewSet):
+    queryset = TacticSource.objects.all()
+    serializer_class = TacticSourceSerializer
     permission_classes = [permissions.IsAdminEditOthersRead]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['id', 'title', 'url']
+    search_fields = ['title', 'url']
+    ordering_fields = ['title']
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        gaissa_roi_analysis_id = self.request.query_params.get('gaissa_roi_analysis_id')
+class MLTacticView(viewsets.ModelViewSet):
+    queryset = MLTactic.objects.all()
+    serializer_class = MLTacticSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['id', 'name', 'sources']
+    search_fields = ['name', 'information']
+    ordering_fields = ['name']
 
-        if gaissa_roi_analysis_id:
-            queryset = queryset.filter(gaissa_roi_analysis=gaissa_roi_analysis_id)
+class TacticParameterOptionView(viewsets.ModelViewSet):
+    queryset = TacticParameterOption.objects.all()
+    serializer_class = TacticParameterOptionSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['id', 'tactic', 'name', 'value']
+    search_fields = ['name', 'value', 'tactic__name']
+    ordering_fields = ['tactic__name', 'name', 'value']
 
-        return queryset
+class ROIMetricView(viewsets.ModelViewSet):
+    queryset = ROIMetric.objects.all()
+    serializer_class = ROIMetricSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['id', 'name', 'unit']
+    search_fields = ['name', 'description']
+    ordering_fields = ['name']
+
+class ROIAnalysisViewSet(viewsets.ModelViewSet):
+    queryset = ROIAnalysis.objects.all()
+    serializer_class = ROIAnalysisSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = {
+        'model_architecture': ['exact'],
+        'tactic_parameter_option': ['exact'],
+        'tactic_parameter_option__tactic': ['exact'],
+        'metric_values__metric': ['exact'],
+        'roianalysiscalculation__country': ['exact', 'icontains'],
+        'roianalysiscalculation__dateRegistration': ['date__gte', 'date__lte'],
+    }
+    search_fields = [
+        'model_architecture__name',
+        'tactic_parameter_option__tactic__name',
+        'tactic_parameter_option__name',
+        'tactic_parameter_option__value',
+        'roianalysiscalculation__country'
+    ]
+    ordering_fields = ['id', 'model_architecture__name', 'tactic_parameter_option__tactic__name']
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            analysis_type = self.request.data.get('analysis_type', 'calculation')
+            if analysis_type == 'calculation':
+                return ROIAnalysisCalculationSerializer
+            elif analysis_type == 'research':
+                return ROIAnalysisResearchSerializer
+        if self.action == 'retrieve':
+            instance = self.get_object()
+            if hasattr(instance, 'roianalysiscalculation'):
+                return ROIAnalysisCalculationSerializer
+            elif hasattr(instance, 'roianalysisresearch'):
+                return ROIAnalysisResearchSerializer
+        return ROIAnalysisSerializer
+
+class AnalysisMetricValueView(viewsets.ModelViewSet):
+    queryset = AnalysisMetricValue.objects.all()
+    serializer_class = AnalysisMetricValueSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['analysis', 'metric']
+    ordering_fields = ['analysis', 'metric']
+
+class ExpectedMetricReductionView(viewsets.ModelViewSet):
+    queryset = ExpectedMetricReduction.objects.all()
+    serializer_class = ExpectedMetricReductionSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['model_architecture', 'tactic_parameter_option', 'metric']
+    ordering_fields = ['model_architecture', 'tactic_parameter_option', 'metric']

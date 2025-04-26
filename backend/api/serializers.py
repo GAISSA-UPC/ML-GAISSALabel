@@ -8,7 +8,9 @@ from django.contrib.auth.hashers import check_password
 
 from api.models import Model, Entrenament, Inferencia, Metrica, Qualificacio, Interval, ResultatEntrenament, \
     ResultatInferencia, InfoAddicional, ValorInfoEntrenament, ValorInfoInferencia, EinaCalcul, TransformacioMetrica, \
-    TransformacioInformacio, Administrador, OptimizationTechnique, GAISSAROIAnalysis, GAISSAROICostMetrics, TechniqueParameter
+    TransformacioInformacio, Administrador, ModelArchitecture, TacticSource, MLTactic, TacticParameterOption, \
+    ROIAnalysis, ROIAnalysisCalculation, ROIAnalysisResearch, ROIMetric, AnalysisMetricValue, ExpectedMetricReduction, \
+    Configuracio
 
 class ModelSerializer(serializers.ModelSerializer):
     class Meta:
@@ -242,70 +244,155 @@ class TransformacioInformacioSerializer(serializers.ModelSerializer):
         model = TransformacioInformacio
         fields = '__all__'
 
-# ROI Serializers
-class TechniqueParameterSerializer(serializers.ModelSerializer):
-    optimization_technique = serializers.PrimaryKeyRelatedField(read_only=True)
+# GAISSA ROI Analyzer Serializers
+class ModelArchitectureSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TechniqueParameter
-        fields = ["id", "name", "optimization_technique"]
-
-class OptimizationTechniqueSerializer(serializers.ModelSerializer):
-    technique_parameters = TechniqueParameterSerializer(many=True, read_only=True)
-    class Meta:
-        model = OptimizationTechnique
+        model = ModelArchitecture
         fields = '__all__'
 
-class GAISSAROICostMetricsSerializer(serializers.ModelSerializer):
+class TacticSourceSerializer(serializers.ModelSerializer):
     class Meta:
-        model = GAISSAROICostMetrics
-        fields = ['type', 'total_packs', 'cost_per_pack', 'taxes', 'num_inferences']
+        model = TacticSource
+        fields = '__all__'
 
-
-class GAISSAROIAnalysisSerializer(serializers.ModelSerializer):
-    model_name = serializers.CharField(source='model.nom', read_only=True)
-    optimization_technique_id = serializers.PrimaryKeyRelatedField(
-        queryset=OptimizationTechnique.objects.all(),
-        write_only=True,
-        source='optimization_technique',
+class MLTacticSerializer(serializers.ModelSerializer):
+    sources = TacticSourceSerializer(many=True, read_only=True)
+    source_ids = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=TacticSource.objects.all(), write_only=True, source='sources', required=True
     )
-    technique_parameter_id = serializers.PrimaryKeyRelatedField(
-        queryset=TechniqueParameter.objects.all(),
-        write_only=True,
-        source='technique_parameter',
-        allow_null=True
-    )
-    gaissa_roi_cost_metrics = GAISSAROICostMetricsSerializer(many=True, read_only=True)
 
     class Meta:
-        model = GAISSAROIAnalysis
-        fields = ['id', 'model', 'model_name', 'optimization_technique_id', 'optimization_technique', 'technique_parameter_id', 'technique_parameter', 'registration_date', 'country', 'gaissa_roi_cost_metrics']
-        read_only_fields = ['model', 'optimization_technique', 'technique_parameter']
+        model = MLTactic
+        fields = ['id', 'name', 'information', 'sources', 'source_ids']
 
-    def validate(self, data):
-        """
-        Validates that the technique_parameter belongs to the selected optimization_technique.
-        """
-        optimization_technique = data.get("optimization_technique")
-        technique_parameter = data.get("technique_parameter") 
+class TacticParameterOptionSerializer(serializers.ModelSerializer):
+    tactic_name = serializers.CharField(source='tactic.name', read_only=True)
+    tactic_id = serializers.PrimaryKeyRelatedField(
+        queryset=MLTactic.objects.all(), write_only=True, source='tactic'
+    )
 
-        if technique_parameter and technique_parameter.optimization_technique != optimization_technique:
-            raise serializers.ValidationError(
-                {
-                    "technique_parameter": "The selected parameter does not belong to the chosen optimization technique."
-                }
+    class Meta:
+        model = TacticParameterOption
+        fields = ['id', 'tactic', 'tactic_id', 'tactic_name', 'name', 'value']
+        read_only_fields = ['tactic'] # tactic is set via tactic_id
+
+class ROIMetricSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ROIMetric
+        fields = '__all__'
+
+class AnalysisMetricValueSerializer(serializers.ModelSerializer):
+    metric_name = serializers.CharField(source='metric.name', read_only=True)
+    metric_id = serializers.PrimaryKeyRelatedField(
+        queryset=ROIMetric.objects.all(), write_only=True, source='metric'
+    )
+
+    class Meta:
+        model = AnalysisMetricValue
+        fields = ['id', 'analysis', 'metric', 'metric_id', 'metric_name', 'baselineValue']
+        read_only_fields = ['metric'] # metric is set via metric_id
+
+class ROIAnalysisSerializer(serializers.ModelSerializer):
+    model_architecture_name = serializers.CharField(source='model_architecture.name', read_only=True)
+    tactic_parameter_option_details = TacticParameterOptionSerializer(source='tactic_parameter_option', read_only=True)
+    metric_values = AnalysisMetricValueSerializer(many=True, read_only=True)
+
+    # Writeable fields for relations
+    model_architecture_id = serializers.PrimaryKeyRelatedField(
+        queryset=ModelArchitecture.objects.all(), write_only=True, source='model_architecture'
+    )
+    tactic_parameter_option_id = serializers.PrimaryKeyRelatedField(
+        queryset=TacticParameterOption.objects.all(), write_only=True, source='tactic_parameter_option'
+    )
+    # For creating metric values alongside analysis
+    metric_values_data = serializers.ListField(
+        child=serializers.DictField(), write_only=True, required=False
+    )
+
+    class Meta:
+        model = ROIAnalysis
+        fields = [
+            'id', 'model_architecture', 'model_architecture_id', 'model_architecture_name',
+            'tactic_parameter_option', 'tactic_parameter_option_id', 'tactic_parameter_option_details',
+            'metric_values', 'metric_values_data'
+        ]
+        read_only_fields = ['model_architecture', 'tactic_parameter_option']
+
+    def create(self, validated_data):
+        metric_values_data = validated_data.pop('metric_values_data', [])
+        analysis = ROIAnalysis.objects.create(**validated_data)
+        for metric_data in metric_values_data:
+            metric_id = metric_data.pop('metric_id')
+            baseline_value = metric_data.pop('baselineValue')
+            AnalysisMetricValue.objects.create(
+                analysis=analysis,
+                metric_id=metric_id,
+                baselineValue=baseline_value
             )
+        return analysis
 
-        return data
-    
-    def to_representation(self, instance):
-        """
-        Modify the representation to include the full optimization_technique object.
-        """
-        representation = super().to_representation(instance)
-        representation['optimization_technique'] = OptimizationTechniqueSerializer(instance.optimization_technique).data
-        representation['technique_parameter'] = TechniqueParameterSerializer(instance.technique_parameter).data if instance.technique_parameter else None
-        representation['gaissa_roi_cost_metrics'] = GAISSAROICostMetricsSerializer(instance.gaissa_roi_cost_metrics, many=True).data
-        return representation
+class ROIAnalysisCalculationSerializer(ROIAnalysisSerializer):
+    class Meta(ROIAnalysisSerializer.Meta):
+        model = ROIAnalysisCalculation
+        fields = ROIAnalysisSerializer.Meta.fields + ['dateRegistration', 'country']
+
+    def create(self, validated_data):
+        metric_values_data = validated_data.pop('metric_values_data', [])
+        # Use ROIAnalysisCalculation.objects.create here
+        analysis = ROIAnalysisCalculation.objects.create(**validated_data)
+        for metric_data in metric_values_data:
+            metric_id = metric_data.pop('metric_id')
+            baseline_value = metric_data.pop('baselineValue')
+            AnalysisMetricValue.objects.create(
+                analysis=analysis,
+                metric_id=metric_id,
+                baselineValue=baseline_value
+            )
+        return analysis
+
+class ROIAnalysisResearchSerializer(ROIAnalysisSerializer):
+     class Meta(ROIAnalysisSerializer.Meta):
+        model = ROIAnalysisResearch
+        fields = ROIAnalysisSerializer.Meta.fields + ['source']
+
+     def create(self, validated_data):
+        metric_values_data = validated_data.pop('metric_values_data', [])
+        # Use ROIAnalysisResearch.objects.create here
+        analysis = ROIAnalysisResearch.objects.create(**validated_data)
+        for metric_data in metric_values_data:
+            metric_id = metric_data.pop('metric_id')
+            baseline_value = metric_data.pop('baselineValue')
+            AnalysisMetricValue.objects.create(
+                analysis=analysis,
+                metric_id=metric_id,
+                baselineValue=baseline_value
+            )
+        return analysis
+
+class ExpectedMetricReductionSerializer(serializers.ModelSerializer):
+    model_architecture_name = serializers.CharField(source='model_architecture.name', read_only=True)
+    tactic_parameter_option_details = TacticParameterOptionSerializer(source='tactic_parameter_option', read_only=True)
+    metric_name = serializers.CharField(source='metric.name', read_only=True)
+
+    # Writeable fields for relations
+    model_architecture_id = serializers.PrimaryKeyRelatedField(
+        queryset=ModelArchitecture.objects.all(), write_only=True, source='model_architecture'
+    )
+    tactic_parameter_option_id = serializers.PrimaryKeyRelatedField(
+        queryset=TacticParameterOption.objects.all(), write_only=True, source='tactic_parameter_option'
+    )
+    metric_id = serializers.PrimaryKeyRelatedField(
+        queryset=ROIMetric.objects.all(), write_only=True, source='metric'
+    )
+
+    class Meta:
+        model = ExpectedMetricReduction
+        fields = [
+            'id', 'model_architecture', 'model_architecture_id', 'model_architecture_name',
+            'tactic_parameter_option', 'tactic_parameter_option_id', 'tactic_parameter_option_details',
+            'metric', 'metric_id', 'metric_name', 'expectedReductionValue'
+        ]
+        read_only_fields = ['model_architecture', 'tactic_parameter_option', 'metric']
 
 # LOGIN
 def validacioLogin(data):
