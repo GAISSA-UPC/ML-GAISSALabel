@@ -3,6 +3,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import User
 from solo.models import SingletonModel
+from django.core.exceptions import ValidationError
 
 class Model(models.Model):
     id = models.AutoField(primary_key=True, verbose_name=_('Identificador'))
@@ -249,8 +250,39 @@ class AnalysisMetricValue(models.Model):
         unique_together = ('analysis', 'metric')
 
     def clean(self):
-        # Constraint 3: Check if the metric is associated with the analysis' tactic (to be done)
-        pass
+        super().clean()
+        # Constraint: Ensure a corresponding ExpectedMetricReduction exists
+        if self.analysis_id and self.metric_id:
+            try:
+                # Fetch related objects safely
+                analysis = ROIAnalysis.objects.select_related('model_architecture', 'tactic_parameter_option').get(pk=self.analysis_id)
+                metric = ROIMetric.objects.get(pk=self.metric_id)
+
+                exists = ExpectedMetricReduction.objects.filter(
+                    model_architecture=analysis.model_architecture,
+                    tactic_parameter_option=analysis.tactic_parameter_option,
+                    metric=metric
+                ).exists()
+
+                if not exists:
+                    raise ValidationError(
+                        _("No matching ExpectedMetricReduction found for the combination of "
+                          "Model Architecture '%(arch)s', Tactic Parameter Option '%(tpo)s', and Metric '%(metric)s'.") % {
+                            'arch': analysis.model_architecture,
+                            'tpo': analysis.tactic_parameter_option,
+                            'metric': metric
+                        }
+                    )
+            # This exceptions allow the creation of the object when creating the analysis
+            # This constraint will be checked in the serializer when the analysis is created
+            except ROIAnalysis.DoesNotExist:
+                # This might happen if the analysis object hasn't been saved yet.
+                # The foreign key constraint itself will handle invalid analysis_id.
+                pass
+            except AttributeError:
+                 # This might happen if analysis doesn't have the related objects yet (e.g., during creation before save)
+                 # Let the serializer handle pre-creation validation.
+                 pass
 
     def __str__(self):
         return f"{self.analysis} - {self.metric.name}: {self.baselineValue}"

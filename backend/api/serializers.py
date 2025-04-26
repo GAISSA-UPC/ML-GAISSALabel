@@ -320,21 +320,50 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         metric_values_data = validated_data.pop('metric_values_data', [])
-        analysis = ROIAnalysis.objects.create(**validated_data)
+        # Get related objects needed for validation
+        model_architecture = validated_data.get('model_architecture')
+        tactic_parameter_option = validated_data.get('tactic_parameter_option')
+
+        # Pre-validate all metric values before creating the analysis
+        metrics_to_create = []
         for metric_data in metric_values_data:
-            metric_id = metric_data.pop('metric_id')
-            baseline_value = metric_data.pop('baselineValue')
+            metric_id = metric_data.get('metric_id')
+            baseline_value = metric_data.get('baselineValue')
+            if metric_id is None or baseline_value is None:
+                 raise ValidationError("Each entry in metric_values_data must include 'metric_id' and 'baselineValue'.")
+
             # Validate metric existence
             try:
                 metric = ROIMetric.objects.get(pk=metric_id)
             except ROIMetric.DoesNotExist:
-                analysis.delete()
                 raise ValidationError(f"ROIMetric with id {metric_id} does not exist.")
 
+            # ExpectedMetricReduction existence check
+            if model_architecture and tactic_parameter_option and metric:
+                exists = ExpectedMetricReduction.objects.filter(
+                    model_architecture=model_architecture,
+                    tactic_parameter_option=tactic_parameter_option,
+                    metric=metric
+                ).exists()
+                if not exists:
+                    raise ValidationError(
+                        f"No matching ExpectedMetricReduction found for the combination of "
+                        f"Model Architecture '{model_architecture}', "
+                        f"Tactic Parameter Option '{tactic_parameter_option}', and Metric '{metric}'."
+                    )
+            else:
+                 # Should not happen due to earlier validation in the serializer
+                 raise ValidationError("Missing Model Architecture or Tactic Parameter Option for validation.")
+
+            metrics_to_create.append({'metric': metric, 'baselineValue': baseline_value})
+
+        # If all validations pass, create the analysis and then the metric values
+        analysis = ROIAnalysis.objects.create(**validated_data)
+        for metric_info in metrics_to_create:
             AnalysisMetricValue.objects.create(
                 analysis=analysis,
-                metric=metric,
-                baselineValue=baseline_value
+                metric=metric_info['metric'],
+                baselineValue=metric_info['baselineValue']
             )
         return analysis
 
