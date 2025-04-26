@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
@@ -10,7 +10,7 @@ from api.models import Model, Entrenament, Inferencia, Metrica, Qualificacio, In
     ResultatInferencia, InfoAddicional, ValorInfoEntrenament, ValorInfoInferencia, EinaCalcul, TransformacioMetrica, \
     TransformacioInformacio, Administrador, ModelArchitecture, TacticSource, MLTactic, TacticParameterOption, \
     ROIAnalysis, ROIAnalysisCalculation, ROIAnalysisResearch, ROIMetric, AnalysisMetricValue, ExpectedMetricReduction, \
-    Configuracio
+    Configuracio, Administrador
 
 class ModelSerializer(serializers.ModelSerializer):
     class Meta:
@@ -324,9 +324,16 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
         for metric_data in metric_values_data:
             metric_id = metric_data.pop('metric_id')
             baseline_value = metric_data.pop('baselineValue')
+            # Validate metric existence
+            try:
+                metric = ROIMetric.objects.get(pk=metric_id)
+            except ROIMetric.DoesNotExist:
+                analysis.delete()
+                raise ValidationError(f"ROIMetric with id {metric_id} does not exist.")
+
             AnalysisMetricValue.objects.create(
                 analysis=analysis,
-                metric_id=metric_id,
+                metric=metric,
                 baselineValue=baseline_value
             )
         return analysis
@@ -336,6 +343,13 @@ class ROIAnalysisCalculationSerializer(ROIAnalysisSerializer):
         model = ROIAnalysisCalculation
         fields = ROIAnalysisSerializer.Meta.fields + ['dateRegistration', 'country']
 
+    def validate(self, data):
+        # Validate country field
+        country = data.get('country')
+        if not country:
+            raise serializers.ValidationError({"country": "This field may not be blank."})
+        return data
+
     def create(self, validated_data):
         metric_values_data = validated_data.pop('metric_values_data', [])
         # Use ROIAnalysisCalculation.objects.create here
@@ -343,9 +357,17 @@ class ROIAnalysisCalculationSerializer(ROIAnalysisSerializer):
         for metric_data in metric_values_data:
             metric_id = metric_data.pop('metric_id')
             baseline_value = metric_data.pop('baselineValue')
+            # Validate metric existence
+            try:
+                metric = ROIMetric.objects.get(pk=metric_id)
+            except ROIMetric.DoesNotExist:
+                # Clean up the created analysis object if a metric is invalid
+                analysis.delete()
+                raise ValidationError(f"ROIMetric with id {metric_id} does not exist.")
+
             AnalysisMetricValue.objects.create(
                 analysis=analysis,
-                metric_id=metric_id,
+                metric=metric,
                 baselineValue=baseline_value
             )
         return analysis
@@ -362,9 +384,17 @@ class ROIAnalysisResearchSerializer(ROIAnalysisSerializer):
         for metric_data in metric_values_data:
             metric_id = metric_data.pop('metric_id')
             baseline_value = metric_data.pop('baselineValue')
+            # Validate metric existence
+            try:
+                metric = ROIMetric.objects.get(pk=metric_id)
+            except ROIMetric.DoesNotExist:
+                # Clean up the created analysis object if a metric is invalid
+                analysis.delete()
+                raise ValidationError(f"ROIMetric with id {metric_id} does not exist.")
+
             AnalysisMetricValue.objects.create(
                 analysis=analysis,
-                metric_id=metric_id,
+                metric=metric,
                 baselineValue=baseline_value
             )
         return analysis
