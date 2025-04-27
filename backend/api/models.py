@@ -169,6 +169,7 @@ class MLTactic(models.Model):
     name = models.CharField(max_length=255, unique=True, verbose_name=_('Tactic Name'))
     information = models.TextField(null=True, blank=True, verbose_name=_('Information'))
     sources = models.ManyToManyField(TacticSource, related_name='tactics', blank=False, verbose_name=_('Sources'))
+    compatible_architectures = models.ManyToManyField(ModelArchitecture, related_name='compatible_tactics', blank=True, verbose_name=_('Compatible Architectures'))
 
     class Meta:
         verbose_name = _('ML Tactic')
@@ -202,9 +203,26 @@ class ROIAnalysis(models.Model):
         verbose_name_plural = _('ROI Analyses')
 
     def clean(self):
-        # Constraint 1: Check compatibility between MLTactic and ModelArchitecture (to be done)
-        pass
-
+        super().clean()
+        # Constraint: Check compatibility between MLTactic and ModelArchitecture
+        if self.model_architecture_id and self.tactic_parameter_option_id:
+            try:
+                tactic = self.tactic_parameter_option.tactic
+                # Check if the model_architecture is in the tactic's compatible list
+                if not tactic.compatible_architectures.filter(pk=self.model_architecture_id).exists():
+                    raise ValidationError(
+                        _("The selected tactic '%(tactic)s' is not compatible with the model architecture '%(arch)s'.") % {
+                            'tactic': tactic.name,
+                            'arch': self.model_architecture.name
+                        }
+                    )
+            except MLTactic.DoesNotExist:
+                # Should not happen due to ForeignKey
+                pass
+            except ModelArchitecture.DoesNotExist:
+                # Should not happen due to ForeignKey
+                pass
+            
     def __str__(self):
         return f"ROI Analysis {self.id} for {self.model_architecture.name} with {self.tactic_parameter_option}"
 

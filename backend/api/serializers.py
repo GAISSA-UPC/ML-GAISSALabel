@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import NotFound, ValidationError
@@ -318,6 +319,23 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['model_architecture', 'tactic_parameter_option']
 
+    def validate(self, data):
+        """Check compatibility between the selected tactic and model architecture."""
+        model_architecture = data.get('model_architecture')
+        tactic_parameter_option = data.get('tactic_parameter_option')
+
+        if model_architecture and tactic_parameter_option:
+            tactic = tactic_parameter_option.tactic
+            if not tactic.compatible_architectures.filter(pk=model_architecture.pk).exists():
+                raise ValidationError(
+                    _("The selected tactic '%(tactic)s' is not compatible with the model architecture '%(arch)s'.") % {
+                        'tactic': tactic.name,
+                        'arch': model_architecture.name
+                    }
+                )
+
+        return data
+
     def _validate_metric_values_against_expected_reduction(self, metric_values_data, model_architecture, tactic_parameter_option):
         """Method to validate metric values against ExpectedMetricReduction."""
         if not metric_values_data:
@@ -381,6 +399,8 @@ class ROIAnalysisCalculationSerializer(ROIAnalysisSerializer):
         fields = ROIAnalysisSerializer.Meta.fields + ['dateRegistration', 'country']
 
     def validate(self, data):
+        data = super().validate(data)
+
         # Validate country field
         country = data.get('country')
         if not country:
