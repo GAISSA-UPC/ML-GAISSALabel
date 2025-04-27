@@ -345,6 +345,8 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
             raise ValidationError("Missing Model Architecture or Tactic Parameter Option for validation.")
 
         metrics_to_create = []
+        tactic = tactic_parameter_option.tactic
+        
         for metric_data in metric_values_data:
             metric_id = metric_data.get('metric_id')
             baseline_value = metric_data.get('baselineValue')
@@ -356,8 +358,17 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
                 metric = ROIMetric.objects.get(pk=metric_id)
             except ROIMetric.DoesNotExist:
                 raise ValidationError(f"ROIMetric with id {metric_id} does not exist.")
+                
+            # Constraint 3: Check if the metric is applicable for the tactic
+            if not tactic.applicable_metrics.filter(pk=metric.pk).exists():
+                raise ValidationError(
+                    _("The metric '%(metric)s' is not applicable for the tactic '%(tactic)s'.") % {
+                        'metric': metric.name,
+                        'tactic': tactic.name
+                    }
+                )
 
-            # ExpectedMetricReduction existence check
+            # Constraint 2: ExpectedMetricReduction existence check
             exists = ExpectedMetricReduction.objects.filter(
                 model_architecture=model_architecture,
                 tactic_parameter_option=tactic_parameter_option,

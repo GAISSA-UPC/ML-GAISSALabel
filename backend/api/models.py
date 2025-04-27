@@ -170,6 +170,7 @@ class MLTactic(models.Model):
     information = models.TextField(null=True, blank=True, verbose_name=_('Information'))
     sources = models.ManyToManyField(TacticSource, related_name='tactics', blank=False, verbose_name=_('Sources'))
     compatible_architectures = models.ManyToManyField(ModelArchitecture, related_name='compatible_tactics', blank=True, verbose_name=_('Compatible Architectures'))
+    applicable_metrics = models.ManyToManyField('ROIMetric', related_name='applicable_tactics', blank=True, verbose_name=_('Applicable Metrics'))
 
     class Meta:
         verbose_name = _('ML Tactic')
@@ -269,13 +270,23 @@ class AnalysisMetricValue(models.Model):
 
     def clean(self):
         super().clean()
-        # Constraint: Ensure a corresponding ExpectedMetricReduction exists
         if self.analysis_id and self.metric_id:
             try:
                 # Fetch related objects safely
                 analysis = ROIAnalysis.objects.select_related('model_architecture', 'tactic_parameter_option').get(pk=self.analysis_id)
                 metric = ROIMetric.objects.get(pk=self.metric_id)
+                tactic = analysis.tactic_parameter_option.tactic
+                
+                # Constraint 3: Check if the metric is applicable for the tactic
+                if not tactic.applicable_metrics.filter(pk=metric.pk).exists():
+                    raise ValidationError(
+                        _("The metric '%(metric)s' is not applicable for the tactic '%(tactic)s'.") % {
+                            'metric': metric.name,
+                            'tactic': tactic.name
+                        }
+                    )
 
+                # Constraint 2: Ensure a corresponding ExpectedMetricReduction exists
                 exists = ExpectedMetricReduction.objects.filter(
                     model_architecture=analysis.model_architecture,
                     tactic_parameter_option=analysis.tactic_parameter_option,
@@ -291,7 +302,7 @@ class AnalysisMetricValue(models.Model):
                             'metric': metric
                         }
                     )
-            # This exceptions allow the creation of the object when creating the analysis
+            # These exceptions allow the creation of the object when creating the analysis
             # This constraint will be checked in the serializer when the analysis is created
             except ROIAnalysis.DoesNotExist:
                 # This might happen if the analysis object hasn't been saved yet.
