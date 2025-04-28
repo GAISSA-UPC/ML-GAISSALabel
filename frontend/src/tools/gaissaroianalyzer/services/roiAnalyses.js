@@ -1,22 +1,33 @@
-import axios from "@/controllers/backend";
+import axios from "@/controllers/backend"
 
 export default {
-    async listByModel(modelId, filters = {}) {
+    async list(filters = {}) {
         try {
-            const response = await axios.get(`/api/models/${modelId}/gaissa-roi-analyses/`, { params: filters });
+            const response = await axios.get('/api/roi/analyses/', { params: filters });
             return response;
         } catch (error) {
-            console.error("Error fetching GAISSA ROI analyses by model:", error);
+            console.error("Error fetching ROI analyses:", error);
             return null;
         }
     },
-    async getAnalysis(modelId, analysisId) {
+    
+    async getAnalysis(analysisId) {
         try {
-            const response = await axios.get(`/api/models/${modelId}/gaissa-roi-analyses/${analysisId}/`);
+            const response = await axios.get(`/api/roi/analyses/${analysisId}/`);
             return response.data;
         } catch (error) {
-            console.error("Error fetching GAISSA ROI analysis:", error);
+            console.error(`Error fetching analysis ${analysisId}:`, error);
             return null;
         }
     },
-};
+    
+    async createAnalysis(analysisData) {
+        try {
+            const response = await axios.post('/api/roi/analyses/', analysisData);
+            return response;
+        } catch (error) {
+            console.error("Error creating ROI analysis:", error);
+            return null;
+        }
+    }
+}

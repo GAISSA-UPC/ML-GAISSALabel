@@ -227,11 +227,11 @@ export default {
             this.roiChart.setOption(this.roiChartOptions, false);
         },
         async loadAnalysisData() {
-            const { id_model, id_experiment } = this.$route.params;
+            const { id_experiment } = this.$route.params;
+            id_model = 1;
 
             // Fetch the analysis data
             this.analysisData = await roiAnalyses.getAnalysis(
-                id_model,
                 id_experiment
             );
 

@@ -66,8 +66,8 @@
 
 <script>
 import models from "@/tools/gaissalabel/services/models";
-import optimizationTechniques from "@/tools/gaissaroianalyzer/services/optimizationTechniques";
-import techniqueParameters from "@/tools/gaissaroianalyzer/services/techniqueParameters";
+import optimizationTechniques from "@/tools/gaissaroianalyzer/services/mlTactics";
+import techniqueParameters from "@/tools/gaissaroianalyzer/services/tacticParameters";
 import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
 import { formatData } from "@/utils";
 
@@ -137,13 +137,14 @@ export default {
         },
         async refreshExperiments() {
             let params = {
-                optimization_technique_id: this.selectedOptimizationTechnique,
+                model_architecture: this.selectedModel,
+                tactic_parameter_option: this.selectedOptimizationTechnique,
             };
             if (this.selectedOptimizationParameter) {
-                params.technique_parameter_id = this.selectedOptimizationParameter;
+                params.tactic_parameter_option = this.selectedOptimizationParameter;
             }
             if (this.selectedModel && this.selectedOptimizationTechnique) {
-                const response = await roiAnalyses.listByModel(this.selectedModel, params);
+                const response = await roiAnalyses.list(params);
                 this.experiments = response.data;
             } else {
                 this.experiments = [];

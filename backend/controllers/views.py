@@ -3,6 +3,7 @@ import pytz
 
 from rest_framework import viewsets, filters, status, mixins
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 from django.shortcuts import get_object_or_404
 
@@ -322,6 +323,17 @@ class ModelArchitectureView(viewsets.ModelViewSet):
     search_fields = ['name', 'information']
     ordering_fields = ['name']
 
+    
+    # Define new endpoint to get compatible tactics for a specific architecture
+    @action(detail=True, methods=['get'], url_path='compatible-tactics')
+    def get_compatible_tactics(self, request, pk=None):
+        architecture = self.get_object()
+        compatible_tactics = architecture.compatible_tactics.all()
+        
+        # Serialize the tactics and return them
+        serializer = MLTacticSerializer(compatible_tactics, many=True)
+        return Response(serializer.data)
+
 class TacticSourceView(viewsets.ModelViewSet):
     queryset = TacticSource.objects.all()
     serializer_class = TacticSourceSerializer
@@ -339,6 +351,16 @@ class MLTacticView(viewsets.ModelViewSet):
     filterset_fields = ['id', 'name', 'sources']
     search_fields = ['name', 'information']
     ordering_fields = ['name']
+
+    # Define new endpoint to get applicable metrics for a specific tactic
+    @action(detail=True, methods=['get'], url_path='applicable-metrics')
+    def get_applicable_metrics(self, request, pk=None):
+        tactic = self.get_object()
+        applicable_metrics = tactic.applicable_metrics.all()
+        
+        # Serialize the metrics and return them
+        serializer = ROIMetricSerializer(applicable_metrics, many=True)
+        return Response(serializer.data)
 
 class TacticParameterOptionView(viewsets.ModelViewSet):
     queryset = TacticParameterOption.objects.all()
@@ -361,7 +383,13 @@ class ROIMetricView(viewsets.ModelViewSet):
 class ROIAnalysisViewSet(viewsets.ModelViewSet):
     queryset = ROIAnalysis.objects.all()
     serializer_class = ROIAnalysisSerializer
-    permission_classes = [permissions.IsAdminEditOthersRead]
+    
+    # Allow anyone to create ROI analyses, for other actions use default permissions
+    def get_permissions(self):
+        if self.action == 'create':
+            return []
+        return [permissions.IsAdminEditOthersRead()]
+    
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = {
         'model_architecture': ['exact'],

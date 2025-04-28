@@ -18,7 +18,7 @@ router.register(r'sincronitzacio', views.SincroView, basename='sincro')
 router.register(r'estadistiques', views.EstadistiquesView, basename='estadistiques')
 
 # GAISSA ROI Analyzer URLs
-router.register(r'roi/architectures', views.ModelArchitectureView, basename='roi_architectures')
+router.register(r'roi/model-architectures', views.ModelArchitectureView, basename='roi_model_architectures')
 router.register(r'roi/sources', views.TacticSourceView, basename='roi_sources')
 router.register(r'roi/tactics', views.MLTacticView, basename='roi_tactics')
 router.register(r'roi/tactic-parameter-options', views.TacticParameterOptionView, basename='roi_tactic_parameter_options')

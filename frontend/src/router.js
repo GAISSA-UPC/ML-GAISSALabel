@@ -20,6 +20,7 @@ const InferenceLabelInfo = () => import('@/tools/gaissalabel/views/InferenceLabe
 // GAISSA ROI Analyzer routes
 const GAISSAROIAnalyzerPreSaved = () => import('@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzerPreSaved.vue')
 const GAISSAROIAnalyzer = () => import("@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzer.vue")
+const GAISSAROIAnalyzerNewForm = () => import("@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzerNewForm.vue")
 
 // Admin routes
 const AdminMetriquesInfo = () => import('@/tools/gaissalabel/views/AdminMetriquesInfo.vue')
@@ -96,6 +97,11 @@ const router = createRouter({
       path: "/models/:id_model/gaissa-roi-analyzer/:id_experiment",
       name: "GAISSA ROI Analyzer",
       component: GAISSAROIAnalyzer,
+    },
+    {
+      path: "/gaissa-roi-analyzer/new-form",
+      name: "GAISSA ROI Analyzer New Form",
+      component: GAISSAROIAnalyzerNewForm,
     },
     {
       path: '/admin/metriquesinfo',
