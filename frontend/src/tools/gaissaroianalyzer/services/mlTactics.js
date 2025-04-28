@@ -6,7 +6,7 @@ export default {
             const response = await axios.get('/api/roi/tactics/', { params: filters });
             return response;
         } catch (error) {
-            console.error("Error fetching optimization techniques:", error);
+            console.error("Error fetching ML tactics:", error);
             return null;
         }
     },
@@ -15,7 +15,7 @@ export default {
             const response = await axios.get(`/api/roi/tactics/${id}/`);
             return response.data;
         } catch (error) {
-            console.error("Error fetching optimization technique:", error);
+            console.error("Error fetching ML tactic:", error);
             return null;
         }
     },
@@ -24,7 +24,7 @@ export default {
             const response = await axios.get(`/api/roi/model-architectures/${architectureId}/compatible-tactics/`);
             return response;
         } catch (error) {
-            console.error(`Error fetching techniques compatible with architecture ${architectureId}:`, error);
+            console.error(`Error fetching tactics compatible with architecture ${architectureId}:`, error);
             return null;
         }
     }

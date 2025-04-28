@@ -62,11 +62,15 @@
         </el-form-item>
         <br>
 
-        <div v-if="formData.mlTactic">
+        <div>
             <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Tactic Metrics") }}</h3>
             <p>{{ $t("Next, introduce the values for each of the metric described.") }}</p><br>
 
-            <el-form-item 
+            <p v-if="!formData.mlTactic" style="color: grey;">
+                {{ $t("Please select a model architecture and a machine learning tactic to see the applicable metrics.") }}
+            </p>
+
+            <el-form-item v-if="formData.mlTactic"
                 v-for="metric in applicableMetrics" 
                 :key="metric.id"
                 :label="metric.name">
@@ -86,7 +90,6 @@
 
         <el-button
             class="action-button"
-            v-if="formData.mlTactic" 
             @click="generateROI"
             :disabled="!formIsValid || loading"
             :loading="loading">
@@ -312,5 +315,14 @@ p {
 .action-button:hover {
     background-color: var(--gaissa_green);
     opacity: 0.9;
+}
+
+.action-button.is-disabled,
+.action-button.is-disabled:hover,
+.action-button.is-disabled:focus {
+    background-color: #c0c4cc !important;
+    color: white !important;
+    cursor: not-allowed !important;
+    opacity: 0.7;
 }
 </style>
