@@ -104,6 +104,7 @@ import mlTactics from "@/tools/gaissaroianalyzer/services/mlTactics";
 import roiMetrics from "@/tools/gaissaroianalyzer/services/roiMetrics";
 import tacticParameters from "@/tools/gaissaroianalyzer/services/tacticParameters";
 import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
+import { ElMessage } from 'element-plus';
 
 export default {
     name: "GAISSAROIAnalyzerNewForm",
@@ -239,6 +240,7 @@ export default {
                         baselineValue: this.metricValues[metricId]
                     })),
                     country: "Catalunya",
+                    analysis_type: "calculation" // Explicitly set analysis type
                 };
                                 
                 //console.log('Sending data to API:', analysisData); // For debugging
@@ -246,14 +248,14 @@ export default {
                 const response = await roiAnalyses.createAnalysis(analysisData);
                 
                 if (response && response.data) {
-                    this.$message({
+                    ElMessage({
                         message: 'ROI Analysis created successfully!',
                         type: 'success'
                     });
                     
                     // Redirect to analysis view page
                     this.$router.push({
-                        name: 'gaissaroianalyzer',
+                        name: 'GAISSA ROI Analyzer',
                         params: {
                             id_experiment: response.data.id 
                         }

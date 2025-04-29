@@ -230,7 +230,7 @@ class ROIAnalysis(models.Model):
 # Inheritance for the analysis subtypes
 class ROIAnalysisCalculation(ROIAnalysis):
     dateRegistration = models.DateTimeField(auto_now_add=True, verbose_name=_('Registration Date'))
-    country = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Country of Deployment'))
+    country = models.CharField(max_length=255, null=False, blank=False, verbose_name=_('Country of Deployment'))
 
     class Meta:
         verbose_name = _('ROI Analysis Calculation')

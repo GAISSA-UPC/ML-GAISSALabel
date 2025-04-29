@@ -411,10 +411,19 @@ class ROIAnalysisViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
             analysis_type = self.request.data.get('analysis_type', 'calculation')
+            
+            # If no analysis_type is provided, determine type by looking at provided fields
+            if not analysis_type:
+                if 'source' in self.request.data:
+                    analysis_type = 'research'
+                elif 'country' in self.request.data:
+                    analysis_type = 'calculation'
+
             if analysis_type == 'calculation':
                 return ROIAnalysisCalculationSerializer
             elif analysis_type == 'research':
                 return ROIAnalysisResearchSerializer
+            
         if self.action == 'retrieve':
             instance = self.get_object()
             if hasattr(instance, 'roianalysiscalculation'):
@@ -422,6 +431,14 @@ class ROIAnalysisViewSet(viewsets.ModelViewSet):
             elif hasattr(instance, 'roianalysisresearch'):
                 return ROIAnalysisResearchSerializer
         return ROIAnalysisSerializer
+        
+    def get_object(self):
+        obj = super().get_object()
+        if hasattr(obj, 'roianalysiscalculation'):
+            return obj.roianalysiscalculation
+        elif hasattr(obj, 'roianalysisresearch'):
+            return obj.roianalysisresearch
+        return obj
 
 class AnalysisMetricValueView(viewsets.ModelViewSet):
     queryset = AnalysisMetricValue.objects.all()

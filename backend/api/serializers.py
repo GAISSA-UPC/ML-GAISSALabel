@@ -430,18 +430,11 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
         return analysis
 
 class ROIAnalysisCalculationSerializer(ROIAnalysisSerializer):
+    country = serializers.CharField(max_length=255, required=True)
+    
     class Meta(ROIAnalysisSerializer.Meta):
         model = ROIAnalysisCalculation
         fields = ROIAnalysisSerializer.Meta.fields + ['dateRegistration', 'country']
-
-    def validate(self, data):
-        data = super().validate(data)
-
-        # Validate country field
-        country = data.get('country')
-        if not country:
-            raise serializers.ValidationError({"country": "This field may not be blank."})
-        return data
 
     def create(self, validated_data):
         metric_values_data = validated_data.pop('metric_values_data', [])
