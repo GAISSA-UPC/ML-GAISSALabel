@@ -297,6 +297,11 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
     model_architecture_name = serializers.CharField(source='model_architecture.name', read_only=True)
     tactic_parameter_option_details = TacticParameterOptionSerializer(source='tactic_parameter_option', read_only=True)
     metric_values = AnalysisMetricValueSerializer(many=True, read_only=True)
+    
+    # Fields from subclasses
+    dateRegistration = serializers.SerializerMethodField(read_only=True)
+    country = serializers.SerializerMethodField(read_only=True)
+    source = serializers.SerializerMethodField(read_only=True)
 
     # Writeable fields for relations
     model_architecture_id = serializers.PrimaryKeyRelatedField(
@@ -315,9 +320,29 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'model_architecture', 'model_architecture_id', 'model_architecture_name',
             'tactic_parameter_option', 'tactic_parameter_option_id', 'tactic_parameter_option_details',
-            'metric_values', 'metric_values_data'
+            'metric_values', 'metric_values_data', 'dateRegistration', 'country', 'source'
         ]
         read_only_fields = ['model_architecture', 'tactic_parameter_option']
+    
+    def get_dateRegistration(self, obj):
+        if hasattr(obj, 'roianalysiscalculation'):
+            return obj.roianalysiscalculation.dateRegistration
+        return None
+    
+    def get_country(self, obj):
+        if hasattr(obj, 'roianalysiscalculation'):
+            return obj.roianalysiscalculation.country
+        return None
+        
+    def get_source(self, obj):
+        if hasattr(obj, 'roianalysisresearch'):
+            source = obj.roianalysisresearch.source
+            return {
+                'id': source.id,
+                'title': source.title,
+                'url': source.url
+            } if source else None
+        return None
 
     def validate(self, data):
         """Check compatibility between the selected tactic and model architecture."""

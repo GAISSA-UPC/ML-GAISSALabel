@@ -89,18 +89,18 @@ const router = createRouter({
       component: InferenceLabelInfo
     },
     {
-      path: '/gaissa-roi-analyzer-pre',
+      path: '/gaissa-roi-analyzer/gaissa-roi-analyzer-pre',
       name: 'GAISSA ROI Analyzer PreSaved Consult',
       component: GAISSAROIAnalyzerPreSaved,
     },
     {
-      path: "/models/:id_model/gaissa-roi-analyzer/:id_experiment",
+      path: '/gaissa-roi-analyzer/gaissa-roi-analysis/:id_experiment',
       name: "GAISSA ROI Analyzer",
       component: GAISSAROIAnalyzer,
     },
     {
-      path: "/gaissa-roi-analyzer/new-form",
-      name: "GAISSA ROI Analyzer New Form",
+      path: '/gaissa-roi-analyzer/new-form',
+      name: 'GAISSA ROI Analyzer New Form',
       component: GAISSAROIAnalyzerNewForm,
     },
     {

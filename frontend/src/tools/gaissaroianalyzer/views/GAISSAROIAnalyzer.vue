@@ -7,20 +7,20 @@
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
                     <h2 class="section-title">{{ $t("Model Information") }}</h2>
                     <el-descriptions v-if="analysisData" :column="1" border>
-                        <el-descriptions-item :label="$t('Model name')">
-                            {{ analysisData.model_name }}
+                        <el-descriptions-item :label="$t('Model architecture')">
+                            {{ analysisData.model_architecture_name }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('Model optimization')">
-                            {{ analysisData.optimization_technique.name }}
+                        <el-descriptions-item :label="$t('ML Tactic')">
+                            {{ analysisData.tactic_parameter_option_details?.tactic_name }}
                         </el-descriptions-item>
-                        <el-descriptions-item v-if="analysisData.technique_parameter" :label="$t('Technique parameter')">
-                            {{ analysisData.technique_parameter.name }}
+                        <el-descriptions-item :label="$t('Tactic parameter')">
+                            {{ analysisData.tactic_parameter_option_details?.name }}: {{ analysisData.tactic_parameter_option_details?.value }}
                         </el-descriptions-item>
                         <el-descriptions-item :label="$t('Analysis identifier')">
                             {{ analysisData.id }}
                         </el-descriptions-item>
                         <el-descriptions-item :label="$t('Analysis registration date')">
-                            {{ formatData(analysisData.registration_date) }}
+                            {{ formatData(analysisData.dateRegistration) }}
                         </el-descriptions-item>
                         <el-descriptions-item :label="$t('Country deploy')">
                             {{ analysisData.country }}
@@ -72,13 +72,15 @@
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
                     <h2 class="section-title">{{ $t("ROI Results") }}</h2>
                     <p class="results-description">
-                        {{ $t("This table provides a detailed breakdown of the ROI analysis over the defined optimization strategy. It illustrates specific data about the potential benefits associated with the dynamic quantization strategy over a range of inferences.") }}
+                        {{ $t("This table provides a detailed breakdown of the ROI analysis over the defined tactic strategy. It illustrates specific data about the potential benefits associated with the applied ML tactic.") }}
                     </p>
-                    <el-table v-if="roiResults.length" :data="roiResults" style="width: 100%">
-                        <el-table-column prop="name" :label="$t('Metric')" />
-                        <el-table-column prop="value" :label="$t('Value')" />
+                    <h3 v-if="analysisData?.metric_values?.length" class="metric-values-title">{{ $t("Baseline Metrics") }}</h3>
+                    <el-table v-if="analysisData?.metric_values?.length" :data="analysisData.metric_values" style="width: 100%; margin-top: 15px;">
+                        <el-table-column prop="metric_name" :label="$t('Metric')" />
+                        <el-table-column prop="baselineValue" :label="$t('Baseline Value')" />
                     </el-table>
-                    <p v-else>{{ $t("Loading ROI results...") }}</p>
+                    
+                    <p v-if="!roiResults.length && !analysisData">{{ $t("Loading ROI results...") }}</p>
                 </el-card>
             </el-col>
         </el-row>
@@ -228,14 +230,21 @@ export default {
         },
         async loadAnalysisData() {
             const { id_experiment } = this.$route.params;
-            id_model = 1;
-
-            // Fetch the analysis data
-            this.analysisData = await roiAnalyses.getAnalysis(
-                id_experiment
-            );
-
-            this.roiResults = this.analysisData.roi_results;
+            
+            try {
+                // Fetch the analysis data
+                this.analysisData = await roiAnalyses.getAnalysis(id_experiment);
+                
+                if (this.analysisData && this.analysisData.roi_results) {
+                    this.roiResults = this.analysisData.roi_results;
+                } else {
+                    console.error("No ROI results found in the analysis data");
+                    this.roiResults = [];
+                }
+            } catch (error) {
+                console.error("Error loading analysis data:", error);
+                this.$message.error("Failed to load ROI analysis data. Please try again.");
+            }
         },
         updateIncomeCostsChartData() {
             if (!this.roiResults || this.roiResults.length === 0) {
@@ -354,6 +363,14 @@ export default {
     font-weight: bold;
     color: var(--gaissa_green);
     margin-bottom: 20px;
+}
+
+.metric-values-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--gaissa_green);
+    margin-top: 30px;
+    margin-bottom: 15px;
 }
 
 .chart-description,
