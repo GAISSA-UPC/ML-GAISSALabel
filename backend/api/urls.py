@@ -26,6 +26,7 @@ router.register(r'roi/tactics/(?P<tactic_id>\d+)/parameter-options', views.Tacti
 router.register(r'roi/metrics', views.ROIMetricView, basename='roi_metrics')
 router.register(r'roi/analyses', views.ROIAnalysisViewSet, basename='roi_analyses')
 router.register(r'roi/analysis-metric-values', views.AnalysisMetricValueView, basename='roi_analysis_metric_values')
+router.register(r'roi/energy-metric-values', views.EnergyAnalysisMetricValueView, basename='roi_energy_metric_values')
 router.register(r'roi/expected-reductions', views.ExpectedMetricReductionView, basename='roi_expected_reductions')
 
 urlpatterns = [

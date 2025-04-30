@@ -10,8 +10,8 @@ from django.contrib.auth.hashers import check_password
 from api.models import Model, Entrenament, Inferencia, Metrica, Qualificacio, Interval, ResultatEntrenament, \
     ResultatInferencia, InfoAddicional, ValorInfoEntrenament, ValorInfoInferencia, EinaCalcul, TransformacioMetrica, \
     TransformacioInformacio, Administrador, ModelArchitecture, TacticSource, MLTactic, TacticParameterOption, \
-    ROIAnalysis, ROIAnalysisCalculation, ROIAnalysisResearch, ROIMetric, AnalysisMetricValue, ExpectedMetricReduction, \
-    Configuracio, Administrador
+    ROIAnalysis, ROIAnalysisCalculation, ROIAnalysisResearch, ROIMetric, AnalysisMetricValue, EnergyAnalysisMetricValue, \
+    ExpectedMetricReduction, Configuracio, Administrador
 
 from efficiency_calculators.roi_metrics_calculator import ROIMetricsCalculator
 
@@ -295,6 +295,47 @@ class AnalysisMetricValueSerializer(serializers.ModelSerializer):
         fields = ['id', 'analysis', 'metric', 'metric_id', 'metric_name', 'baselineValue']
         read_only_fields = ['metric'] # metric is set via metric_id
 
+class EnergyAnalysisMetricValueSerializer(serializers.ModelSerializer):
+    metric_name = serializers.CharField(source='metric.name', read_only=True)
+    metric_id = serializers.PrimaryKeyRelatedField(
+        queryset=ROIMetric.objects.filter(is_energy_related=True), write_only=True, source='metric'
+    )
+    cost_savings = serializers.SerializerMethodField(read_only=True)
+    
+    class Meta:
+        model = EnergyAnalysisMetricValue
+        fields = ['id', 'analysis', 'metric', 'metric_id', 'metric_name', 'baselineValue', 
+                 'energy_cost_rate', 'implementation_cost', 'cost_savings']
+        read_only_fields = ['metric'] # metric is set via metric_id
+    
+    def validate_metric_id(self, value):
+        if not value.is_energy_related:
+            raise serializers.ValidationError(_("Only energy-related metrics can be used with EnergyAnalysisMetricValue."))
+        return value
+    
+    def get_cost_savings(self, obj):
+        # Default calculation for 10 million inferences if not specified
+        num_inferences = self.context.get('num_inferences', 10000000)
+        
+        try:
+            expected_reduction = ExpectedMetricReduction.objects.get(
+                model_architecture=obj.analysis.model_architecture,
+                tactic_parameter_option=obj.analysis.tactic_parameter_option,
+                metric=obj.metric
+            )
+            
+            # Use the calculator to get cost savings
+            calculator = ROIMetricsCalculator()
+            return calculator.calculate_cost_savings(
+                obj,
+                expected_reduction.expectedReductionValue,
+                num_inferences
+            )
+        except ExpectedMetricReduction.DoesNotExist:
+            return {'error': f"No expected reduction found for this metric ({obj.metric.name})"}
+        except Exception as e:
+            return {'error': str(e)}
+
 class ROIAnalysisSerializer(serializers.ModelSerializer):
     model_architecture_name = serializers.CharField(source='model_architecture.name', read_only=True)
     tactic_parameter_option_details = TacticParameterOptionSerializer(source='tactic_parameter_option', read_only=True)
@@ -414,7 +455,23 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
                     f"Tactic Parameter Option '{tactic_parameter_option}', and Metric '{metric}'."
                 )
 
-            metrics_to_create.append({'metric': metric, 'baselineValue': baseline_value})
+            # Check if energy-related metrics have energy cost information
+            if metric.is_energy_related:
+                energy_cost_rate = metric_data.get('energy_cost_rate')
+                implementation_cost = metric_data.get('implementation_cost')
+                if energy_cost_rate is None or implementation_cost is None:
+                    raise ValidationError(
+                        f"Energy-related metric '{metric.name}' requires 'energy_cost_rate' and 'implementation_cost' values."
+                    )
+                metrics_to_create.append({
+                    'metric': metric, 
+                    'baselineValue': baseline_value,
+                    'is_energy_related': True,
+                    'energy_cost_rate': energy_cost_rate,
+                    'implementation_cost': implementation_cost
+                })
+            else:
+                metrics_to_create.append({'metric': metric, 'baselineValue': baseline_value, 'is_energy_related': False})
         return metrics_to_create
 
     def create(self, validated_data):
@@ -429,12 +486,23 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
 
         # If validation passed, create the analysis and then the metric values
         analysis = ROIAnalysis.objects.create(**validated_data)
+        
         for metric_info in metrics_to_create:
-            AnalysisMetricValue.objects.create(
-                analysis=analysis,
-                metric=metric_info['metric'],
-                baselineValue=metric_info['baselineValue']
-            )
+            # Create the appropriate metric value type based on whether it's energy-related
+            if metric_info['is_energy_related']:
+                EnergyAnalysisMetricValue.objects.create(
+                    analysis=analysis,
+                    metric=metric_info['metric'],
+                    baselineValue=metric_info['baselineValue'],
+                    energy_cost_rate=metric_info['energy_cost_rate'],
+                    implementation_cost=metric_info['implementation_cost']
+                )
+            else:
+                AnalysisMetricValue.objects.create(
+                    analysis=analysis,
+                    metric=metric_info['metric'],
+                    baselineValue=metric_info['baselineValue']
+                )
         return analysis
 
 class ROIAnalysisCalculationSerializer(ROIAnalysisSerializer):
@@ -456,12 +524,23 @@ class ROIAnalysisCalculationSerializer(ROIAnalysisSerializer):
 
         # If validation passed, create the specific analysis type and then the metric values
         analysis = ROIAnalysisCalculation.objects.create(**validated_data)
+        
         for metric_info in metrics_to_create:
-            AnalysisMetricValue.objects.create(
-                analysis=analysis,
-                metric=metric_info['metric'],
-                baselineValue=metric_info['baselineValue']
-            )
+            # Create the appropriate metric value type based on whether it's energy-related
+            if metric_info['is_energy_related']:
+                EnergyAnalysisMetricValue.objects.create(
+                    analysis=analysis,
+                    metric=metric_info['metric'],
+                    baselineValue=metric_info['baselineValue'],
+                    energy_cost_rate=metric_info['energy_cost_rate'],
+                    implementation_cost=metric_info['implementation_cost']
+                )
+            else:
+                AnalysisMetricValue.objects.create(
+                    analysis=analysis,
+                    metric=metric_info['metric'],
+                    baselineValue=metric_info['baselineValue']
+                )
         return analysis
 
 class ROIAnalysisResearchSerializer(ROIAnalysisSerializer):
@@ -481,12 +560,23 @@ class ROIAnalysisResearchSerializer(ROIAnalysisSerializer):
 
         # If validation passed, create the specific analysis type and then the metric values
         analysis = ROIAnalysisResearch.objects.create(**validated_data)
+        
         for metric_info in metrics_to_create:
-            AnalysisMetricValue.objects.create(
-                analysis=analysis,
-                metric=metric_info['metric'],
-                baselineValue=metric_info['baselineValue']
-            )
+            # Create the appropriate metric value type based on whether it's energy-related
+            if metric_info['is_energy_related']:
+                EnergyAnalysisMetricValue.objects.create(
+                    analysis=analysis,
+                    metric=metric_info['metric'],
+                    baselineValue=metric_info['baselineValue'],
+                    energy_cost_rate=metric_info['energy_cost_rate'],
+                    implementation_cost=metric_info['implementation_cost']
+                )
+            else:
+                AnalysisMetricValue.objects.create(
+                    analysis=analysis,
+                    metric=metric_info['metric'],
+                    baselineValue=metric_info['baselineValue']
+                )
         return analysis
 
 class ExpectedMetricReductionSerializer(serializers.ModelSerializer):

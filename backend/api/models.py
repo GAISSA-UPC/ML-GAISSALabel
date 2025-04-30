@@ -249,6 +249,7 @@ class ROIMetric(models.Model):
     name = models.CharField(max_length=255, unique=True, verbose_name=_('Metric Name'))
     description = models.TextField(null=True, blank=True, verbose_name=_('Description'))
     unit = models.CharField(max_length=50, null=True, blank=True, verbose_name=_('Unit'))
+    is_energy_related = models.BooleanField(default=False, verbose_name=_('Is Energy Related'))
 
     class Meta:
         verbose_name = _('ROI Metric')
@@ -302,6 +303,13 @@ class AnalysisMetricValue(models.Model):
                             'metric': metric
                         }
                     )
+                
+                # Constraint 4: Ensure energy metrics use EnergyAnalysisMetricValue
+                if metric.is_energy_related and self.__class__ == AnalysisMetricValue:
+                    raise ValidationError(
+                        _("Energy-related metrics must use EnergyAnalysisMetricValue instead of AnalysisMetricValue.")
+                    )
+
             # These exceptions allow the creation of the object when creating the analysis
             # This constraint will be checked in the serializer when the analysis is created
             except ROIAnalysis.DoesNotExist:
@@ -315,6 +323,27 @@ class AnalysisMetricValue(models.Model):
 
     def __str__(self):
         return f"{self.analysis} - {self.metric.name}: {self.baselineValue}"
+
+class EnergyAnalysisMetricValue(AnalysisMetricValue):
+    """
+    Only applicable when the related metric has is_energy_related=True.
+    """
+    energy_cost_rate = models.DecimalField(max_digits=10, decimal_places=4, verbose_name=_('Energy Cost Rate (€/kWh)'), help_text=_('The cost per kilowatt-hour of energy in €'))
+    implementation_cost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('Implementation Costs (€)'), help_text=_('Additional costs for implementing this energy optimization tactic in €'))
+
+    class Meta:
+        verbose_name = _('Energy Metric Analysis Value')
+        verbose_name_plural = _('Energy Metric Analysis Values')
+
+    def clean(self):
+        super().clean()
+        # Ensure this is only used with energy-related metrics
+        if self.metric_id and not self.metric.is_energy_related:
+            raise ValidationError(_("EnergyAnalysisMetricValue can only be used with energy-related metrics."))
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
 class ExpectedMetricReduction(models.Model):
     id = models.AutoField(primary_key=True)
@@ -330,7 +359,6 @@ class ExpectedMetricReduction(models.Model):
 
     def __str__(self):
         return f"Reduction for {self.metric.name} on {self.model_architecture.name} with {self.tactic_parameter_option}"
-
 
 # Configuracio model
 class Configuracio(SingletonModel):

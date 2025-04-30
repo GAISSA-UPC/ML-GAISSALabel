@@ -1,4 +1,5 @@
-from api.models import ROIAnalysis, AnalysisMetricValue, ExpectedMetricReduction
+from api.models import ROIAnalysis, AnalysisMetricValue, ExpectedMetricReduction, EnergyAnalysisMetricValue
+from efficiency_calculators.roi_calculator import ROICalculator
 
 class ROIMetricsCalculator:
     """
@@ -56,6 +57,22 @@ class ROIMetricsCalculator:
                         'new_expected_value': new_expected_value,
                     }
                     
+                    # If this is an energy metric with cost data, calculate cost savings
+                    if metric_value.metric.is_energy_related:
+                        try:
+                            energy_metric_value = EnergyAnalysisMetricValue.objects.get(id=metric_value.id)
+                            # Calculate cost savings with default 10M inferences
+                            cost_savings = self.calculate_cost_savings(
+                                energy_metric_value, 
+                                expected_reduction.expectedReductionValue, 
+                                10000000
+                            )
+                            result['cost_savings'] = cost_savings
+                        except EnergyAnalysisMetricValue.DoesNotExist:
+                            # This is an energy-related metric but without the cost data
+                            print(f"Energy metric {metric_value.metric.id} does not have cost data.")
+                            pass
+                    
                     results.append(result)
                     
                 except ExpectedMetricReduction.DoesNotExist:
@@ -69,3 +86,72 @@ class ROIMetricsCalculator:
         except Exception as e:
             print(f"Error calculating metrics for ROI analysis {analysis_id}: {e}")
             return []
+    
+    def calculate_cost_savings(self, energy_metric_value, reduction_factor, num_inferences):
+        """
+        Calculate cost savings based on energy reduction.
+        
+        Args:
+            energy_metric_value (the EnergyAnalysisMetricValue instance), reduction_factor, num_inferences
+            
+        Returns:
+            Dictionary with cost savings information
+        """
+        try:
+            baseline_energy_joules = energy_metric_value.baselineValue
+            new_energy_joules = baseline_energy_joules * (1 - reduction_factor)
+            
+            # Convert Joules to kWh for cost calculation (1 kWh = 3,600,000 J)
+            joules_to_kwh = 1 / 3600000
+            baseline_energy_kwh = baseline_energy_joules * joules_to_kwh
+            new_energy_kwh = new_energy_joules * joules_to_kwh
+            
+            # Calculate costs
+            baseline_cost_per_inference = baseline_energy_kwh * float(energy_metric_value.energy_cost_rate)
+            new_cost_per_inference = new_energy_kwh * float(energy_metric_value.energy_cost_rate)
+            
+            implementation_cost = float(energy_metric_value.implementation_cost)
+            
+            # Use the ROICalculator for consistent ROI calculations
+            roi_calculator = ROICalculator()
+            roi = roi_calculator.calculate_roi(
+                implementation_cost, 
+                new_cost_per_inference, 
+                baseline_cost_per_inference, 
+                num_inferences
+            )
+            
+            # Calculate break-even point
+            break_even_inferences = roi_calculator.calculate_break_even_point(
+                implementation_cost,
+                new_cost_per_inference,
+                baseline_cost_per_inference
+            )
+            
+            # Calculate total costs for the given number of inferences
+            total_baseline_cost = baseline_cost_per_inference * num_inferences
+            total_new_cost = new_cost_per_inference * num_inferences + implementation_cost
+            
+            total_savings = total_baseline_cost - total_new_cost
+                
+            return {
+                'baseline_energy_joules': baseline_energy_joules,
+                'new_energy_joules': new_energy_joules,
+                'energy_reduction_joules': baseline_energy_joules - new_energy_joules,
+                'energy_reduction_percentage': reduction_factor * 100,
+                'baseline_cost_per_inference': baseline_cost_per_inference,
+                'new_cost_per_inference': new_cost_per_inference,
+                'cost_savings_per_inference': baseline_cost_per_inference - new_cost_per_inference,
+                'total_baseline_cost': total_baseline_cost,
+                'total_new_cost': total_new_cost,
+                'implementation_cost': implementation_cost,
+                'total_savings': total_savings,
+                'roi': roi,
+                'break_even_inferences': break_even_inferences,
+                'num_inferences': num_inferences
+            }
+            
+        except Exception as e:
+            return {
+                'error': f"Error calculating cost savings: {str(e)}"
+            }

@@ -12,14 +12,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 from api.models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, Interval, EinaCalcul, \
     TransformacioMetrica, TransformacioInformacio, Administrador, Configuracio, \
     ModelArchitecture, TacticSource, MLTactic, TacticParameterOption, ROIAnalysis, ROIAnalysisCalculation, \
-    ROIAnalysisResearch, ROIMetric, AnalysisMetricValue, ExpectedMetricReduction
+    ROIAnalysisResearch, ROIMetric, AnalysisMetricValue, EnergyAnalysisMetricValue, ExpectedMetricReduction
 from api.serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
     EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer, \
     IntervalBasicSerializer, MetricaSerializer, EinaCalculBasicSerializer, EinaCalculSerializer, \
     TransformacioMetricaSerializer, TransformacioInformacioSerializer, LoginAdminSerializer, \
     ModelArchitectureSerializer, TacticSourceSerializer, MLTacticSerializer, TacticParameterOptionSerializer, \
     ROIAnalysisSerializer, ROIAnalysisCalculationSerializer, ROIAnalysisResearchSerializer, ROIMetricSerializer, \
-    AnalysisMetricValueSerializer, ExpectedMetricReductionSerializer
+    AnalysisMetricValueSerializer, EnergyAnalysisMetricValueSerializer, ExpectedMetricReductionSerializer
 
 from api import permissions
 from efficiency_calculators.rating_calculator import calculateRating
@@ -447,6 +447,27 @@ class AnalysisMetricValueView(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['analysis', 'metric']
     ordering_fields = ['analysis', 'metric']
+
+class EnergyAnalysisMetricValueView(viewsets.ModelViewSet):
+    queryset = EnergyAnalysisMetricValue.objects.all()
+    serializer_class = EnergyAnalysisMetricValueSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['analysis', 'metric']
+    ordering_fields = ['analysis', 'metric']
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        
+        # Allow custom number of inferences for cost savings calculations
+        num_inferences = self.request.query_params.get('num_inferences')
+        if num_inferences:
+            try:
+                context['num_inferences'] = int(num_inferences)
+            except ValueError:
+                pass  # Use the default value
+        
+        return context
 
 class ExpectedMetricReductionView(viewsets.ModelViewSet):
     queryset = ExpectedMetricReduction.objects.all()
