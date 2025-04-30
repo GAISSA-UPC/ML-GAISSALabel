@@ -321,12 +321,12 @@ class ExpectedMetricReduction(models.Model):
     model_architecture = models.ForeignKey(ModelArchitecture, on_delete=models.CASCADE, verbose_name=_('Model Architecture'))
     tactic_parameter_option = models.ForeignKey(TacticParameterOption, on_delete=models.CASCADE, verbose_name=_('Tactic Parameter Option'))
     metric = models.ForeignKey(ROIMetric, on_delete=models.CASCADE, verbose_name=_('ROI Metric'))
-    expectedReductionValue = models.FloatField(verbose_name=_('Expected Reduction Value')) # Assuming percentage or absolute value
+    expectedReductionValue = models.FloatField(verbose_name=_('Expected Reduction Value'))
 
     class Meta:
         verbose_name = _('Expected Metric Reduction')
         verbose_name_plural = _('Expected Metric Reductions')
-        unique_together = ('model_architecture', 'tactic_parameter_option', 'metric') # Constraint 2 implied here
+        unique_together = ('model_architecture', 'tactic_parameter_option', 'metric')
 
     def __str__(self):
         return f"Reduction for {self.metric.name} on {self.model_architecture.name} with {self.tactic_parameter_option}"

@@ -13,6 +13,8 @@ from api.models import Model, Entrenament, Inferencia, Metrica, Qualificacio, In
     ROIAnalysis, ROIAnalysisCalculation, ROIAnalysisResearch, ROIMetric, AnalysisMetricValue, ExpectedMetricReduction, \
     Configuracio, Administrador
 
+from efficiency_calculators.roi_metrics_calculator import ROIMetricsCalculator
+
 class ModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Model
@@ -297,6 +299,7 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
     model_architecture_name = serializers.CharField(source='model_architecture.name', read_only=True)
     tactic_parameter_option_details = TacticParameterOptionSerializer(source='tactic_parameter_option', read_only=True)
     metric_values = AnalysisMetricValueSerializer(many=True, read_only=True)
+    metrics_analysis = serializers.SerializerMethodField(read_only=True)
     
     # Fields from subclasses
     dateRegistration = serializers.SerializerMethodField(read_only=True)
@@ -320,9 +323,14 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'model_architecture', 'model_architecture_id', 'model_architecture_name',
             'tactic_parameter_option', 'tactic_parameter_option_id', 'tactic_parameter_option_details',
-            'metric_values', 'metric_values_data', 'dateRegistration', 'country', 'source'
+            'metric_values_data', 'metrics_analysis', 'dateRegistration', 'country', 
+            'source'
         ]
         read_only_fields = ['model_architecture', 'tactic_parameter_option']
+    
+    def get_metrics_analysis(self, obj):
+        calculator = ROIMetricsCalculator()
+        return calculator.calculate_metrics_for_analysis(obj.id)
     
     def get_dateRegistration(self, obj):
         if hasattr(obj, 'roianalysiscalculation'):

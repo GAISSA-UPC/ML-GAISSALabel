@@ -74,10 +74,12 @@
                     <p class="results-description">
                         {{ $t("This table provides a detailed breakdown of the ROI analysis over the defined tactic strategy. It illustrates specific data about the potential benefits associated with the applied ML tactic.") }}
                     </p>
-                    <h3 v-if="analysisData?.metric_values?.length" class="metric-values-title">{{ $t("Baseline Metrics") }}</h3>
-                    <el-table v-if="analysisData?.metric_values?.length" :data="analysisData.metric_values" style="width: 100%; margin-top: 15px;">
+                    <h3 v-if="analysisData?.metrics_analysis?.length" class="metric-values-title">{{ $t("Baseline Metrics") }}</h3>
+                    <el-table v-if="analysisData?.metrics_analysis?.length" :data="analysisData.metrics_analysis" style="width: 100%; margin-top: 15px;">
                         <el-table-column prop="metric_name" :label="$t('Metric')" />
-                        <el-table-column prop="baselineValue" :label="$t('Baseline Value')" />
+                        <el-table-column prop="baseline_value" :label="$t('Baseline Value')" />
+                        <el-table-column prop="expected_reduction_percent" :label="$t('Reduction (%)')" />
+                        <el-table-column prop="new_expected_value" :label="$t('New Expected Value')" />
                     </el-table>
                     
                     <p v-if="!roiResults.length && !analysisData">{{ $t("Loading ROI results...") }}</p>
