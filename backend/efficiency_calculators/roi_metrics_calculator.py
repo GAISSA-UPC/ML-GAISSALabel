@@ -107,8 +107,9 @@ class ROIMetricsCalculator:
             new_energy_kwh = new_energy_joules * joules_to_kwh
             
             # Calculate costs
-            baseline_cost_per_inference = baseline_energy_kwh * float(energy_metric_value.energy_cost_rate)
-            new_cost_per_inference = new_energy_kwh * float(energy_metric_value.energy_cost_rate)
+            energy_cost_rate = float(energy_metric_value.energy_cost_rate)
+            baseline_cost_per_inference = baseline_energy_kwh * energy_cost_rate
+            new_cost_per_inference = new_energy_kwh * energy_cost_rate
             
             implementation_cost = float(energy_metric_value.implementation_cost)
             
@@ -119,6 +120,12 @@ class ROIMetricsCalculator:
                 new_cost_per_inference, 
                 baseline_cost_per_inference, 
                 num_inferences
+            )
+            infinite_roi = roi_calculator.calculate_roi(
+                implementation_cost, 
+                new_cost_per_inference, 
+                baseline_cost_per_inference, 
+                float('inf')
             )
             
             # Calculate break-even point
@@ -141,12 +148,13 @@ class ROIMetricsCalculator:
                 'energy_reduction_percentage': reduction_factor * 100,
                 'baseline_cost_per_inference': baseline_cost_per_inference,
                 'new_cost_per_inference': new_cost_per_inference,
-                'cost_savings_per_inference': baseline_cost_per_inference - new_cost_per_inference,
                 'total_baseline_cost': total_baseline_cost,
                 'total_new_cost': total_new_cost,
                 'implementation_cost': implementation_cost,
+                'energy_cost_rate': energy_cost_rate,
                 'total_savings': total_savings,
                 'roi': roi,
+                'infinite_roi': infinite_roi,
                 'break_even_inferences': break_even_inferences,
                 'num_inferences': num_inferences
             }

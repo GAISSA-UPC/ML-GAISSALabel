@@ -68,21 +68,73 @@
                 </el-card>
             </el-col>
 
+            <!-- Tactic Metric Results Card -->
             <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
-                    <h2 class="section-title">{{ $t("ROI Results") }}</h2>
+                    <h2 class="section-title">{{ $t("Tactic Metric Results") }}</h2>
                     <p class="results-description">
-                        {{ $t("This table provides a detailed breakdown of the ROI analysis over the defined tactic strategy. It illustrates specific data about the potential benefits associated with the applied ML tactic.") }}
+                        {{ $t("This table provides a detailed breakdown of the metric values affected by the tactic. It illustrates specific data about the expected changes in each metric when applying the ML tactic.") }}
                     </p>
-                    <h3 v-if="analysisData?.metrics_analysis?.length" class="metric-values-title">{{ $t("Baseline Metrics") }}</h3>
+                    
                     <el-table v-if="analysisData?.metrics_analysis?.length" :data="analysisData.metrics_analysis" style="width: 100%; margin-top: 15px;">
                         <el-table-column prop="metric_name" :label="$t('Metric')" />
                         <el-table-column prop="baseline_value" :label="$t('Baseline Value')" />
                         <el-table-column prop="expected_reduction_percent" :label="$t('Reduction (%)')" />
                         <el-table-column prop="new_expected_value" :label="$t('New Expected Value')" />
+                        <el-table-column prop="unit" :label="$t('Unit')" />
                     </el-table>
                     
-                    <p v-if="!roiResults.length && !analysisData">{{ $t("Loading ROI results...") }}</p>
+                    <p v-if="!analysisData?.metrics_analysis?.length && !analysisData">{{ $t("Loading tactic results...") }}</p>
+                </el-card>
+            </el-col>
+
+            <!-- ROI Results Card -->
+            <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" style="margin-top: 20px;">
+                <el-card shadow="always" :body-style="{ padding: '20px' }">
+                    <h2 class="section-title">{{ $t("ROI Results") }}</h2>
+                    <p class="results-description">
+                        {{ $t("This table provides a detailed economic analysis of the applied tactic, showing the estimated cost savings and Return on Investment metrics.") }}
+                    </p>
+                    
+                    <div v-if="costMetricsResults.length" class="roi-cards-container">
+                        <div v-for="(metric, index) in costMetricsResults" :key="index" class="roi-card">
+                            <h3 v-if="costMetricsResults.length > 1">{{ metric.metric_name }}</h3>
+                            <el-descriptions :column="2" border>
+                                <el-descriptions-item :label="$t('Incurred Cost (€)')">
+                                    {{ formatNumber(metric.total_new_cost) }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('Non-optimized Incurred Cost (€)')">
+                                    {{ formatNumber(metric.total_baseline_cost) }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('Inference Cost (€)')">
+                                    {{ formatNumber(metric.new_cost_per_inference) }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('Non-optimized Inference Cost (€)')">
+                                    {{ formatNumber(metric.baseline_cost_per_inference) }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('Implementation Cost (€)')">
+                                    {{ formatNumber(metric.implementation_cost) }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('Energy Cost (€/kWh)')">
+                                    {{ formatNumber(metric.energy_cost_rate) }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('Cost Savings (€)')">
+                                    {{ formatNumber(metric.total_savings) }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('Break-Even Point (inferences)')">
+                                    {{ metric.break_even_inferences }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t(`ROI (for ${metric.num_inferences.toLocaleString()} inferences)`)">
+                                    {{ formatNumber(metric.roi_percentage) }}%
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('ROI (for infinite inferences)')">
+                                    {{ formatNumber(metric.infinite_roi_percentage) }}%
+                                </el-descriptions-item>
+                            </el-descriptions>
+                        </div>
+                    </div>
+                    
+                    <p v-if="costMetricsResults.length === 0">{{ $t("No energy-related metrics found to calculate ROI.") }}</p>
                 </el-card>
             </el-col>
         </el-row>
@@ -217,8 +269,57 @@ export default {
             }
         };
     },
+    computed: {
+        costMetricsResults() {
+            if (!this.analysisData?.metrics_analysis) return [];
+            
+            return this.analysisData.metrics_analysis.filter(metric => 
+                metric.cost_savings && !metric.cost_savings.error
+            ).map(metric => {
+                const costData = metric.cost_savings;
+
+                return {
+                    metric_name: metric.metric_name,
+                    total_new_cost: parseFloat(costData.total_new_cost),
+                    total_baseline_cost: parseFloat(costData.total_baseline_cost),
+                    baseline_cost_per_inference: parseFloat(costData.baseline_cost_per_inference),
+                    new_cost_per_inference: parseFloat(costData.new_cost_per_inference),
+                    implementation_cost: parseFloat(costData.implementation_cost),
+                    energy_cost_rate: parseFloat(costData.energy_cost_rate || 0),
+                    total_savings: parseFloat(costData.total_savings),
+                    break_even_inferences: costData.break_even_inferences !== Infinity ? 
+                        parseInt(costData.break_even_inferences).toLocaleString() : 
+                        'Never',
+                    roi_percentage: parseFloat(costData.roi) * 100,
+                    infinite_roi_percentage: parseFloat(costData.infinite_roi) * 100,
+                    num_inferences: costData.num_inferences
+                };
+            });
+        }
+    },
     methods: {
         formatData,
+        formatNumber(value) {
+            if (value === null || value === undefined || isNaN(value)) {
+                return 'N/A';
+            }
+            
+            // Scientific notation for very small values
+            if (Math.abs(value) < 0.00001 && value !== 0) {
+                return value.toExponential(4);
+            } 
+            
+            // Adapt number to regional format and appropriate decimal places
+            if (Math.abs(value) >= 1000) {
+                return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+            } else if (Math.abs(value) >= 1) {
+                return value.toLocaleString(undefined, { maximumFractionDigits: 4 });
+            } else if (Math.abs(value) >= 0.01) {
+                return value.toLocaleString(undefined, { maximumFractionDigits: 6 });
+            } else {
+                return value.toLocaleString(undefined, { maximumFractionDigits: 8 });
+            }
+        },
         initializeIncomeCostsChart() {
             // Initialize the Income/Costs Chart
             const incomeCostsChartContainer = this.$refs.incomeCostsChartContainer;
@@ -389,9 +490,31 @@ export default {
     margin-bottom: 20px;
 }
 
+.roi-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.roi-card {
+    flex: 1;
+    min-width: 400px;
+}
+
+.roi-card h3 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--gaissa_green);
+    margin-bottom: 15px;
+}
+
 @media (max-width: 768px) {
     .mobile-card {
         margin-bottom: 20px;
+    }
+    
+    .roi-card {
+        min-width: 100%;
     }
 }
 </style>
