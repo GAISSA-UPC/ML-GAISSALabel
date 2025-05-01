@@ -88,6 +88,40 @@
             <br>
         </div>
 
+        <div v-if="hasEnergyRelatedMetrics">
+            <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Cost Metrics") }}</h3>
+            <p>{{ $t("Next, introduce the metrics to assess the economic impact of applying the tactic and estimate the ROI (Return on Investment) of the approach.") }}</p><br>
+
+            <div v-for="metric in energyRelatedMetrics" :key="`cost-${metric.id}`">
+                <h4 v-if="energyRelatedMetrics.length > 1">{{ metric.name }} - {{ $t('Cost Information') }}</h4>
+                
+                <el-form-item :label="$t('Energy Cost Rate (€/kWh)')">
+                    <el-input-number 
+                        v-model="energyCostRates[metric.id]" 
+                        :precision="4" 
+                        :step="0.001"
+                        :min="0"
+                        style="width: 200px"></el-input-number>
+                    <el-alert type="info" show-icon :closable="false" style="margin-top: 10px">
+                        <p style="font-size: 14px">{{ $t('The cost of the electricity supply used.') }}</p>
+                    </el-alert>
+                </el-form-item>
+                
+                <el-form-item :label="$t('Implementation Cost (€)')">
+                    <el-input-number 
+                        v-model="implementationCosts[metric.id]" 
+                        :precision="2" 
+                        :step="1"
+                        :min="0"
+                        style="width: 200px"></el-input-number>
+                    <el-alert type="info" show-icon :closable="false" style="margin-top: 10px">
+                        <p style="font-size: 14px">{{ $t('The cost associated with implementing the ML tactic, including development, testing, and deployment costs.') }}</p>
+                    </el-alert>
+                </el-form-item>
+            </div>
+            <br>
+        </div>
+
         <el-button
             class="action-button"
             @click="generateROI"
@@ -114,12 +148,15 @@ export default {
             tactics: [],
             tacticParameters: [],
             applicableMetrics: [],
+            energyRelatedMetrics: [],
             formData: {
                 modelArchitecture: null,
                 mlTactic: null,
                 tacticParameter: null,
             },
             metricValues: {},
+            energyCostRates: {},
+            implementationCosts: {},
             loading: false,
             error: null,
         };
@@ -132,7 +169,15 @@ export default {
             const metricsValid = this.applicableMetrics.every(metric => 
                 this.metricValues[metric.id] !== undefined && this.metricValues[metric.id] !== null && this.metricValues[metric.id] > 0);
             
-            return basicFormValid && metricsValid;
+            // Check if energy-related metrics are valid
+            const energyMetricsValid = this.energyRelatedMetrics.every(metric => 
+                this.energyCostRates[metric.id] !== undefined && this.energyCostRates[metric.id] !== null && this.energyCostRates[metric.id] > 0 &&
+                this.implementationCosts[metric.id] !== undefined && this.implementationCosts[metric.id] !== null && this.implementationCosts[metric.id] > 0);
+            
+            return basicFormValid && metricsValid && energyMetricsValid;
+        },
+        hasEnergyRelatedMetrics() {
+            return this.energyRelatedMetrics.length > 0;
         }
     },
     methods: {
@@ -177,6 +222,7 @@ export default {
         async fetchApplicableMetrics() {
             if (!this.formData.mlTactic) {
                 this.applicableMetrics = [];
+                this.energyRelatedMetrics = [];
                 return;
             }
             
@@ -191,6 +237,18 @@ export default {
                             this.metricValues[metric.id] = 0;
                         }
                     });
+
+                    // Initialize energy-related metrics values
+                    this.energyRelatedMetrics = this.applicableMetrics.filter(metric => metric.is_energy_related);
+
+                    this.energyRelatedMetrics.forEach(metric => {
+                        if (!this.energyCostRates[metric.id]) {
+                            this.energyCostRates[metric.id] = 0;
+                        }
+                        if (!this.implementationCosts[metric.id]) {
+                            this.implementationCosts[metric.id] = 0;
+                        }
+                    });
                 }
             } catch (error) {
                 console.error(`Error fetching metrics for tactic ${this.formData.mlTactic}:`, error);
@@ -202,6 +260,7 @@ export default {
             this.formData.mlTactic = null;
             this.formData.tacticParameter = null;
             this.applicableMetrics = [];
+            this.energyRelatedMetrics = [];
             this.tacticParameters = [];
             
             // Fetch tactics compatible with the selected model architecture
@@ -215,6 +274,8 @@ export default {
             // Reset tactic parameter selection and metrics
             this.formData.tacticParameter = null;
             this.metricValues = {};
+            this.energyCostRates = {};
+            this.implementationCosts = {};
             
             // Fetch parameters and metrics for the selected tactic
             this.fetchTacticParameters();
@@ -232,13 +293,29 @@ export default {
             this.error = null;
             
             try {
+                const metricValuesData = Object.keys(this.metricValues).map(metricId => {
+                    const metric = this.applicableMetrics.find(m => m.id === parseInt(metricId));
+                    const isEnergyMetric = metric && metric.is_energy_related;
+                    
+                    // Base metric data
+                    let metricData = {
+                        metric_id: parseInt(metricId),
+                        baselineValue: this.metricValues[metricId]
+                    };
+                    
+                    // Add energy-specific data if applicable
+                    if (isEnergyMetric) {
+                        metricData.energy_cost_rate = this.energyCostRates[metricId];
+                        metricData.implementation_cost = this.implementationCosts[metricId];
+                    }
+                    
+                    return metricData;
+                });
+                
                 const analysisData = {
                     model_architecture_id: parseInt(this.formData.modelArchitecture),
                     tactic_parameter_option_id: parseInt(this.formData.tacticParameter),
-                    metric_values_data: Object.keys(this.metricValues).map(metricId => ({
-                        metric_id: parseInt(metricId),
-                        baselineValue: this.metricValues[metricId]
-                    })),
+                    metric_values_data: metricValuesData,
                     country: "Catalunya",
                     analysis_type: "calculation" // Explicitly set analysis type
                 };
@@ -269,7 +346,7 @@ export default {
                 if (error.response && error.response.data) {
                     this.error = `Failed to create ROI analysis: ${JSON.stringify(error.response.data)}`;
                 } else {
-                    this.error = "Failed to create ROI analysis. Please check your inputs and network connection, and ensure you are logged in.";
+                    this.error = "Failed to create ROI analysis. Please check your inputs are properly filled.";
                 }
                 window.scrollTo({top: 0});
             } finally {
