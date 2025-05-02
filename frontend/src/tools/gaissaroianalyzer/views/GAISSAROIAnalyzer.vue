@@ -286,9 +286,8 @@ export default {
                     implementation_cost: parseFloat(costData.implementation_cost),
                     energy_cost_rate: parseFloat(costData.energy_cost_rate || 0),
                     total_savings: parseFloat(costData.total_savings),
-                    break_even_inferences: costData.break_even_inferences !== Infinity ? 
-                        parseInt(costData.break_even_inferences).toLocaleString() : 
-                        'Never',
+                    break_even_inferences: costData.break_even_inferences === 'Infinity' ? 
+                        costData.break_even_inferences : parseInt(costData.break_even_inferences).toLocaleString(),
                     roi_percentage: parseFloat(costData.roi) * 100,
                     infinite_roi_percentage: parseFloat(costData.infinite_roi) * 100,
                     num_inferences: costData.num_inferences
@@ -352,7 +351,7 @@ export default {
             const optimizationCost = metric.implementation_cost;
             const newCostPerInference = metric.new_cost_per_inference;
             const oldCostPerInference = metric.baseline_cost_per_inference;
-            const breakEvenPoint = metric.break_even_inferences === 'Never' ? 
+            const breakEvenPoint = metric.break_even_inferences === 'Infinity' ? 
                 Infinity : parseInt(metric.break_even_inferences.replace(/[^\d]/g, ''));
 
             // Chart points when breakEvenPoint is NEGATIVE or INFINITE 

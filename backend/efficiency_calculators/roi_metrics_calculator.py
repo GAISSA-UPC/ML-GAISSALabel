@@ -134,6 +134,10 @@ class ROIMetricsCalculator:
                 new_cost_per_inference,
                 baseline_cost_per_inference
             )
+            if break_even_inferences == float('inf'):
+                break_even_inferences = "Infinity"
+            else:
+                break_even_inferences = int(break_even_inferences)
             
             # Calculate total costs for the given number of inferences
             total_baseline_cost = baseline_cost_per_inference * num_inferences
