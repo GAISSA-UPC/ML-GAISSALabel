@@ -151,7 +151,6 @@ export default {
     data() {
         return {
             analysisData: null,
-            roiResults: [],
             incomeCostsChart: null,
             roiChart: null,
             incomeCostsChartOptions: {
@@ -337,28 +336,24 @@ export default {
             try {
                 // Fetch the analysis data
                 this.analysisData = await roiAnalyses.getAnalysis(id_experiment);
-                
-                if (this.analysisData && this.analysisData.roi_results) {
-                    this.roiResults = this.analysisData.roi_results;
-                } else {
-                    console.error("No ROI results found in the analysis data");
-                    this.roiResults = [];
-                }
             } catch (error) {
                 console.error("Error loading analysis data:", error);
                 this.$message.error("Failed to load ROI analysis data. Please try again.");
             }
         },
         updateIncomeCostsChartData() {
-            if (!this.roiResults || this.roiResults.length === 0) {
+            if (!this.costMetricsResults || this.costMetricsResults.length === 0) {
                 return;
             }
 
-            const optimizationCost = parseFloat(this.roiResults.find(r => r.name === 'Optimization Cost')?.value) || 0;
-            const newCostPerInference = parseFloat(this.roiResults.find(r => r.name === 'New Cost Per Inference')?.value) || 0;
-            const oldCostPerInference = parseFloat(this.roiResults.find(r => r.name === 'Original Cost Per Inference')?.value) || 0;
-            const breakEvenPointValue = this.roiResults.find(r => r.name === 'Break-Even Point')?.value;
-            const breakEvenPoint = !isFinite(parseFloat(breakEvenPointValue)) ? Infinity : parseFloat(breakEvenPointValue) || 0;
+            // Use the first metric for the chart
+            const metric = this.costMetricsResults[0];
+            
+            const optimizationCost = metric.implementation_cost;
+            const newCostPerInference = metric.new_cost_per_inference;
+            const oldCostPerInference = metric.baseline_cost_per_inference;
+            const breakEvenPoint = metric.break_even_inferences === 'Never' ? 
+                Infinity : parseInt(metric.break_even_inferences.replace(/[^\d]/g, ''));
 
             // Chart points when breakEvenPoint is NEGATIVE or INFINITE 
             if (!isFinite(breakEvenPoint) || breakEvenPoint < 0) {
@@ -444,7 +439,7 @@ export default {
         window.removeEventListener('resize', this.resizeCharts);
     },
     watch: {
-        roiResults: {
+        costMetricsResults: {
             handler: 'updateIncomeCostsChartData',
             deep: true
         },
