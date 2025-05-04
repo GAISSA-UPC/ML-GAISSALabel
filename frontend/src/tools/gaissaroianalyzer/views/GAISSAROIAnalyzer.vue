@@ -413,15 +413,31 @@ export default {
             this.incomeCostsChart.setOption(this.incomeCostsChartOptions, false);
         },
         updateROIChartData() {
-            if (!this.analysisData || !this.analysisData.roi_evolution_chart_data) {
+            if (!this.analysisData?.metrics_analysis) {
                 return;
             }
 
-            this.roiChartOptions.xAxis.max = Math.max(...this.analysisData.roi_evolution_chart_data.map(item => item.inferences));
+            // Find the first energy metric with ROI evolution data
+            const metricWithROIData = this.analysisData.metrics_analysis.find(metric => 
+                metric.roi_evolution_chart_data && metric.roi_evolution_chart_data.length > 0
+            );
 
-            const roiEvolutionData = this.analysisData.roi_evolution_chart_data.map(item => [item.inferences, item.roi]);
+            if (!metricWithROIData) {
+                console.warn('No ROI evolution chart data found in metrics analysis');
+                return;
+            }
+
+            const roiEvolutionData = metricWithROIData.roi_evolution_chart_data.map(item => 
+                [item.inferences, item.roi]
+            );
+
+            if (roiEvolutionData.length > 0) {
+                const maxInferences = Math.max(...roiEvolutionData.map(point => point.inferences));
+                this.roiChartOptions.xAxis.max = maxInferences;
+            }
+
+            // Update chart data
             this.roiChartOptions.series[0].data = roiEvolutionData;
-
             this.roiChart.setOption(this.roiChartOptions, false);
         },
         resizeCharts() {
