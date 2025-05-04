@@ -26,48 +26,12 @@ class ROICalculator:
         break_even_point = optimization_cost / (original_cost_per_inference - new_cost_per_inference)
         return int(break_even_point)
     
-    def calculate_roi_from_metrics(self, optimization_cost_metrics, original_cost_metrics, new_cost_metrics, num_inferences=100):
-        """
-        Calculates ROI using GAISSAROICostMetrics objects.
-        """
-        optimization_cost = self._calculate_total_cost(optimization_cost_metrics)
-        new_cost_per_inference = self._calculate_cost_per_inference(new_cost_metrics)
-        original_cost_per_inference = self._calculate_cost_per_inference(original_cost_metrics)
-
-        return self.calculate_roi(optimization_cost, new_cost_per_inference, original_cost_per_inference, num_inferences)
-
-    def calculate_break_even_point_from_metrics(self, optimization_cost_metrics, original_cost_metrics, new_cost_metrics):
-        """
-        Calculates the break-even point using GAISSAROICostMetrics objects.
-        """
-        optimization_cost = self._calculate_total_cost(optimization_cost_metrics)
-        new_cost_per_inference = self._calculate_cost_per_inference(new_cost_metrics)
-        original_cost_per_inference = self._calculate_cost_per_inference(original_cost_metrics)
-
-        return self.calculate_break_even_point(optimization_cost, new_cost_per_inference, original_cost_per_inference)
-
-    def _calculate_total_cost(self, cost_metrics):
-        """
-        Calculates the total cost, including taxes.
-        """
-        return float(cost_metrics.total_packs * cost_metrics.cost_per_pack * (1 + cost_metrics.taxes))
-
-    def _calculate_cost_per_inference(self, cost_metrics):
-        """
-        Calculates the cost per inference.
-        """
-        return self._calculate_total_cost(cost_metrics) / cost_metrics.num_inferences
-
-    def calculate_roi_evolution(self, optimization_cost_metrics, original_cost_metrics, new_cost_metrics, inference_numbers=None):
+    def calculate_roi_evolution(self, optimization_cost, original_cost_per_inference, new_cost_per_inference, inference_numbers=None):
         """
         Calculates ROI for a range of inference numbers.
         """
-        optimization_cost = self._calculate_total_cost(optimization_cost_metrics)
-        new_cost_per_inference = self._calculate_cost_per_inference(new_cost_metrics)
-        original_cost_per_inference = self._calculate_cost_per_inference(original_cost_metrics)
-
         if inference_numbers is None:
-            break_even_point = self.calculate_break_even_point_from_metrics(optimization_cost_metrics, original_cost_metrics, new_cost_metrics)
+            break_even_point = self.calculate_break_even_point(optimization_cost, new_cost_per_inference, original_cost_per_inference)
             if break_even_point == float('inf') or break_even_point < 0:
                 # If no positive ROI, default inference range
                 inference_numbers = range(0, 2000001, 10000)

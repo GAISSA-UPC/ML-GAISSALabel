@@ -68,6 +68,14 @@ class ROIMetricsCalculator:
                                 10000000
                             )
                             result['cost_savings'] = cost_savings
+                            
+                            # Calculate ROI evolution data points (useful for chart display)
+                            roi_evolution_data = self.calculate_roi_evolution_data(
+                                energy_metric_value, 
+                                expected_reduction.expectedReductionValue
+                            )
+                            result['roi_evolution_chart_data'] = roi_evolution_data
+                            
                         except EnergyAnalysisMetricValue.DoesNotExist:
                             # This is an energy-related metric but without the cost data
                             print(f"Energy metric {metric_value.metric.id} does not have cost data.")
@@ -167,3 +175,50 @@ class ROIMetricsCalculator:
             return {
                 'error': f"Error calculating cost savings: {str(e)}"
             }
+
+    def calculate_roi_evolution_data(self, energy_metric_value, reduction_factor):
+        """
+        Calculate ROI evolution data points for a chart using the direct ROICalculator interface.
+        
+        Args:
+            energy_metric_value (the EnergyAnalysisMetricValue instance), reduction_factor
+            
+        Returns:
+            List of dictionaries with inferences and ROI values for each point
+        """
+        try:
+            baseline_energy_joules = energy_metric_value.baselineValue
+            new_energy_joules = baseline_energy_joules * (1 - reduction_factor)
+            
+            # Convert Joules to kWh for cost calculation (1 kWh = 3,600,000 J)
+            joules_to_kwh = 1 / 3600000
+            baseline_energy_kwh = baseline_energy_joules * joules_to_kwh
+            new_energy_kwh = new_energy_joules * joules_to_kwh
+            
+            # Calculate costs
+            energy_cost_rate = float(energy_metric_value.energy_cost_rate)
+            baseline_cost_per_inference = baseline_energy_kwh * energy_cost_rate
+            new_cost_per_inference = new_energy_kwh * energy_cost_rate
+            
+            implementation_cost = float(energy_metric_value.implementation_cost)
+            
+            roi_calculator = ROICalculator()
+            roi_evolution = roi_calculator.calculate_roi_evolution(
+                implementation_cost,
+                baseline_cost_per_inference, 
+                new_cost_per_inference
+            )
+            
+            # Format the results
+            data_points = []
+            for inferences, roi in roi_evolution:
+                data_points.append({
+                    'inferences': inferences,
+                    'roi': roi
+                })
+                
+            return data_points
+            
+        except Exception as e:
+            print(f"Error calculating ROI evolution data: {e}")
+            return []
