@@ -28,21 +28,6 @@
                     </el-descriptions>
                     <p v-else>{{ $t("Loading model information...") }}</p>
                 </el-card>
-
-                <div style="margin-bottom: 20px"></div>
-
-                <el-card shadow="always" :body-style="{ padding: '20px' }">
-                    <h2 class="section-title">{{ $t("ROI Evolution Chart") }}</h2>
-                    <p class="chart-description">
-                        {{ $t("This chart illustrates the evolution of the Return on Investment (ROI) of the specified technique over a range of inferences.") }}
-                    </p>
-                    <div ref="roiChartContainer" class="chart-container">
-                        <!-- Chart will be rendered here -->
-                    </div>
-                    <p>
-                        The ROI Evolution Chart shows the evolution of the Return on Investment (ROI) over a range of inferences. A positive ROI indicates that you've saved more money than you've spent on optimization and inferences. A negative ROI means you've spent more than you've saved. For example, a positive ROI of 0.5 means that for every €1 you've spent, you've earned/saved €0.5.
-                    </p>
-                </el-card>
             </el-col>
 
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mobile-card">
@@ -56,29 +41,6 @@
                     </div>
                     <p>
                         The Metrics Chart shows the evolution of the metrics affected by the tactic over a range of inferences. The chart displays the baseline and new expected values for each metric, allowing you to visualize the impact of the optimization.
-                    </p>
-                </el-card>
-
-                <div style="margin-bottom: 20px"></div>
-
-                <el-card shadow="always" :body-style="{ padding: '20px' }">
-                    <h2 class="section-title">{{ $t("Income/Costs Chart") }}</h2>
-                    <p class="chart-description">
-                        {{ $t("This chart illustrates the evolution of income and costs over a range of inferences for the specified technique.") }}
-                    </p>
-                    <p>
-                        <strong>Income:</strong> how much money you would spend on inferences if you didn't optimize your model.<br>
-                        <strong>Costs:</strong> total expenses, which include the initial optimization cost plus the new cost per inference.
-                    </p>
-                    <div ref="incomeCostsChartContainer" class="chart-container">
-                        <!-- Chart will be rendered here -->
-                    </div>
-                    <p>
-                        <strong>ROI &lt; 0:</strong> When the "Costs" line is above the "Income" line, your ROI is negative. This means you've spent more on optimization and inferences than you would have if you hadn't optimized your model.
-                        <br>
-                        <strong>ROI = 0 (Break-Even Point):</strong> The point where the "Costs" line and "Income" line intersect is the Break-Even point. At this point, your total savings equal your total costs.
-                        <br>
-                        <strong>ROI &gt; 0:</strong> When the "Income" line is above the "Costs" line, your ROI is positive. This means you've spent less than you would have if you hadn't optimized your model. This means you are saving money.
                     </p>
                 </el-card>
             </el-col>
@@ -150,6 +112,44 @@
                     </div>
                     
                     <p v-if="costMetricsResults.length === 0">{{ $t("No energy-related metrics found to calculate ROI.") }}</p>
+                </el-card>
+            </el-col>
+
+            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mobile-card" style="margin-top: 20px;">
+                <el-card shadow="always" :body-style="{ padding: '20px' }">
+                    <h2 class="section-title">{{ $t("ROI Evolution Chart") }}</h2>
+                    <p class="chart-description">
+                        {{ $t("This chart illustrates the evolution of the Return on Investment (ROI) of the specified technique over a range of inferences.") }}
+                    </p>
+                    <div ref="roiChartContainer" class="chart-container">
+                        <!-- Chart will be rendered here -->
+                    </div>
+                    <p>
+                        The ROI Evolution Chart shows the evolution of the Return on Investment (ROI) over a range of inferences. A positive ROI indicates that you've saved more money than you've spent on optimization and inferences. A negative ROI means you've spent more than you've saved. For example, a positive ROI of 0.5 means that for every €1 you've spent, you've earned/saved €0.5.
+                    </p>
+                </el-card>
+            </el-col>
+
+            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mobile-card" style="margin-top: 20px;">
+                <el-card shadow="always" :body-style="{ padding: '20px' }">
+                    <h2 class="section-title">{{ $t("Income/Costs Chart") }}</h2>
+                    <p class="chart-description">
+                        {{ $t("This chart illustrates the evolution of income and costs over a range of inferences for the specified technique.") }}
+                    </p>
+                    <p>
+                        <strong>Income:</strong> how much money you would spend on inferences if you didn't optimize your model.<br>
+                        <strong>Costs:</strong> total expenses, which include the initial optimization cost plus the new cost per inference.
+                    </p>
+                    <div ref="incomeCostsChartContainer" class="chart-container">
+                        <!-- Chart will be rendered here -->
+                    </div>
+                    <p>
+                        <strong>ROI &lt; 0:</strong> When the "Costs" line is above the "Income" line, your ROI is negative. This means you've spent more on optimization and inferences than you would have if you hadn't optimized your model.
+                        <br>
+                        <strong>ROI = 0 (Break-Even Point):</strong> The point where the "Costs" line and "Income" line intersect is the Break-Even point. At this point, your total savings equal your total costs.
+                        <br>
+                        <strong>ROI &gt; 0:</strong> When the "Income" line is above the "Costs" line, your ROI is positive. This means you've spent less than you would have if you hadn't optimized your model. This means you are saving money.
+                    </p>
                 </el-card>
             </el-col>
         </el-row>
