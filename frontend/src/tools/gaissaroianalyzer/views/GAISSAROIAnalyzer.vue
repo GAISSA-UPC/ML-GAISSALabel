@@ -49,17 +49,77 @@
             <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
                     <h2 class="section-title">{{ $t("Tactic Metric Results") }}</h2>
+                    
+                    <div class="view-toggle">
+                        <span>{{ $t("View Mode:") }}</span>
+                        <el-switch
+                            v-model="showVisualMetrics"
+                            :active-text="$t('Visual')"
+                            :inactive-text="$t('Table')"
+                            class="ml-2"
+                        />
+                    </div>
+                    
                     <p class="results-description">
-                        {{ $t("This table provides a detailed breakdown of the metric values affected by the tactic. It illustrates specific data about the expected changes in each metric when applying the ML tactic.") }}
+                        {{ $t("This section provides a detailed breakdown of the metric values affected by the tactic. It illustrates specific data about the expected changes in each metric when applying the ML tactic.") }}
                     </p>
                     
-                    <el-table v-if="analysisData?.metrics_analysis?.length" :data="analysisData.metrics_analysis" style="width: 100%; margin-top: 15px;">
-                        <el-table-column prop="metric_name" :label="$t('Metric')" />
-                        <el-table-column prop="baseline_value" :label="$t('Baseline Value')" />
-                        <el-table-column prop="expected_reduction_percent" :label="$t('Reduction (%)')" />
-                        <el-table-column prop="new_expected_value" :label="$t('New Expected Value')" />
-                        <el-table-column prop="unit" :label="$t('Unit')" />
-                    </el-table>
+                    <!-- Table View -->
+                    <div v-if="!showVisualMetrics && analysisData?.metrics_analysis?.length">
+                        <el-table :data="analysisData.metrics_analysis" style="width: 100%; margin-top: 15px;">
+                            <el-table-column prop="metric_name" :label="$t('Metric')" />
+                            <el-table-column prop="baseline_value" :label="$t('Baseline Value')" />
+                            <el-table-column prop="expected_reduction_percent" :label="$t('Reduction (%)')" />
+                            <el-table-column prop="new_expected_value" :label="$t('New Expected Value')" />
+                            <el-table-column prop="unit" :label="$t('Unit')" />
+                        </el-table>
+                    </div>
+                    
+                    <!-- Visual View -->
+                    <div v-if="showVisualMetrics && analysisData?.metrics_analysis?.length" class="visual-metrics-container">
+                        <div v-for="(metric, index) in analysisData.metrics_analysis" :key="index" class="metric-card">
+
+                            <!-- Percentage Change -->
+                            <div class="change-indicator">
+                                <div class="arrow-container">
+                                    <font-awesome-icon v-if="isReductionPositive(metric)" :icon="['fas', 'down-long']" class="change-arrow down"/>
+                                    <font-awesome-icon v-else :icon="['fas', 'up-long']" class="change-arrow up"/>                                     
+                                </div>
+                                <div :class="['change-percentage', isReductionPositive(metric) ? 'positive' : 'negative']">
+                                    {{ this.formatNumber(Math.abs(parseFloat(metric.expected_reduction_percent).toFixed(2))) }}%
+                                </div>
+                            </div>
+
+                            <div class="metric-data">
+                                <!-- Metric Title and Description -->
+                                 <div class="metric-info">                                   
+                                    <h3 class="metric-title">{{ metric.metric_name }}</h3>
+                                    <p class="metric-description">{{ metric.description }}</p>
+                                </div>
+                                <!-- Metric Comparison Area -->
+                                <div class="metric-comparison">                            
+                                    <!-- Values Comparison (Right) -->
+                                    <div class="values-comparison">
+                                        <!-- Optimized Value -->
+                                        <div class="value-container optimized">
+                                            <div class="value-label">{{ $t("Optimized") }}</div>
+                                            <div :class="['value', isReductionPositive(metric) ? 'positive' : 'negative']">
+                                                {{ formatNumber(metric.new_expected_value) }} <span class="unit">{{ metric.unit }}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Non-Optimized Value -->
+                                        <div class="value-container baseline">
+                                            <div class="value-label">{{ $t("Non-optimized") }}</div>
+                                            <div class="value">
+                                                {{ formatNumber(metric.baseline_value) }} <span class="unit">{{ metric.unit }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     
                     <p v-if="!analysisData?.metrics_analysis?.length && !analysisData">{{ $t("Loading tactic results...") }}</p>
                 </el-card>
@@ -169,6 +229,7 @@ export default {
             metricsRadialChart: null,
             incomeCostsChart: null,
             roiChart: null,
+            showVisualMetrics: true,
             metricsRadialChartOptions: {
                 legend: {
                     bottom: 0,
@@ -356,6 +417,9 @@ export default {
             } else {
                 return value.toLocaleString(undefined, { maximumFractionDigits: 8 });
             }
+        },
+        isReductionPositive(metric) {
+            return parseFloat(metric.expected_reduction_percent) > 0;
         },
         initializeIncomeCostsChart() {
             // Initialize the Metrics Radial Chart
@@ -634,13 +698,167 @@ export default {
     margin-bottom: 15px;
 }
 
-@media (max-width: 768px) {
-    .mobile-card {
-        margin-bottom: 20px;
+.view-toggle {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    justify-content: flex-end;
+}
+
+.visual-metrics-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.metric-card {
+    display: flex;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f8f8f8;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    flex-direction: row;
+    min-width: 0;
+}
+
+.metric-data {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.metric-title {
+    font-size: 1.4rem !important;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.metric-description {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.metric-comparison {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px dashed #ddd;
+}
+
+.change-indicator {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;               
+    align-items: center;
+    flex: 0;
+    margin-right: 30px;
+}
+
+.change-percentage {
+    font-size: 2.5rem;
+    font-weight: bold;
+    letter-spacing: -1px;
+    margin-bottom: 5px;
+}
+
+.change-percentage.positive {
+    color: green;
+}
+
+.change-percentage.negative {
+    color: orange;
+}
+
+.arrow-container {
+    margin-top: 5px;
+}
+
+.change-arrow {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.change-arrow.down {
+    color: green;
+}
+
+.change-arrow.up {
+    color: orange;
+}
+
+.values-comparison {
+    display: flex;
+    justify-content: flex-start;
+    gap: 40px;
+    flex: 2;
+    margin-left: 10px;
+}
+
+.value-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+}
+
+.value-label {
+    font-size: 0.9rem;
+    color: #777;
+    margin-bottom: 5px;
+}
+
+.value {
+    font-size: 1.6rem;
+    font-weight: bold;
+    letter-spacing: -0.5px;
+}
+
+.value.positive {
+    color: green;
+}
+
+.value.negative {
+    color: orange;
+}
+
+.unit {
+    font-size: 0.9rem;
+    opacity: 0.7;
+    margin-left: 3px;
+}
+
+@media (max-width: 1300px) {
+    .visual-metrics-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 992px) {
+    .values-comparison {
+        width: 100%;
+        justify-content: space-between;
+        gap: 10px;
+        margin-left: 0;
     }
     
-    .roi-card {
-        min-width: 100%;
+    .value-container {
+        align-items: center;
+    }
+
+    .metric-card {
+        flex-direction: column;
+        align-items: center;
     }
 }
 </style>
