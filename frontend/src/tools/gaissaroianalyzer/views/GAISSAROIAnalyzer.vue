@@ -181,6 +181,47 @@
                                     We encourage you to consider a different ML tactic as this one does not provide a positive return on investment.
                                 </div>
                             </div>
+
+                            <!-- Incurred Cost Metric Card -->
+                            <div class="metric-card roi-metric-card">
+                                <!-- Percentage Change -->
+                                <div class="change-indicator">
+                                    <div class="arrow-container">
+                                        <font-awesome-icon v-if="calculateCostReductionPercent(metric) >= 0" :icon="['fas', 'down-long']" class="change-arrow down"/>
+                                        <font-awesome-icon v-else :icon="['fas', 'up-long']" class="change-arrow up"/>
+                                    </div>
+                                    <div :class="['change-percentage', calculateCostReductionPercent(metric) >= 0 ? 'positive' : 'negative']">
+                                        {{ formatNumber(Math.abs(calculateCostReductionPercent(metric))) }}%
+                                    </div>
+                                </div>
+
+                                <div class="metric-data">
+                                    <!-- Metric Title and Description -->
+                                    <div class="metric-info">
+                                        <h3 class="metric-title">{{ $t('Incurred Cost') }}</h3>
+                                        <p class="metric-description">{{ $t('Total cost associated with running the model for') }} {{ this.formatNumber(metric.num_inferences) }} {{ $t('inferences.') }}</p>
+                                    </div>
+                                    <!-- Metric Comparison Area -->
+                                    <div class="metric-comparison">
+                                        <div class="values-comparison">
+                                            <!-- Optimized Value -->
+                                            <div class="value-container optimized">
+                                                <div class="value-label">{{ $t("Optimized") }}</div>
+                                                <div :class="['value', calculateCostReductionPercent(metric) >= 0 ? 'positive' : 'negative']">
+                                                    {{ formatNumber(metric.total_new_cost) }} <span class="unit">€</span>
+                                                </div>
+                                            </div>
+                                            <!-- Non-Optimized Value -->
+                                            <div class="value-container baseline">
+                                                <div class="value-label">{{ $t("Non-optimized") }}</div>
+                                                <div class="value">
+                                                    {{ formatNumber(metric.total_baseline_cost) }} <span class="unit">€</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -410,6 +451,21 @@ export default {
     },
     methods: {
         formatData,
+        calculateCostReductionPercent(costMetric) {
+            // Handle cases where baseline cost is zero or non-numeric
+            const baselineCost = parseFloat(costMetric.total_baseline_cost);
+            const newCost = parseFloat(costMetric.total_new_cost);
+
+            if (isNaN(baselineCost) || isNaN(newCost)) return 0;
+            if (baselineCost === 0) {
+                return -Infinity;
+            }
+
+            const reduction = baselineCost - newCost;
+            const percentage = (reduction / baselineCost) * 100;
+            
+            return parseFloat(percentage.toFixed(2));
+        },
         formatNumber(value) {
             if (value === null || value === undefined || isNaN(value)) {
                 return 'N/A';
@@ -860,6 +916,7 @@ export default {
     align-items: center;
     gap: 10px;
     margin-top: 20px;
+    margin-bottom: 20px;
     padding: 15px;
     border-radius: 8px;
     background-color: #f9f9f9;
