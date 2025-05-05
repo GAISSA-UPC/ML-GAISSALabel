@@ -168,6 +168,19 @@
                                     {{ formatNumber(metric.infinite_roi_percentage) }}%
                                 </el-descriptions-item>
                             </el-descriptions>
+                            
+                            <!-- Recommendation based on Break-Even Point -->
+                            <div class="recommendation-container" v-if="analysisData">
+                                <font-awesome-icon v-if="metric.break_even_inferences !== 'Infinity'" :icon="['fas', 'lightbulb']" class="recommendation-icon positive"/>
+                                <font-awesome-icon v-else :icon="['fas', 'lightbulb']" class="recommendation-icon negative"/>
+                                <div v-if="metric.break_even_inferences !== 'Infinity'" class="recommendation positive">
+                                    <strong>We recommend you to apply the tactic {{ analysisData.tactic_parameter_option_details?.tactic_name }}</strong> 
+                                    if you expect to perform an amount of inferences higher than {{ metric.break_even_inferences }}.
+                                </div>
+                                <div v-else class="recommendation negative">
+                                    We encourage you to consider a different ML tactic as this one does not provide a positive return on investment.
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -840,6 +853,43 @@ export default {
     font-size: 0.9rem;
     opacity: 0.7;
     margin-left: 3px;
+}
+
+.recommendation-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.recommendation-icon.positive {
+    font-size: 2rem;
+    color: var(--gaissa_green);
+}
+
+.recommendation-icon.negative {
+    font-size: 2rem;
+    color: orange;
+}
+
+.recommendation {
+    font-size: 1.1rem;
+    line-height: 1.5;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.recommendation.positive {
+    background-color: rgba(0, 128, 0, 0.1);
+    border-left: 4px solid green;
+}
+
+.recommendation.negative {
+    background-color: rgba(255, 165, 0, 0.1);
+    border-left: 4px solid orange;
 }
 
 @media (max-width: 1300px) {
