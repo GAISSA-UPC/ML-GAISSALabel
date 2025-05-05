@@ -136,7 +136,7 @@
                     <div v-if="costMetricsResults.length" class="roi-cards-container">
                         <div v-for="(metric, index) in costMetricsResults" :key="index" class="roi-card">
                             <h3 v-if="costMetricsResults.length > 1">{{ metric.metric_name }}</h3>
-                            <el-descriptions :column="2" border>
+                            <el-descriptions :column="getDescriptionsColumnCount()" border>
                                 <el-descriptions-item :label="$t('Incurred Cost (€)')">
                                     {{ formatNumber(metric.total_new_cost) }}
                                 </el-descriptions-item>
@@ -620,7 +620,11 @@ export default {
         resizeCharts() {
             if (this.incomeCostsChart) this.incomeCostsChart.resize();
             if (this.roiChart) this.roiChart.resize();
+            if (this.metricsRadialChart) this.metricsRadialChart.resize();
         },
+        getDescriptionsColumnCount() {
+            return window.innerWidth < 992 ? 1 : 2;
+        }
     },
     mounted() {
         window.addEventListener('resize', this.resizeCharts);
@@ -688,7 +692,7 @@ export default {
 
 .roi-card {
     flex: 1;
-    min-width: 400px;
+    min-width: 20px;
 }
 
 .roi-card h3 {
@@ -845,6 +849,11 @@ export default {
 }
 
 @media (max-width: 992px) {
+    .roi-card {
+        min-width: 100%;
+        width: 100%;
+    }
+    
     .values-comparison {
         width: 100%;
         justify-content: space-between;
