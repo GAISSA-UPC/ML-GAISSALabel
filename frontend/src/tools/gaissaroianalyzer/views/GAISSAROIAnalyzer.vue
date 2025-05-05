@@ -47,6 +47,21 @@
 
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mobile-card">
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
+                    <h2 class="section-title">{{ $t("Metrics Chart") }}</h2>
+                    <p class="chart-description">
+                        {{ $t("This chart illustrates the evolution of the metrics affected by the tactic over a range of inferences.") }}
+                    </p>
+                    <div ref="metricsRadialChartContainer" class="chart-container">
+                        <!-- Chart will be rendered here -->
+                    </div>
+                    <p>
+                        The Metrics Chart shows the evolution of the metrics affected by the tactic over a range of inferences. The chart displays the baseline and new expected values for each metric, allowing you to visualize the impact of the optimization.
+                    </p>
+                </el-card>
+
+                <div style="margin-bottom: 20px"></div>
+
+                <el-card shadow="always" :body-style="{ padding: '20px' }">
                     <h2 class="section-title">{{ $t("Income/Costs Chart") }}</h2>
                     <p class="chart-description">
                         {{ $t("This chart illustrates the evolution of income and costs over a range of inferences for the specified technique.") }}
@@ -151,8 +166,42 @@ export default {
     data() {
         return {
             analysisData: null,
+            metricsRadialChart: null,
             incomeCostsChart: null,
             roiChart: null,
+            metricsRadialChartOptions: {
+                legend: {
+                    bottom: 0,
+                    data: ['Allocated Budget', 'Actual Spending']
+                },
+                radar: {
+                    // shape: 'circle',
+                    indicator: [
+                        { name: 'Sales', max: 6500 },
+                        { name: 'Administration', max: 16000 },
+                        { name: 'Information Technology', max: 30000 },
+                        { name: 'Customer Support', max: 38000 },
+                        { name: 'Development', max: 52000 },
+                        { name: 'Marketing', max: 25000 }
+                    ]
+                },
+                series: [
+                    {
+                        name: 'Budget vs spending',
+                        type: 'radar',
+                        data: [
+                            {
+                                value: [4200, 3000, 20000, 35000, 50000, 18000],
+                                name: 'Allocated Budget'
+                            },
+                            {
+                                value: [5000, 14000, 28000, 26000, 42000, 21000],
+                                name: 'Actual Spending'
+                            }
+                        ]
+                    }
+                ]
+            },
             incomeCostsChartOptions: {
                 xAxis: {
                     type: 'value',
@@ -319,6 +368,11 @@ export default {
             }
         },
         initializeIncomeCostsChart() {
+            // Initialize the Metrics Radial Chart
+            const metricsRadialChartContainer = this.$refs.metricsRadialChartContainer;
+            this.metricsRadialChart = echarts.init(metricsRadialChartContainer);
+            this.metricsRadialChart.setOption(this.metricsRadialChartOptions, false); 
+
             // Initialize the Income/Costs Chart
             const incomeCostsChartContainer = this.$refs.incomeCostsChartContainer;
             this.incomeCostsChart = echarts.init(incomeCostsChartContainer);
