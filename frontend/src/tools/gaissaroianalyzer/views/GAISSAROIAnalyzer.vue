@@ -178,6 +178,13 @@ export default {
                 radar: {
                     indicator: []
                 },
+                label: {
+                    show: true,
+                    formatter: function (params) {
+                        return typeof params.value === 'number' ? 
+                            this.formatNumber(params.value) : params.value;
+                    }.bind(this)
+                },
                 series: [
                     {
                         type: 'radar',
@@ -529,11 +536,17 @@ export default {
             this.metricsRadialChartOptions.series[0].data = [
                 {
                     value: baselineValues,
-                    name: 'Baseline'
+                    name: 'Baseline',
+                    itemStyle: {
+                        color: 'orange'
+                    }
                 },
                 {
                     value: newValues,
-                    name: 'Optimized'
+                    name: 'Optimized',
+                    itemStyle: {
+                        color: 'green'
+                    }
                 }
             ];
             
