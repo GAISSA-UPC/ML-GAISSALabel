@@ -172,33 +172,16 @@ export default {
             metricsRadialChartOptions: {
                 legend: {
                     bottom: 0,
-                    data: ['Allocated Budget', 'Actual Spending']
+                    itemGap: 20,
+                    data: []
                 },
                 radar: {
-                    // shape: 'circle',
-                    indicator: [
-                        { name: 'Sales', max: 6500 },
-                        { name: 'Administration', max: 16000 },
-                        { name: 'Information Technology', max: 30000 },
-                        { name: 'Customer Support', max: 38000 },
-                        { name: 'Development', max: 52000 },
-                        { name: 'Marketing', max: 25000 }
-                    ]
+                    indicator: []
                 },
                 series: [
                     {
-                        name: 'Budget vs spending',
                         type: 'radar',
-                        data: [
-                            {
-                                value: [4200, 3000, 20000, 35000, 50000, 18000],
-                                name: 'Allocated Budget'
-                            },
-                            {
-                                value: [5000, 14000, 28000, 26000, 42000, 21000],
-                                name: 'Actual Spending'
-                            }
-                        ]
+                        data: []
                     }
                 ]
             },
@@ -494,6 +477,47 @@ export default {
             this.roiChartOptions.series[0].data = roiEvolutionData;
             this.roiChart.setOption(this.roiChartOptions, false);
         },
+        updateMetricsRadialChartData() {
+            if (!this.analysisData?.metrics_analysis || this.analysisData.metrics_analysis.length === 0) {
+                return;
+            }
+
+            const metrics = this.analysisData.metrics_analysis;
+            
+            // Create indicators from metrics (slightly higher than the highest value)
+            const indicators = metrics.map(metric => {
+                const maxValue = Math.max(
+                    parseFloat(metric.baseline_value) || 0,
+                    parseFloat(metric.new_expected_value) || 0
+                ) * 1.2;
+                
+                return {
+                    name: metric.metric_name,
+                    max: maxValue
+                };
+            });
+            
+            // Create data series
+            const baselineValues = metrics.map(metric => parseFloat(metric.baseline_value) || 0);
+            const newValues = metrics.map(metric => parseFloat(metric.new_expected_value) || 0);
+            
+            // Update chart options
+            this.metricsRadialChartOptions.radar.indicator = indicators;
+            this.metricsRadialChartOptions.legend.data = ['Baseline', 'Optimized'];
+            this.metricsRadialChartOptions.series[0].data = [
+                {
+                    value: baselineValues,
+                    name: 'Baseline'
+                },
+                {
+                    value: newValues,
+                    name: 'Optimized'
+                }
+            ];
+            
+            // Update chart with new data
+            this.metricsRadialChart.setOption(this.metricsRadialChartOptions, false);
+        },
         resizeCharts() {
             if (this.incomeCostsChart) this.incomeCostsChart.resize();
             if (this.roiChart) this.roiChart.resize();
@@ -513,7 +537,10 @@ export default {
             deep: true
         },
         analysisData: {
-            handler: 'updateROIChartData',
+            handler(newData) {
+                this.updateROIChartData();
+                this.updateMetricsRadialChartData();
+            },
             deep: true
         }
     },
