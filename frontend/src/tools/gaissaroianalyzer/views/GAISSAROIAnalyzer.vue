@@ -483,6 +483,7 @@ export default {
             }
 
             const metrics = this.analysisData.metrics_analysis;
+            const hasIncurredCost = this.costMetricsResults && this.costMetricsResults.length > 0;
             
             // Create indicators from metrics (slightly higher than the highest value)
             const indicators = metrics.map(metric => {
@@ -496,10 +497,31 @@ export default {
                     max: maxValue
                 };
             });
+
+            // Add incurred cost (of the first cost metric) indicator if exists
+            if (hasIncurredCost) {
+                const costMetric = this.costMetricsResults[0];
+                const maxIncurredCost = Math.max(
+                    parseFloat(costMetric.total_baseline_cost) || 0,
+                    parseFloat(costMetric.total_new_cost) || 0
+                ) * 1.2;
+
+                indicators.push({
+                    name: 'Incurred Cost (€)',
+                    max: maxIncurredCost
+                });
+            }
             
             // Create data series
             const baselineValues = metrics.map(metric => parseFloat(metric.baseline_value) || 0);
             const newValues = metrics.map(metric => parseFloat(metric.new_expected_value) || 0);
+            
+            // Add incurred cost values if they exist
+            if (hasIncurredCost) {
+                const costMetric = this.costMetricsResults[0];
+                baselineValues.push(parseFloat(costMetric.total_baseline_cost) || 0);
+                newValues.push(parseFloat(costMetric.total_new_cost) || 0);
+            }
             
             // Update chart options
             this.metricsRadialChartOptions.radar.indicator = indicators;
