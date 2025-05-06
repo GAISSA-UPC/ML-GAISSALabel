@@ -55,6 +55,7 @@ class ROIMetricsCalculator:
                         'baseline_value': baseline_value,
                         'expected_reduction_percent': reduction_percent,
                         'new_expected_value': new_expected_value,
+                        'higher_is_better': metric_value.metric.higher_is_better,
                     }
                     
                     # If this is an energy metric with cost data, calculate cost savings

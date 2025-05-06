@@ -94,8 +94,10 @@
                             <!-- Percentage Change -->
                             <div class="change-indicator">
                                 <div class="arrow-container">
-                                    <font-awesome-icon v-if="isReductionPositive(metric)" :icon="['fas', 'down-long']" class="change-arrow down"/>
-                                    <font-awesome-icon v-else :icon="['fas', 'up-long']" class="change-arrow up"/>                                     
+                                    <font-awesome-icon v-if="parseFloat(metric.expected_reduction_percent) > 0" :icon="['fas', 'down-long']" 
+                                        :class="['change-arrow', isReductionPositive(metric) ? 'positive' : 'negative']"/>
+                                    <font-awesome-icon v-else :icon="['fas', 'up-long']" 
+                                        :class="['change-arrow', isReductionPositive(metric) ? 'positive' : 'negative']"/>                                     
                                 </div>
                                 <div :class="['change-percentage', isReductionPositive(metric) ? 'positive' : 'negative']">
                                     {{ this.formatNumber(Math.abs(parseFloat(metric.expected_reduction_percent).toFixed(2))) }}%
@@ -199,8 +201,8 @@
                                 <!-- Percentage Change -->
                                 <div class="change-indicator">
                                     <div class="arrow-container">
-                                        <font-awesome-icon v-if="calculateCostReductionPercent(metric) >= 0" :icon="['fas', 'down-long']" class="change-arrow down"/>
-                                        <font-awesome-icon v-else :icon="['fas', 'up-long']" class="change-arrow up"/>
+                                        <font-awesome-icon v-if="calculateCostReductionPercent(metric) >= 0" :icon="['fas', 'down-long']" class="change-arrow positive"/>
+                                        <font-awesome-icon v-else :icon="['fas', 'up-long']" class="change-arrow negative"/>
                                     </div>
                                     <div :class="['change-percentage', calculateCostReductionPercent(metric) >= 0 ? 'positive' : 'negative']">
                                         {{ formatNumber(Math.abs(calculateCostReductionPercent(metric))) }}%
@@ -504,7 +506,14 @@ export default {
             }
         },
         isReductionPositive(metric) {
-            return parseFloat(metric.expected_reduction_percent) > 0;
+            const reductionPercent = parseFloat(metric.expected_reduction_percent);
+            const higherIsBetter = metric.higher_is_better;
+
+            if (higherIsBetter) {
+                return reductionPercent <= 0;
+            } else {
+                return reductionPercent >= 0;
+            }
         },
         initializeIncomeCostsChart() {
             // Initialize the Metrics Radial Chart
@@ -946,11 +955,11 @@ export default {
     font-weight: bold;
 }
 
-.change-arrow.down {
+.change-arrow.positive {
     color: green;
 }
 
-.change-arrow.up {
+.change-arrow.negative {
     color: orange;
 }
 

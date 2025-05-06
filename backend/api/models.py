@@ -250,6 +250,7 @@ class ROIMetric(models.Model):
     description = models.TextField(null=True, blank=True, verbose_name=_('Description'))
     unit = models.CharField(max_length=50, null=True, blank=True, verbose_name=_('Unit'))
     is_energy_related = models.BooleanField(default=False, verbose_name=_('Is Energy Related'))
+    higher_is_better = models.BooleanField(default=False, verbose_name=_('Higher is better'))
 
     class Meta:
         verbose_name = _('ROI Metric')
