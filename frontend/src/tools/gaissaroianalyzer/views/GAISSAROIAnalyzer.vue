@@ -1,6 +1,18 @@
 <template>
-    <div class="gaissa-roi-analyzer">
+    <div class="gaissa-roi-analyzer" id="roi-analysis-container">
         <h1>{{ $t("GAISSA ROI Analyzer") }}</h1>
+        
+        <!-- Export button at the top right -->
+        <div class="export-button-container">
+            <el-button 
+                type="primary" 
+                class="action-button export-button" 
+                @click="generatePDFReport" 
+                :loading="pdfGenerating">
+                <font-awesome-icon style="margin-right: 6px" :icon="['fas', 'file-pdf']" />
+                {{ $t("Generate PDF Report") }}
+            </el-button>
+        </div>
 
         <el-row :gutter="20" type="flex" :justify="center" class="row-bg">
             <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mobile-card">
@@ -274,6 +286,9 @@
 import { formatData } from "@/utils";
 import * as echarts from 'echarts';
 import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
+import pdfReportService from "@/tools/gaissaroianalyzer/services/pdfReportService";
+import { ElMessage } from 'element-plus';
+import 'element-plus/es/components/message/style/css';
 
 export default {
     name: "GAISSAROIAnalyzer",
@@ -284,6 +299,7 @@ export default {
             incomeCostsChart: null,
             roiChart: null,
             showVisualMetrics: true,
+            pdfGenerating: false,
             metricsRadialChartOptions: {
                 legend: {
                     bottom: 0,
@@ -693,6 +709,64 @@ export default {
         },
         getDescriptionsColumnCount() {
             return window.innerWidth < 992 ? 1 : 2;
+        },
+        async generatePDFReport() {
+            this.pdfGenerating = true;
+            
+            try {
+                // Force resize and re-render all charts
+                this.resizeCharts();
+                
+                // Explicitly update all charts to ensure they're rendered
+                if (this.metricsRadialChart) {
+                    this.updateMetricsRadialChartData();
+                    this.metricsRadialChart.resize();
+                }
+                
+                if (this.incomeCostsChart) {
+                    this.updateIncomeCostsChartData();
+                    this.incomeCostsChart.resize();
+                }
+                
+                if (this.roiChart) {
+                    this.updateROIChartData();
+                    this.roiChart.resize();
+                }
+                
+                // Give charts time to fully render before capturing
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Generate file name based on analysis data
+                const fileName = `roi-analysis-${this.analysisData.id}-${this.analysisData.model_architecture_name}-${this.analysisData.tactic_parameter_option_details.tactic_name}.pdf`.replace(/\s+/g, '-').toLowerCase();
+                
+                // Generate the PDF
+                const result = await pdfReportService.generatePDFReport(
+                    this.analysisData,
+                    'roi-analysis-container', 
+                    fileName
+                );
+                
+                if (result) {
+                    ElMessage({
+                        message: this.$t('PDF report generated successfully!'),
+                        type: 'success',
+                        duration: 5000,
+                        showClose: true
+                    });
+                } else {
+                    throw new Error('PDF generation failed');
+                }
+            } catch (error) {
+                console.error("Error generating PDF report:", error);
+                ElMessage({
+                    message: this.$t('Failed to generate PDF report. Please try again.'),
+                    type: 'error',
+                    duration: 5000,
+                    showClose: true
+                });
+            } finally {
+                this.pdfGenerating = false;
+            }
         }
     },
     mounted() {
@@ -751,6 +825,12 @@ export default {
 
 .mobile-card {
     margin-bottom: 20px;
+}
+
+.el-button {
+    background-color: var(--gaissa_green);
+    color: white;
+    border-color: var(--gaissa_green);
 }
 
 .roi-cards-container {
@@ -947,6 +1027,18 @@ export default {
 .recommendation.negative {
     background-color: rgba(255, 165, 0, 0.1);
     border-left: 4px solid orange;
+}
+
+.export-button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 @media (max-width: 1300px) {
