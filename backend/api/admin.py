@@ -1,5 +1,5 @@
 from django.contrib import admin
-from . import models
+from api import models
 
 admin.site.register(models.Model)
 admin.site.register(models.Entrenament)
@@ -16,3 +16,4 @@ admin.site.register(models.EinaCalcul)
 admin.site.register(models.TransformacioMetrica)
 admin.site.register(models.TransformacioInformacio)
 admin.site.register(models.Administrador)
+admin.site.register(models.Configuracio)

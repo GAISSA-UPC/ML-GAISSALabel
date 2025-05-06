@@ -9,7 +9,13 @@
 export default {
     name: "EnergyLabel",
     props: {
-        pdfBase64: {required: true, type: String}
+        pdfBase64: {
+            required: true,
+            type: String,
+            validator(value) {
+                return value !== null && value !== "";
+            }
+        }
     },
     data() {
         return {

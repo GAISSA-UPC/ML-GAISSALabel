@@ -8,6 +8,11 @@
                     v-model="newModel.nom"
                 />
             </el-form-item>
+            <el-form-item :label="$t('Author')">
+                <el-input
+                    v-model="newModel.autor"
+                />
+            </el-form-item>
             <el-form-item :label="$t('Description')">
                 <el-input
                     v-model="newModel.informacio"
@@ -25,7 +30,7 @@
 </template>
 
 <script>
-import models from "@/services/models";
+import models from "@/controllers/models";
 
 export default {
     name: "DialogNewModel",
@@ -39,7 +44,7 @@ export default {
         async afegirModel() {
             const response = await models.create(this.newModel)
             if (response.status === 201) {
-                this.$emit('modelCreat-ok')
+                this.$emit('modelCreat-ok', response.data.id)
             }
         },
         async closeDialogNewModel() {

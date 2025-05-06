@@ -49,6 +49,18 @@
                 />
             </el-select>
         </el-form-item>
+        <el-form-item :label="$t('How to compute')">
+            <el-input
+                v-model="metrica.calcul"
+                type="textarea"
+            />
+        </el-form-item>
+        <el-form-item :label="$t('How to improve')">
+            <el-input
+                v-model="metrica.recomanacions"
+                type="textarea"
+            />
+        </el-form-item>
         <br>
 
         <h3>{{ $t('Intervals') }}</h3><br>
@@ -95,7 +107,7 @@
 </template>
 
 <script>
-import metriques from "@/services/metriques";
+import metriques from "@/controllers/metriques";
 export default {
     name: "AdminMetrica",
     data() {

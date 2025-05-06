@@ -1,12 +1,19 @@
 <template>
     <h1>{{ $t("Energy label for") }} {{ fase }}</h1><br>
     <h2>{{ $t("Create label for dataset model") }}</h2><br>
+
+    <p style="font-size: 20px">{{ $t('This page allows you to consult the energy efficiency of a') }} {{ fase }} {{ $t(' of a model.') }}</p>
+    <br>
+
     <div>
         <el-form label-position="top">
-            <el-form-item :label="$t('Model')">
+            <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Model") }}</h3>
+            <p>{{ $t('Please, indicate the model you are interested in.') }}</p><br>
+            <el-form-item>
                 <el-select
                     v-model="selectedModel"
                     @change="canviModel"
+                    filterable
                 >
                     <el-option
                         v-for="(model, i) in models" :key="i"
@@ -14,21 +21,22 @@
                         :label="model.nom"
                     />
                 </el-select>
-            </el-form-item>
-            <el-form-item
-                :label="fase"
-                v-show="selectedModel != null"
-            >
-                <el-select
-                    v-model="selectedExperiment"
-                >
-                    <el-option
-                        v-for="(experiment, i) in experiments" :key="i"
-                        :value="experiment.id"
-                        :label="formatData(experiment.dataRegistre)"
-                    />
-                </el-select>
-            </el-form-item>
+            </el-form-item><br>
+            <div v-show="selectedModel != null">
+                <h3 style="color: var(--gaissa_green);font-weight: bold">{{ fase }}</h3>
+                <p>{{ $t('Now specify the') }} {{ fase }} {{ $t('from which you want to get the evaluation.') }}</p><br>
+                <el-form-item>
+                    <el-select
+                        v-model="selectedExperiment"
+                    >
+                        <el-option
+                            v-for="(experiment, i) in experiments" :key="i"
+                            :value="experiment.id"
+                            :label="formatData(experiment.dataRegistre)"
+                        />
+                    </el-select>
+                </el-form-item>
+            </div><br>
             <el-button
                 @click="mostrarEtiqueta"
                 color="var(--gaissa_green)"
@@ -41,9 +49,9 @@
 </template>
 
 <script>
-import models from '@/services/models'
-import trainings from '@/services/trainings'
-import inferencies from '@/services/inferencies'
+import models from '@/controllers/models'
+import trainings from '@/controllers/trainings'
+import inferencies from '@/controllers/inferencies'
 import {formatData} from '@/utils'
 export default {
     name: "PreSaved",

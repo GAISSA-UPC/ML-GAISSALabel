@@ -1,9 +1,13 @@
 <template>
     <h1>{{ $t("Metrics and additional information") }}</h1><br>
+
+    <p>{{ $t('This page allows you to handle metrics and additional information. Metrics are used to compute the energy \
+    efficiency result for trainings and inferences. On the ohter hand, additional information is asked to the user to complete the efficiency evaluation.') }}</p><br>
+
     <h2 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Training") }}</h2><br>
     <el-row justify="space-between">
         <el-col :span="6">
-            <h3>{{ $t("Metrics") }}</h3><br>
+            <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Metrics") }}</h3><br>
         </el-col>
         <el-col :span="2">
             <el-button
@@ -43,7 +47,7 @@
 
     <el-row justify="space-between">
         <el-col :span="6">
-            <h3>{{ $t("Additional information") }}</h3><br>
+            <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Additional information") }}</h3><br>
         </el-col>
         <el-col :span="2">
             <el-button
@@ -85,7 +89,7 @@
     <h2 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Inference") }}</h2><br>
     <el-row justify="space-between">
         <el-col :span="6">
-            <h3>{{ $t("Metrics") }}</h3><br>
+            <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Metrics") }}</h3><br>
         </el-col>
         <el-col :span="2">
             <el-button
@@ -125,7 +129,7 @@
 
     <el-row justify="space-between">
         <el-col :span="6">
-            <h3>{{ $t("Additional information") }}</h3><br>
+            <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Additional information") }}</h3><br>
         </el-col>
         <el-col :span="2">
             <el-button
@@ -181,8 +185,8 @@
 
 
 <script>
-import metriques from "@/services/metriques";
-import informacions from "@/services/informacions";
+import metriques from "@/controllers/metriques";
+import informacions from "@/controllers/informacions";
 
 export default {
     name: "AdminMetriquesInfo",

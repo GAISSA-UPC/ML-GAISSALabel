@@ -1,20 +1,30 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
-import TrainingForm from '@/views/TrainingForm.vue'
-import TrainingPreSaved from '@/views/TrainingPreSaved.vue'
-import TrainingFile from '@/views/TrainingFile.vue'
-import InferenceForm from '@/views/InferenceForm.vue'
-import InferencePreSaved from '@/views/InferencePreSaved.vue'
-import InferenceFile from '@/views/InferenceFile.vue'
-import InferenceDeploy from '@/views/InferenceDeploy.vue'
-import TrainingLabelInfo from "@/views/TrainingLabelInfo.vue"
-import InferenceLabelInfo from "@/views/InferenceLabelInfo.vue"
-import AdminMetriquesInfo from "@/views/AdminMetriquesInfo.vue"
-import AdminMetrica from "@/views/AdminMetrica.vue"
-import AdminInformacio from "@/views/AdminInformacio.vue"
-import AdminEines from "@/views/AdminEines.vue"
-import AdminEina from "@/views/AdminEina.vue"
-import AdminLogin from "@/views/AdminLogin.vue"
+
+// Core routes
+const HomeView = () => import('@/views/HomeView.vue')
+const AboutView = () => import('@/views/AboutView.vue')
+
+// Training routes
+const TrainingForm = () => import('@/views/TrainingForm.vue')
+const TrainingPreSaved = () => import('@/views/TrainingPreSaved.vue')
+const TrainingFile = () => import('@/views/TrainingFile.vue')
+const TrainingLabelInfo = () => import('@/views/TrainingLabelInfo.vue')
+
+// Inference routes
+const InferenceForm = () => import('@/views/InferenceForm.vue')
+const InferencePreSaved = () => import('@/views/InferencePreSaved.vue')
+const InferenceFile = () => import('@/views/InferenceFile.vue')
+const InferenceDeploy = () => import('@/views/InferenceDeploy.vue')
+const InferenceLabelInfo = () => import('@/views/InferenceLabelInfo.vue')
+
+// Admin routes
+const AdminMetriquesInfo = () => import('@/views/AdminMetriquesInfo.vue')
+const AdminMetrica = () => import('@/views/AdminMetrica.vue')
+const AdminInformacio = () => import('@/views/AdminInformacio.vue')
+const AdminEines = () => import('@/views/AdminEines.vue')
+const AdminEina = () => import('@/views/AdminEina.vue')
+const AdminSincro = () => import('@/views/AdminSincro.vue')
+const AdminLogin = () => import('@/views/AdminLogin.vue')
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,6 +33,10 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView
+    },{
+      path: '/about',
+      name: 'about',
+      component: AboutView
     },
     {
       path: '/trainingForm',
@@ -115,6 +129,12 @@ const router = createRouter({
       path: '/admin/eines',
       name: 'Admin eina new',
       component: AdminEina,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/admin/sincronitzacio',
+      name: 'Admin sincronitzacio',
+      component: AdminSincro,
       meta: { requiresAuth: true }
     },
     {

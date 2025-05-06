@@ -2,32 +2,13 @@
     <h1>{{ $t("Energy label for") }} {{ fase }}</h1><br>
     <h2>{{ $t("Register a new") }} {{ fase }}</h2><br>
 
-    <el-alert v-if="estat === 'modelCreat-ok'" :title="$t('Model registered correctly')" type="success" @close="estat = ''"/>
-    <el-alert v-else-if="estat === 'modelCreat-ko'" :title="$t('There was an error while creating the model')" type="success" @close="estat = ''"/>
+    <p style="font-size: 20px">{{ $t('This page allows you to evaluate the energy efficiency of your models\'') }} {{ fase }}s. {{ $t('You may upload the file or files that provide the information for the evaluation.') }}</p>
+    <br>
 
     <div>
         <el-form label-position="top">
-            <el-form-item :label="$t('Model')">
-                <el-select
-                    v-model="selectedModel"
-                >
-                    <el-option
-                        v-for="(model, i) in models" :key="i"
-                        :value="model.id"
-                        :label="model.nom"
-                    />
-                </el-select>
-                <el-button
-                    style="margin-left: 10px"
-                    @click="dialogNewModel = true"
-                    class="action-button-light"
-                >
-                    <font-awesome-icon :icon="['fas', 'plus']" />
-                </el-button>
-            </el-form-item>
-            <el-form-item
-                :label="$t('Files')"
-            >
+            <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Files") }}</h3><br>
+            <el-form-item>
                 <el-upload
                     v-model:file-list="fileList"
                     multiple
@@ -66,6 +47,7 @@
                 </ul>
             </el-form-item>
             <el-button
+                ref="generateLabelButton"
                 @click="gestioFitxers"
                 color="var(--gaissa_green)"
                 v-show="fileList.length !== 0"
@@ -73,42 +55,53 @@
                 {{ $t('Generate label') }}
             </el-button>
         </el-form><br>
-    </div>
+    </div><br>
 
-    <DialogNewModel v-model="dialogNewModel"
-                    @cancel="dialogNewModel = false"
-                    @model-creat-ok="modelCreat()"
-                    @model-creat-ko="dialogNewModel = false; estat = 'modelCreat-ko'"
-    />
+    <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("How to obtain the files?") }}</h3><br>
+
+    <p style="font-size: 20px">{{ $t('There are many ways you can get the needed information. Here, we propose the following tools:') }}</p><br>
+
+    <p style="font-weight: bold">{{ $t('GAISSALabel plug-in') }}</p>
+    <p>{{ $t('We offer you a plug-in that runs on the terminal of your server. It will help you generate a file with the \
+        configuration parameters of your model. Specifically, it will provide the size of the model, the size of its file and the FLOPS.') }}</p>
+    <p>{{ $t('You can download it through this') }} <a href="/GAISSALabel_plugin.zip" target="_blank">{{ $t('link') }}</a>.</p>
+    <p>{{ $t('Then, follow these steps:') }}</p>
+    <ol style="margin-left: 30px">
+        <li><p>{{ $t('Decompress the downloaded file') }}</p></li>
+        <li><p>{{ $t('Access your console and go inside the decompressed folder') }}</p></li>
+        <li><p>{{ $t('Create a python virtual environment using the command: # python -m venv env') }}</p></li>
+        <li><p>{{ $t('Activate the virtual environment: # source env/bin/activate') }}</p></li>
+        <li><p>{{ $t('Install the requirements: # pip install -r requirements.txt') }}</p></li>
+        <li><p>{{ $t('Run the script and follow the instructions of the plug-in: # python main_script.py') }}</p></li>
+    </ol><br>
+
+    <p style="font-weight: bold">{{ $t('CodeCarbon') }}</p>
+    <p>{{ $t('CodeCarbon will help you compute the information about the duration of your training or inference and the energy consumed.') }}</p>
+    <p>{{ $t('To install and use this tool, you may:') }}</p>
+    <ol style="margin-left: 30px">
+        <li><p>{{ $t('Download CodeCarbon using this') }} <a href="https://github.com/mlco2/codecarbon" target="_blank">{{ $t('link') }}</a>.</p></li>
+        <li><p>{{ $t('Follow the documentation of CodeCarbon to install and use the tool. The documentation is accessible') }} <a href="https://mlco2.github.io/codecarbon/" target="_blank">{{ $t('here') }}</a>.</p></li>
+    </ol><br>
+
 
 </template>
 
 <script>
-import models from '@/services/models'
-import DialogNewModel from "@/components/DialogNewModel.vue";
 import * as XLSX from "xlsx";
-import eines from "@/services/eines";
+import eines from "@/controllers/eines";
 export default {
     name: "FileNewExperiment",
     props: {
         fase: {required: true, type: String}
     },
-    components: {DialogNewModel},
     data() {
         return {
             estat: '',
-            models: null,
-            selectedModel: null,
             fileList: [],
-            dialogNewModel: false,
             eines: null,
         };
     },
     methods: {
-        async refrescaModels() {
-            const response = await models.list()
-            this.models = response.data
-        },
         async refrescaEines() {
             let response = await eines.list()
             this.eines = response.data
@@ -129,6 +122,8 @@ export default {
                     const reader = new FileReader();
                     reader.onload = (event) => {
                         const contingut = event.target.result;
+                        console.log(file.tool)
+                        console.log(file.name)
                         const contingutFormatted = this.transformarContingut(this.parseExcelJSON(contingut), file.tool);
                         resolve(contingutFormatted);
                     };
@@ -223,19 +218,15 @@ export default {
             }
             return nouContingut
         },
-        async modelCreat() {
-            await this.refrescaModels()
-            this.dialogNewModel = false
-            this.selectedModel = this.models.length
-            this.estat = 'modelCreat-ok'
-        }
     },
     async mounted() {
-        await this.refrescaModels();
         await this.refrescaEines();
     },
 };
 </script>
 
 <style>
+p {
+    font-size: 18px
+}
 </style>

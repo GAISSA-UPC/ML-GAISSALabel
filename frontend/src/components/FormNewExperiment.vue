@@ -2,29 +2,41 @@
     <h1>{{ $t("Energy label for") }} {{ fase }}</h1><br>
     <h2>{{ $t("Register a new") }} {{ fase }}</h2><br>
 
-    <el-alert v-if="estat === 'modelCreat-ok'" :title="$t('Model registered correctly')" type="success" @close="estat = ''"/>
-    <el-alert v-else-if="estat === 'modelCreat-ko'" :title="$t('There was an error while creating the model')" type="success" @close="estat = ''"/>
+    <div v-if="estat">
+        <el-alert v-if="estat === 'modelCreat-ok'" :title="$t('Model registered correctly')" type="success" @close="estat = ''"/>
+        <el-alert v-else-if="estat === 'modelCreat-ko'" :title="$t('There was an error while creating the model')" type="error" @close="estat = ''"/>
+        <el-alert v-else-if="estat === 'select-model'" :title="$t('Please, select (or create) some model')" type="error" @close="estat = ''"/>
+        <br>
+    </div>
+
+    <p style="font-size: 20px">{{ $t('This page allows you to evaluate the energy efficiency of your models\'') }} {{ fase }}s. {{ $t('You may go through the following sections to provide the necessary information.') }}</p>
+    <br>
 
     <el-form label-position="top">
-        <el-form-item :label="$t('Model')">
-            <el-select v-model="selectedModel">
-                <el-option
-                    v-for="(model, i) in models" :key="i"
-                    :value="model.id"
-                    :label="model.nom"
-                />
-            </el-select>
-            <el-button
-                style="margin-left: 10px"
-                @click="dialogNewModel = true"
-                class="action-button-light"
-            >
-                <font-awesome-icon :icon="['fas', 'plus']" />
-            </el-button>
+        <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Model") }}</h3>
+        <p>{{ $t('First, please indicate the model you are working with. If it is a new one or not listed above, you can register a new model.') }}</p><br>
+        <el-form-item>
+            <div style="display: flex; align-items: center">
+                <el-select v-model="selectedModel" filterable class="model-select">
+                    <el-option
+                        v-for="(model, i) in models" :key="i"
+                        :value="model.id"
+                        :label="model.nom"
+                    />
+                </el-select>
+                <el-button
+                    style="margin-left: 10px"
+                    @click="dialogNewModel = true"
+                    class="action-button-light"
+                >
+                    <font-awesome-icon :icon="['fas', 'plus']" />
+                </el-button>
+            </div>
         </el-form-item>
         <br>
 
-        <h3>{{ $t("Metrics") }}</h3><br>
+        <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Metrics") }}</h3>
+        <p>{{ $t('Next, introduce the results for each of the metric you have described. Please, try to compute all of them, to accomplish a more accurate efficiency study.') }}</p><br>
         <el-form-item
             v-for="(metrica, i) in metriques" :key="i"
             :label="metrica.nom"
@@ -33,15 +45,17 @@
                 step="0.01"
                 v-model="metrica.valor"
                 min="0"
+                style="width: 200px"
             />
             <p style="margin-left: 10px">{{ metrica.unitat }}</p>
             <el-alert v-if="metrica.calcul" type="info" show-icon :closable="false" style="margin-top: 10px">
-                <p>{{ metrica.calcul }}</p>
+                <p style="font-size: 14px">{{ metrica.calcul }}</p>
             </el-alert>
         </el-form-item>
         <br>
 
-        <h3>{{ $t("Additional information") }}</h3><br>
+        <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Additional information") }}</h3>
+        <p>{{ $t('Finally, if you want, you can add some additional information related to the experiment. This information will not be taken into account when generating the efficiency result, but may be interesting for you or other developers to know.') }}</p><br>
         <el-form-item
             v-for="(infoAdd, i) in informacions" :key="i"
             :label="infoAdd.nom"
@@ -65,6 +79,7 @@
         </el-form-item>
         <br>
         <el-button
+            ref="generateLabelButton"
             @click="mostrarEtiqueta"
             color="var(--gaissa_green)"
         >
@@ -74,18 +89,18 @@
 
     <DialogNewModel v-model="dialogNewModel"
                     @cancel="dialogNewModel = false"
-                    @model-creat-ok="dialogNewModel = false;selectedModel = models.length; estat = 'modelCreat-ok'"
+                    @model-creat-ok="handleModelCreated" 
                     @model-creat-ko="dialogNewModel = false; estat = 'modelCreat-ko'"
     />
 
 </template>
 
 <script>
-import models from '@/services/models'
-import metriques from '@/services/metriques'
-import informacions from "@/services/informacions";
-import inferencies from '@/services/inferencies'
-import trainings from '@/services/trainings'
+import models from '@/controllers/models'
+import metriques from '@/controllers/metriques'
+import informacions from "@/controllers/informacions";
+import inferencies from '@/controllers/inferencies'
+import trainings from '@/controllers/trainings'
 import DialogNewModel from "@/components/DialogNewModel.vue";
 export default {
     name: "FormNewExperiment",
@@ -135,24 +150,35 @@ export default {
             })
         },
         async mostrarEtiqueta() {
-            let responseCreate = null
-            if (this.fase === this.$t('Training'))
-                responseCreate = await trainings.create(this.selectedModel, this.metriques, this.informacions)
-            else
-                responseCreate = await inferencies.create(this.selectedModel, this.metriques, this.informacions)
-            if (responseCreate.status === 201) {
-                const experiment_id = responseCreate.data['id']
+            if (this.selectedModel) {
+                let responseCreate = null
                 if (this.fase === this.$t('Training'))
-                    this.$router.push({
-                        name: 'Label info for training',
-                        params: {id_model: this.selectedModel, id_training: experiment_id}
-                    })
+                    responseCreate = await trainings.create(this.selectedModel, this.metriques, this.informacions)
                 else
-                    this.$router.push({
-                        name: 'Label info for inference',
-                        params: {id_model: this.selectedModel, id_inference: experiment_id}
-                    })
+                    responseCreate = await inferencies.create(this.selectedModel, this.metriques, this.informacions)
+                if (responseCreate.status === 201) {
+                    const experiment_id = responseCreate.data['id']
+                    if (this.fase === this.$t('Training'))
+                        this.$router.push({
+                            name: 'Label info for training',
+                            params: {id_model: this.selectedModel, id_training: experiment_id}
+                        })
+                    else
+                        this.$router.push({
+                            name: 'Label info for inference',
+                            params: {id_model: this.selectedModel, id_inference: experiment_id}
+                        })
+                }
+            } else {
+                this.estat = 'select-model'
+                window.scrollTo({top:0})
             }
+        },
+        async handleModelCreated(newModelId) {
+            this.dialogNewModel = false;
+            await this.refrescaModels();
+            this.selectedModel = newModelId;
+            this.estat = 'modelCreat-ok';
         },
     },
     async mounted() {
@@ -168,4 +194,15 @@ export default {
 </script>
 
 <style>
+p {
+    font-size: 18px
+}
+
+.el-select {
+    width: 200px;
+}
+
+.model-select {
+  width: 300px;
+}
 </style>

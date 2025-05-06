@@ -18,6 +18,15 @@
                     </template>
                     {{ model.nom }}
                 </el-descriptions-item>
+                <el-descriptions-item v-if="model.autor">
+                    <template #label>
+                        <div class="cell-item">
+                            <font-awesome-icon :icon="['fas', 'user']" />
+                            {{ $t('Model author') }}
+                        </div>
+                    </template>
+                    {{ model.autor }}
+                </el-descriptions-item>
                 <el-descriptions-item>
                     <template #label>
                         <div class="cell-item">
@@ -83,7 +92,12 @@
                 <h3 style="font-weight: bold;margin-bottom: 6px">{{info.nom}}</h3>
                 <p align="justify">{{ descripcions[metrica] }}</p>
                 <CustomSlider :marks="marks[metrica]" :max="inf[metrica]" :values="ranges[metrica]" :color="info.color"/>
-                <p align="justify">{{ recomanacions[metrica] }}</p>
+                <div v-if="recomanacions[metrica]">
+                    <h3>{{ $t('Recommendations to improve this result') }}</h3>
+                    <ul style="margin-left: 30px">
+                        <li v-for="(r, i) in recomanacions[metrica].split(';')" :key="i">{{ r }}</li>
+                    </ul>
+                </div>
             </el-col>
             <el-col :span="3" align="middle">
                 <p :style="{ fontSize: '35px', fontWeight: 'bold', color: info.color }">{{ info.qualificacio }}</p>
@@ -94,10 +108,10 @@
 </template>
 
 <script>
-import trainings from '@/services/trainings'
-import inferencies from '@/services/inferencies'
-import metriques from "@/services/metriques";
-import models from '@/services/models'
+import trainings from '@/controllers/trainings'
+import inferencies from '@/controllers/inferencies'
+import metriques from "@/controllers/metriques";
+import models from '@/controllers/models'
 import EnergyLabel from "@/components/EnergyLabel.vue";
 import CustomSlider from "@/components/CustomSlider.vue";
 import {formatData} from '@/utils'
@@ -148,30 +162,32 @@ export default {
         },
         async calculateVariables() {
             this.metriques.forEach(metrica => {
-                const intervals = metrica['intervals']
-                let marks = {0: '',}
-                let last = 0
-                let toAdd = 0
-                intervals.reverse().forEach(interval => {
-                    const limSup = interval['limitSuperior']
-                    const limInf = interval['limitInferior']
-                    if (limSup === 100000000000000000000) {
-                        toAdd = last/(intervals.length - 1) + last
-                        marks[toAdd] = ''//toAdd.toFixed(2)
-                    }
-                    else {
-                        last = interval['limitSuperior']
-                        marks[last] = ''//interval['limitSuperior'].toFixed(2)
-                    }
-                    if (limSup > this.resultats[metrica.id].value && this.resultats[metrica.id].value > limInf) {
-                        if (limSup === 100000000000000000000) this.ranges[metrica.id] = [limInf, toAdd]
-                        else this.ranges[metrica.id] = [limInf, limSup]
-                    }
-                })
-                this.marks[metrica.id] = marks
-                this.inf[metrica.id] = toAdd
-                this.descripcions[metrica.id] = metrica.descripcio
-                this.recomanacions[metrica.id] = metrica.recomanacions
+                if (metrica.id in this.resultats) {
+                    this.resultats[metrica.id].nom = metrica.nom
+                    const intervals = metrica['intervals']
+                    let marks = {0: '',}
+                    let last = 0
+                    let toAdd = 0
+                    intervals.reverse().forEach(interval => {
+                        const limSup = interval['limitSuperior']
+                        const limInf = interval['limitInferior']
+                        if (limSup === 100000000000000000000) {
+                            toAdd = last / (intervals.length - 1) + last
+                            marks[toAdd] = ''//toAdd.toFixed(2)
+                        } else {
+                            last = interval['limitSuperior']
+                            marks[last] = ''//interval['limitSuperior'].toFixed(2)
+                        }
+                        if (limSup > this.resultats[metrica.id].value && this.resultats[metrica.id].value > limInf) {
+                            if (limSup === 100000000000000000000) this.ranges[metrica.id] = [limInf, toAdd]
+                            else this.ranges[metrica.id] = [limInf, limSup]
+                        }
+                    })
+                    this.marks[metrica.id] = marks
+                    this.inf[metrica.id] = toAdd
+                    this.descripcions[metrica.id] = metrica.descripcio
+                    this.recomanacions[metrica.id] = metrica.recomanacions
+                }
             })
         },
         getImageDecoded(img) {

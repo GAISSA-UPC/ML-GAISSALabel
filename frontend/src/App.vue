@@ -1,20 +1,21 @@
 <template>
     <div class="common-layout">
-        <el-container>
+        <el-container class="app-container">
             <el-header style="display: flex; align-items: center">
                 <BarraSuperior
-                    :collapsed = collapse
-                    @collapse = "collapse=true;console.log(collapse)"
-                    @expand =  "collapse=false"
+                    :collapsed="collapse"
+                    @collapse="collapse=true"
+                    @expand="collapse=false"
                 />
             </el-header>
-            <el-container>
-                <el-aside width="60">
+            <el-container class="main-container" :class="{ 'mobile': isMobile }">
+                <el-aside :class="{ 'mobile': isMobile }" :width="isMobile ? 'auto' : (collapse ? '64px' : '200px')">
                     <MenuLateral
-                        :collapsed = collapse
+                        :collapsed="collapse"
+                        :class="{ 'mobile': isMobile }"
                     />
                 </el-aside>
-                <el-main style="margin-right: 75px">
+                <el-main :class="{ 'mobile': isMobile }" style="margin-right: 75px">
                     <RouterView />
                 </el-main>
             </el-container>
@@ -23,23 +24,64 @@
 </template>
 
 <script>
-import 'element-plus/theme-chalk/index.css'
 import { RouterView } from 'vue-router'
 import MenuLateral from "@/components/base/MenuLateral.vue";
 import BarraSuperior from "@/components/base/BarraSuperior.vue";
 
 export default {
     name: "App",
-    components: {RouterView, MenuLateral, BarraSuperior},
+    components: {
+        RouterView, 
+        MenuLateral, 
+        BarraSuperior,
+    },
     data() {
         return {
-            collapse: false
+            collapse: false,
+            isMobile: false
+        }
+    },
+    mounted() {
+        this.checkScreenSize()
+        window.addEventListener('resize', this.checkScreenSize)
+    },
+    beforeUnmount() {
+        window.removeEventListener('resize', this.checkScreenSize)
+    },
+    methods: {
+        checkScreenSize() {
+            this.isMobile = window.innerWidth < 768
+            this.collapse = this.isMobile
         }
     }
-}
-</script>
+}</script>
 
 <style scoped>
+.app-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-container {
+    flex: 1;
+    display: flex;
+}
+
+.main-container.mobile {
+    flex-direction: column;
+}
+
+.el-aside.mobile {
+    width: 100% !important;
+    max-height: fit-content;
+}
+
+.el-main.mobile {
+    margin-right: 0 !important;
+    padding: 20px;
+}
+
 header {
     line-height: 1.5;
 }

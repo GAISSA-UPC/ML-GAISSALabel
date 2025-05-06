@@ -7,4 +7,7 @@ venv/
 db.sqlite3
 .coverage
 /*.png
+/*.dot
 emissions.csv
+hf_preRaw.csv
+django_logs.log

@@ -1,0 +1,769 @@
+
+biology:
+  - medical
+  - alphafold
+  - protein-model
+  - protein-folding
+  - biology
+  - single-cell
+  - genomics
+  - rita
+  
+general_concepts:
+  - xgboost
+  - structured-data-classification
+  - autotrain
+  - joblib
+  - glm
+  - decision_transformer
+  - clustering
+  - time-series
+  - time-series-forecasting
+  - encoder
+  - ddim_diffusion
+  - probabilistic-models
+  - regression
+  - classification
+  - tabular-data
+  - diffusion-models-class
+  - time_series_transformer
+  - perplexity
+  - multiple-choice
+  - finance
+  - custom_classification
+  - 3d-reconstruction
+  - lstm
+  - transfo-xl
+  - reconstruction
+  - denoising
+  - generative-adversarial-network
+  - gan
+  - vae
+  - transformer_vae
+  - diffusers
+  - gradient-boosting
+  - cnn
+  - generation
+  - forecasting
+  - timeseries
+  - nowcasting
+  - anomaly-detection
+  - reproducibility
+
+libraries:
+  - pytorch
+  - tf
+  - jax
+  - transformers
+  - tensorboard
+  - stable-baselines3
+  - diffusers
+  - onnx
+  - ml-agents
+  - sentence-transformers
+  - safetensors
+  - timm
+  - keras
+  - sample-factory
+  - espnet
+  - spacy
+  - adapter-transformers
+  - fasttext
+  - rust
+  - scikit-learn
+  - fastai
+  - joblib
+  - nemo
+  - paddlepaddle
+  - core-ml
+  - flair
+  - speechbrain
+  - graphcore
+  - fairseq
+  - stanza
+  - paddlenlp
+  - openvino
+  - tf-lite
+  - openclip
+  - asteroid
+  - habana
+  - allennlp
+  - tensorflowtts
+  - pythae
+  - pyannote.audio
+
+auxiliar:
+  - autotrain
+  - autotrain_compatible
+  - has_space
+
+languages:
+  - en
+  - fr
+  - es
+  - ch
+  - ge
+  - ja
+  - ru
+  - pt
+  - ar
+  - it
+  - mu
+  - sw
+  - hi
+  - ko
+  - tu
+  - vi
+  - fi
+  - du
+  - in
+  - uk
+  - ro
+  - pl
+  - pe
+  - th
+  - ca
+  - be
+  - da
+  - et
+  - gr
+  - ta
+  - ur
+  - ma
+  - sw
+  - bu
+  - cz
+  - hu
+  - te
+  - no
+  - ic
+  - gj
+  - ml
+  - sl
+  - ba
+  - li
+  - cr
+  - pj
+  - ne
+  - kn
+  - as
+  - he
+  - sr
+  - af
+  - gl
+  - lv
+  - sk
+  - bl
+  - we
+  - si
+  - mc
+  - mn
+  - my
+  - gg
+  - yo
+  - or
+  - am
+  - ar
+  - tg
+  - ha
+  - ep
+  - br
+  - xh
+  - az
+  - kz
+  - al
+  - uz
+  - so
+  - ps
+  - ir
+  - sn
+  - kh
+  - su
+  - ig
+  - lt
+  - mt
+  - ht
+  - mg
+  - lo
+  - li
+  - bo
+  - si
+  - ja
+  - yi
+  - lu
+  - kw
+  - ky
+  - nn
+  - cd
+  - zu
+  - sc
+  - gd
+  - ch
+  - nj
+  - sa
+  - ss
+  - ki
+  - nb
+  - tj
+  - wo
+  - ba
+  - oc
+  - ta
+  - ts
+  - fa
+  - ku
+  - tn
+  - mr
+  - tw
+  - uy
+  - ti
+  - ak
+  - bm
+  - tk
+  - ki
+  - or
+  - sa
+  - ti
+  - ab
+  - gu
+  - co
+  - ew
+  - ar
+  - cv
+  - sg
+  - jw
+  - dv
+  - iw
+  - ro
+  - fj
+  - ko
+  - af
+  - sw
+  - sa
+  - ch
+  - mx
+  - sh
+  - li
+  - to
+  - id
+  - ta
+  - wa
+  - il
+  - lm
+  - dz
+  - os
+  - ch
+  - ma
+  - ns
+  - bi
+  - dk
+  - vo
+  - ka
+  - jp
+  - qu
+  - lk
+  - ud
+  - ma
+  - co
+  - kn
+  - fu
+  - in
+  - vn
+  - hi
+  - gr
+  - ns
+  - po
+  - bu
+  - tu
+  - cz
+  - ve
+  - ge
+  - py
+  - bh
+  - av
+  - na
+  - tc
+ 
+licenses:
+  - apache-2.0
+  - mit
+  - creativeml-openrail-m
+  - openrail
+  - cc-by-4.0
+  - afl-3.0
+  - other
+  - cc-by-nc-sa-4.0
+  - cc-by-sa-4.0
+  - cc-by-nc-4.0
+  - gpl-3.0
+  - artistic-2.0
+  - cc
+  - bsd-3-clause
+  - bigscience-bloom-rail-1.0
+  - bigscience-openrail-m
+  - cc0-1.0
+  - wtfpl
+  - agpl-3.0
+  - unlicense
+  - openrail++
+  - gpl
+  - bsl-1.0
+  - bsd
+  - cc-by-sa-3.0
+  - gpl-2.0
+  - bsd-2-clause
+  - cc-by-3.0
+  - cc-by-2.0
+  - cc-by-nc-3.0
+  - lgpl-3.0
+  - osl-3.0
+  - cc-by-nc-nd-4.0
+  - lgpl
+  - bsd-3-clause-clear
+  - c-uda
+  - pddl
+  - lgpl-lr
+  - ecl-2.0
+  - cc-by-nc-2.0
+  - cc-by-nc-sa-3.0
+  - gfdl
+  - ms-pl
+  - cc-by-nd-4.0
+  - mpl-2.0
+  - cc-by-nc-sa-2.0
+  - isc
+  - zlib
+  - odc-by
+  - odbl
+  - ncsa
+  - epl-2.0
+  - cc-by-2.5
+  - epl-1.0
+  - postgresql
+  - ofl-1.1
+  - cc-by-nc-nd-3.0
+  - eupl-1.1
+  - lgpl-2.1
+  - lppl-1.3c
+
+
+tags_to_domain:
+    task_to_domain:
+        3d: Computer Vision
+        Audio task: Audio
+        audio-classification: Audio
+        audio-generation: Audio
+        audio-to-audio: Audio
+        automatic-speech-recognition: Audio
+        bert-generation: NLP
+        causal-lm: NLP
+        computer-vision: Computer Vision
+        conversational: NLP
+        depth-estimation: Computer Vision
+        document-question-answering: Multimodal
+        document-understanding: NLP
+        emotion-recognition: Computer Vision
+        expression-recognition: Computer Vision
+        face-generation: Computer Vision
+        face-recognition: Computer Vision
+        face-stylization: Computer Vision
+        facial-expression-recognition: Computer Vision
+        feature-extraction: Multimodal
+        fill-mask: NLP
+        focusondepth: Computer Vision
+        graph-machine-learning: Multimodal
+        groupbert: NLP
+        image-classification: Computer Vision
+        image-generation: Computer Vision
+        image-segmentation: Computer Vision
+        image-super-resolution: Computer Vision
+        image-to-image: Computer Vision
+        image-to-text: Multimodal
+        image_restoration: Computer Vision
+        imagegeneration: Computer Vision
+        keyphrase-generation: NLP
+        landmarkdetection: Computer Vision
+        language-model: NLP
+        language-modeling: NLP
+        machine-translation: NLP
+        med3d: Computer Vision
+        medicalimaging: Computer Vision
+        multimodal-entailment: Multimodal
+        named-entity-recognition: NLP
+        nlp: NLP
+        object-detection: Computer Vision
+        objectclassification: Computer Vision
+        objectdetection: Computer Vision
+        program-synthesis: NLP
+        pronunciation-generation: Audio
+        question-answering: NLP
+        reinforcement-learning: Reinforcement Learning
+        robotics: Reinforcement Learning
+        romanization: NLP
+        scene-generation: Computer Vision
+        scene-recognition: Computer Vision
+        sentence-similarity: NLP
+        sentiment-analysis: NLP
+        speaker-diarization: Audio
+        speakerrecognition: Audio
+        speech-synthesis: Audio
+        speech_to_text: Audio
+        speechclassification: Audio
+        spell-correction: NLP
+        spoken-language-recognition: Audio
+        spoken-language-understanding: NLP
+        summarization: NLP
+        super-image: Computer Vision
+        table-question-answering: NLP
+        text-classification: NLP
+        text-classifier: NLP
+        text-generation: NLP
+        text-regression: NLP
+        text-to-image: Multimodal
+        text-to-rating: NLP
+        text-to-speech: Audio
+        text-to-video: Multimodal
+        text2text-generation: NLP
+        token-classification: NLP
+        tokenizer: NLP
+        transducer: Audio
+        translation: NLP
+        unconditional-audio-generation: Audio
+        unconditional-image-generation: Computer Vision
+        upscaler: Computer Vision
+        upscalers: Computer Vision
+        video-classification: Computer Vision
+        video-prediction: Computer Vision
+        video-to-video: Computer Vision
+        vision: Computer Vision
+        vision-encoder-decoder: Multimodal
+        visual-question-answering: Multimodal
+        voice-activity-detection: Audio
+        wav2vec: Audio
+        wav2vec2: Audio
+        word-piece-tokenizer: NLP
+        xray-ribs-segmentation: Computer Vision
+        zero-shot-classification: NLP
+        zero-shot-image-classification: Computer Vision
+
+    model_to_domain:
+        albert: NLP
+        albert_act: NLP
+        align: Multimodal
+        altclip: Multimodal
+        animeganv2: Computer Vision
+        animeganv3: Computer Vision
+        audio-spectrogram-transformer: Audio
+        bart: NLP
+        barthez: NLP
+        bartpho: NLP
+        beit: Computer Vision
+        bert: NLP
+        bert-base-cased: NLP
+        bert_causalm: NLP
+        bertgeneration: NLP
+        bertjapanese: NLP
+        bertweet: NLP
+        big_bird: NLP
+        bigbird: NLP
+        bigbird_pegasus: NLP
+        bigbirdpegasus: NLP
+        biogpt: NLP
+        bit: Computer Vision
+        blenderbot: NLP
+        blenderbot-small: NLP
+        blip: Multimodal
+        blip-2: Multimodal
+        bloom: NLP
+        bluebert: NLP
+        bort: NLP
+        bridgetower: Multimodal
+        byt5: NLP
+        camembert: NLP
+        canine: NLP
+        character_bert: NLP
+        chatglm: NLP
+        chinese-clip: Multimodal
+        clap: Audio
+        clip: Multimodal
+        clip-vision-marian: Multimodal
+        clip_text_model: Multimodal
+        clip_vision_model: Multimodal
+        clipseg: Multimodal
+        codegen: NLP
+        conditional-detr: Computer Vision
+        context-roberta: NLP
+        convbert: NLP
+        convnext: Computer Vision
+        convnext_maskrcnn: Computer Vision
+        convnextv2: Computer Vision
+        cpm: NLP
+        ctc: Audio
+        ctrl: NLP
+        cvt: Computer Vision
+        data2vec: Multimodal
+        deberta: NLP
+        deberta-v2: NLP
+        deberta_arg_classifier: NLP
+        decision-transformer: Reinforcement Learning
+        deformable-detr: Computer Vision
+        deit: Computer Vision
+        deta: Computer Vision
+        detr: Computer Vision
+        dialogpt: NLP
+        dinat: Computer Vision
+        distilbert: NLP
+        dit: Computer Vision
+        donut: Multimodal
+        dpr: NLP
+        dpt: Computer Vision
+        ebk-bert: NLP
+        ecapa: Audio
+        efficientformer: Computer Vision
+        efficientnet: Computer Vision
+        electra: NLP
+        emformer: Audio
+        encoder-decoder-models: NLP
+        enformer: NLP
+        ernie: NLP
+        erniem: NLP
+        esm: NLP
+        exbert: NLP
+        fan: Computer Vision
+        fastspeech2: Audio
+        feature-pyramid-network: Computer Vision
+        flan-t5: NLP
+        flan-ul2: NLP
+        flaubert: NLP
+        flava: Multimodal
+        flexibert: NLP
+        fnet: NLP
+        focalnet: Computer Vision
+        fsmt: NLP
+        funnel-transformer: NLP
+        ganbert: NLP
+        git: Multimodal
+        glove: NLP
+        glpn: Computer Vision
+        gpt: NLP
+        gpt2: NLP
+        gpt2_causalm: NLP
+        gpt3: NLP
+        gpt_neo: NLP
+        gpt_neox: NLP
+        gpt_neox_japanese: NLP
+        gptj: NLP
+        gptsan-japanese: NLP
+        gptsw3: NLP
+        groupvit: Multimodal
+        herbert: NLP
+        hubert: Audio
+        hybrid-clip: Multimodal
+        i-bert: NLP
+        ibert: NLP
+        image-similarity: Computer Vision
+        imagegpt: Computer Vision
+        jukebox: NLP
+        layoutlm: Multimodal
+        layoutlmv2: Multimodal
+        layoutlmv3: Multimodal
+        layoutxlm: Multimodal
+        ldmbert: NLP
+        lean_albert: NLP
+        led: NLP
+        levit: Computer Vision
+        lilt: Multimodal
+        llama: NLP
+        longformer: NLP
+        longt5: NLP
+        lstm_causalm: NLP
+        luke: NLP
+        lxmert: Multimodal
+        m2m100: NLP
+        m2m_100: NLP
+        marian: NLP
+        marianmt: NLP
+        markuplm: NLP
+        mask2former: Computer Vision
+        maskformer: Computer Vision
+        mbart: NLP
+        mbart-and-mbart-50: NLP
+        mctct: Audio
+        megatron-bert: NLP
+        megatronbert: NLP
+        megatrongpt2: NLP
+        mert_model: Audio
+        mgp-str: Multimodal
+        mluke: NLP
+        mobilebert: NLP
+        mobilenetv1: Computer Vision
+        mobilenetv2: Computer Vision
+        mobilevit: Computer Vision
+        mpnet: NLP
+        msrn: Computer Vision
+        mt5: NLP
+        mvp: NLP
+        nat: Computer Vision
+        nemo: Multimodal
+        nezha: NLP
+        nllb: NLP
+        nllb-moe: NLP
+        "nystr\xF6mformer": NLP
+        ofa: Multimodal
+        oneformer: Multimodal
+        open_clip: Multimodal
+        opt: NLP
+        owl-vit: Multimodal
+        peft: NLP
+        pegasus: NLP
+        pegasus-x: NLP
+        pegasusgpt2: NLP
+        perceiver: Multimodal
+        phobert: NLP
+        plbart: NLP
+        poolformer: Computer Vision
+        pose_estimation: Computer Vision
+        prophetnet: NLP
+        qdqbert: NLP
+        r3m: Computer Vision
+        rag: NLP
+        rcan: Computer Vision
+        realm: NLP
+        reformer: NLP
+        regnet: Computer Vision
+        rembert: NLP
+        resnet: Computer Vision
+        resnet50: Computer Vision
+        resnetd: Computer Vision
+        retinanet: Computer Vision
+        retribert: NLP
+        roberta: NLP
+        roberta-prelayernorm: NLP
+        roberta_causalm: NLP
+        rocbert: NLP
+        roformer: NLP
+        segformer: Computer Vision
+        segmentation-maps: Computer Vision
+        sew: Audio
+        sew-d: Audio
+        spatially-adaptive-normalization: Computer Vision
+        speech-encoder-decoder-models: Multimodal
+        speech2text: Audio
+        speech2text2: Audio
+        speecht5: Audio
+        splinter: NLP
+        squeezebert: NLP
+        swin: Computer Vision
+        swin-ir: Computer Vision
+        swin-transformer: Computer Vision
+        swin-transformer-v2: Computer Vision
+        swin2sr: Computer Vision
+        switchtransformers: NLP
+        t5: NLP
+        t5v1.1: NLP
+        table-transformer: Computer Vision
+        tapas: Multimodal
+        tapex: NLP
+        timesformer: Computer Vision
+        trajectory-transformer: Reinforcement Learning
+        transformer-xl: NLP
+        trocr: Multimodal
+        tvlt: Multimodal
+        ul2: NLP
+        unet: Computer Vision
+        unispeech: Audio
+        unispeech-sat: Audio
+        upernet: Computer Vision
+        van: Computer Vision
+        videomae: Computer Vision
+        vilt: Multimodal
+        vision-encoder-decoder-models: Multimodal
+        vision-text-dual-encoder: Multimodal
+        vision-transformer-vit: Computer Vision
+        visual_bert: Multimodal
+        visualbert: Multimodal
+        vit: Computer Vision
+        vit-hybrid: Computer Vision
+        vitmae: Computer Vision
+        vitmsn: Computer Vision
+        vle: Multimodal
+        wav2vec2: Audio
+        wav2vec2-conformer: Audio
+        wav2vec2phoneme: Audio
+        wavlm: Audio
+        whisper: Audio
+        whisper-event: Audio
+        x-clip: Multimodal
+        x-mod: NLP
+        xglm: NLP
+        xlm: NLP
+        xlm-prophetnet: NLP
+        xlm-roberta: NLP
+        xlm-roberta-xl: NLP
+        xlm-v: NLP
+        xlnet: NLP
+        xls-r: Audio
+        xlsr-wav2vec2: Audio
+        xmod: NLP
+        yolo: Computer Vision
+        yolos: Computer Vision
+        yoso: NLP
+
+    concepts_to_domain:
+        aivtuber: Computer Vision
+        anime: Computer Vision
+        art: Computer Vision
+        arte: Computer Vision
+        asr: Audio
+        audacity: Audio
+        audio: Audio
+        books: NLP
+        cartoon: Computer Vision
+        code: NLP
+        computer_vision: Computer Vision
+        converstional: NLP
+        corenlp: NLP
+        corneos: Computer Vision
+        dallebart: Computer Vision
+        deep-dream: Computer Vision
+        digital-art: Computer Vision
+        doctr: Computer Vision
+        dreambooth: Computer Vision
+        esb: Audio
+        gaugan: Computer Vision
+        gensim: NLP
+        handwritten: NLP
+        huggingtweets: NLP
+        image: Computer Vision
+        images: Computer Vision
+        kenlm: NLP
+        lora: Computer Vision
+        mathematics: NLP
+        medical-images: Computer Vision
+        microtransquest: NLP
+        midjourney: Computer Vision
+        multilingual: NLP
+        music: Audio
+        n-gram: NLP
+        nft: Computer Vision
+        paddlenlp: NLP
+        paddlepaddle: Multimodal
+        ponet: NLP
+        ppdiffusers: Computer Vision
+        pyannote: Audio
+        reward_model: NLP
+        satflow: Computer Vision
+        speaker: Audio
+        speech: Audio
+        speech-recordings: Audio
+        speechbrain: Audio
+        speechmix: Audio
+        stable-diffusion: Computer Vision
+        stable-diffusion-model: Computer Vision
+        stable_diffusion: Computer Vision
+        swin-ir: Computer Vision
+        task-oriented-dialog: NLP
+        video: Computer Vision
+        vits: Computer Vision
+        wikipedia: NLP
+

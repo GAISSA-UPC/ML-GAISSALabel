@@ -1,5 +1,5 @@
 [run]
-source=gaissalabel/,api/
+source=gaissalabel/,api/,efficiency_calculators/
 omit=
     */env/*
     */migrations/*
@@ -7,3 +7,5 @@ omit=
     */__init__.py
     */wsgi.py
     */asgi.py
+    efficiency_calculators/calculator_codecarbon_adapter.py
+    efficiency_calculators/efficiency_calculator.py
