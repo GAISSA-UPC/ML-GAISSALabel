@@ -364,7 +364,7 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'model_architecture', 'model_architecture_id', 'model_architecture_name',
             'tactic_parameter_option', 'tactic_parameter_option_id', 'tactic_parameter_option_details',
-            'metric_values_data', 'metrics_analysis', 'dateRegistration', 'country', 
+            'metric_values', 'metric_values_data', 'metrics_analysis', 'dateRegistration', 'country', 
             'source'
         ]
         read_only_fields = ['model_architecture', 'tactic_parameter_option']

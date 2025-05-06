@@ -8,18 +8,18 @@
         </p>
 
         <el-form label-position="top" class="form-container">
-            <h3 class="section-title">{{ $t("Model") }}</h3>
-            <p class="field-description">{{ $t("Please, indicate the model you are interested in.") }}</p>
+            <h3 class="section-title">{{ $t("Model Architecture") }}</h3>
+            <p class="field-description">{{ $t("Please, indicate the model architecture you are interested in.") }}</p>
             <el-form-item>
                 <el-select v-model="selectedModel" @change="onModelChange" placeholder="Select" class="full-width"
                     filterable>
-                    <el-option v-for="(model, i) in models" :key="i" :value="model.id" :label="model.nom" />
+                    <el-option v-for="(model, i) in models" :key="i" :value="model.id" :label="model.name" />
                 </el-select>
             </el-form-item>
 
             <div v-if="selectedModel !== null">
-                <h3 class="section-title">{{ $t("Optimization Technique") }}</h3>
-                <p class="field-description">{{ $t("Please, indicate the optimization technique you are interested in.")
+                <h3 class="section-title">{{ $t("ML Tactic") }}</h3>
+                <p class="field-description">{{ $t("Please, indicate the ML tactic you are interested in.")
                     }}</p>
                 <el-form-item>
                     <el-select v-model="selectedOptimizationTechnique" @change="onOptimizationTechniqueChange"
@@ -30,18 +30,18 @@
                 </el-form-item>
             </div>
             <div v-if="selectedOptimizationTechnique !== null && optimizationTechniqueParameters.length > 0">
-                <h3 class="section-title">{{ $t("Technique Parameters") }}</h3>
-                <p class="field-description">{{ $t("Please, specify the parameters for the chosen technique.") }}</p>
+                <h3 class="section-title">{{ $t("Tactic Parameter") }}</h3>
+                <p class="field-description">{{ $t("Please, specify the parameter for the chosen tactic.") }}</p>
                 <el-form-item>
                     <el-select v-model="selectedOptimizationParameter" @change="onOptimizationParameterChange"
                         placeholder="Select a parameter" class="full-width">
                         <el-option v-for="parameter in optimizationTechniqueParameters" :key="parameter.id"
-                            :value="parameter.id" :label="parameter.name" />
+                            :value="parameter.id" :label="`${parameter.name}: ${parameter.value}`" />
                     </el-select>
                 </el-form-item>
             </div>
 
-            <div v-if="selectedOptimizationTechnique !== null && (optimizationTechniqueParameters.length === 0 || selectedOptimizationParameter !== null)">
+            <div v-if="selectedOptimizationTechnique !== null && selectedOptimizationParameter !== null">
                 <h3 class="section-title">{{ $t("Analysis") }}</h3>
                 <p class="field-description">
                     {{ $t('Now specify the') }} {{ fase }} {{ $t('from which you want to get the evaluation.') }}
@@ -49,7 +49,7 @@
                 <el-form-item>
                     <el-select v-model="selectedExperiment" placeholder="Select" class="full-width">
                         <el-option v-for="(experiment, i) in experiments" :key="i" :value="experiment.id"
-                            :label="formatData(experiment.registration_date)" />
+                            :label="formatData(experiment.dateRegistration)" />
                     </el-select>
                 </el-form-item>
             </div>
@@ -65,9 +65,9 @@
 </template>
 
 <script>
-import models from "@/tools/gaissalabel/services/models";
-import optimizationTechniques from "@/tools/gaissaroianalyzer/services/mlTactics";
-import techniqueParameters from "@/tools/gaissaroianalyzer/services/tacticParameters";
+import modelArchitectures from "@/tools/gaissaroianalyzer/services/modelArchitectures";
+import mlTactics from "@/tools/gaissaroianalyzer/services/mlTactics";
+import tacticParameters from "@/tools/gaissaroianalyzer/services/tacticParameters";
 import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
 import { formatData } from "@/utils";
 
@@ -93,23 +93,29 @@ export default {
             return (
                 this.selectedModel !== null &&
                 this.selectedOptimizationTechnique !== null &&
-                (this.optimizationTechniqueParameters.length === 0 || this.selectedOptimizationParameter !== null) &&
+                this.selectedOptimizationParameter !== null &&
                 this.selectedExperiment !== null
             );
         },
     },
     methods: {
         async refreshModels() {
-            const response = await models.list({ has_roi_analysis: "true" });
-            this.models = response.data;
+            const response = await modelArchitectures.list();
+            if (response && response.data) {
+                this.models = response.data;
+            }
         },
         async refreshOptimizationTechniques() {
-            const response = await optimizationTechniques.list({ model_id: this.selectedModel });
-            this.optimizationTechniques = response.data;
+            const response = await mlTactics.getCompatibleTacticsWithArchitecture(this.selectedModel);
+            if (response && response.data) {
+                this.optimizationTechniques = response.data;
+            }
         },
         async refreshOptimizationTechniqueParameters() {
-            const response = await techniqueParameters.list(this.selectedOptimizationTechnique, { model_id: this.selectedModel });
-            this.optimizationTechniqueParameters = response.data;
+            const response = await tacticParameters.list(this.selectedOptimizationTechnique);
+            if (response && response.data) {
+                this.optimizationTechniqueParameters = response.data;
+            }
         },
         async onModelChange() {
             this.selectedOptimizationTechnique = null;
@@ -125,10 +131,6 @@ export default {
             this.selectedExperiment = null;
 
             await this.refreshOptimizationTechniqueParameters();
-
-            if (this.optimizationTechniqueParameters.length === 0) {
-                await this.refreshExperiments();
-            }
         },
         async onOptimizationParameterChange() {
             this.experiments = [];
@@ -137,15 +139,16 @@ export default {
         },
         async refreshExperiments() {
             let params = {
-                model_architecture: this.selectedModel,
-                tactic_parameter_option: this.selectedOptimizationTechnique,
+                model_architecture_id: this.selectedModel,
+                tactic_parameter_option_id: this.selectedOptimizationParameter,
+                tactic_id: this.selectedOptimizationTechnique,
             };
-            if (this.selectedOptimizationParameter) {
-                params.tactic_parameter_option = this.selectedOptimizationParameter;
-            }
-            if (this.selectedModel && this.selectedOptimizationTechnique) {
+            
+            if (this.selectedModel && this.selectedOptimizationParameter && this.selectedOptimizationTechnique) {
                 const response = await roiAnalyses.list(params);
-                this.experiments = response.data;
+                if (response && response.data) {
+                    this.experiments = response.data;
+                }
             } else {
                 this.experiments = [];
             }
@@ -154,7 +157,6 @@ export default {
             this.$router.push({
                 name: "GAISSA ROI Analyzer",
                 params: {
-                    id_model: this.selectedModel,
                     id_experiment: this.selectedExperiment,
                 },
             });
