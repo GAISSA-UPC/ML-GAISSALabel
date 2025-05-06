@@ -4,44 +4,44 @@
         <h2>{{ $t("Consult a new ROI Analysis") }}</h2>
 
         <p class="description">
-            {{ $t("This page allows you to consult the previously calculated Return on Investment (ROI) of your models' Inferences.") }}
+            {{ $t("This page allows you to consult the previously calculated Return on Investment (ROI) of applying a ML tactic to your model architecture.") }}
         </p>
 
         <el-form label-position="top" class="form-container">
             <h3 class="section-title">{{ $t("Model Architecture") }}</h3>
             <p class="field-description">{{ $t("Please, indicate the model architecture you are interested in.") }}</p>
             <el-form-item>
-                <el-select v-model="selectedModel" @change="onModelChange" placeholder="Select" class="full-width"
+                <el-select v-model="selectedModelArchitecture" @change="onModelArchitectureChange" placeholder="Select" class="full-width"
                     filterable>
-                    <el-option v-for="(model, i) in models" :key="i" :value="model.id" :label="model.name" />
+                    <el-option v-for="(modelArchitecture, i) in modelArchitectures" :key="i" :value="modelArchitecture.id" :label="modelArchitecture.name" />
                 </el-select>
             </el-form-item>
 
-            <div v-if="selectedModel !== null">
+            <div v-if="selectedModelArchitecture !== null">
                 <h3 class="section-title">{{ $t("ML Tactic") }}</h3>
                 <p class="field-description">{{ $t("Please, indicate the ML tactic you are interested in.")
                     }}</p>
                 <el-form-item>
-                    <el-select v-model="selectedOptimizationTechnique" @change="onOptimizationTechniqueChange"
+                    <el-select v-model="selectedMlTactic" @change="onMlTacticChange"
                         placeholder="Select" class="full-width">
-                        <el-option v-for="(technique, i) in optimizationTechniques" :key="i" :value="technique.id"
-                            :label="technique.name" />
+                        <el-option v-for="(mlTactic, i) in mlTactics" :key="i" :value="mlTactic.id"
+                            :label="mlTactic.name" />
                     </el-select>
                 </el-form-item>
             </div>
-            <div v-if="selectedOptimizationTechnique !== null && optimizationTechniqueParameters.length > 0">
+            <div v-if="selectedMlTactic !== null && tacticParameters.length > 0">
                 <h3 class="section-title">{{ $t("Tactic Parameter") }}</h3>
                 <p class="field-description">{{ $t("Please, specify the parameter for the chosen tactic.") }}</p>
                 <el-form-item>
-                    <el-select v-model="selectedOptimizationParameter" @change="onOptimizationParameterChange"
+                    <el-select v-model="selectedTacticParameter" @change="onTacticParameterChange"
                         placeholder="Select a parameter" class="full-width">
-                        <el-option v-for="parameter in optimizationTechniqueParameters" :key="parameter.id"
+                        <el-option v-for="parameter in tacticParameters" :key="parameter.id"
                             :value="parameter.id" :label="`${parameter.name}: ${parameter.value}`" />
                     </el-select>
                 </el-form-item>
             </div>
 
-            <div v-if="selectedOptimizationTechnique !== null && selectedOptimizationParameter !== null">
+            <div v-if="selectedMlTactic !== null && selectedTacticParameter !== null">
                 <h3 class="section-title">{{ $t("Analysis") }}</h3>
                 <p class="field-description">
                     {{ $t('Now specify the') }} {{ fase }} {{ $t('from which you want to get the evaluation.') }}
@@ -78,73 +78,73 @@ export default {
     },
     data() {
         return {
-            models: [],
-            selectedModel: null,
-            optimizationTechniques: [],
-            selectedOptimizationTechnique: null,
+            modelArchitectures: [],
+            selectedModelArchitecture: null,
+            mlTactics: [],
+            selectedMlTactic: null,
             experiments: [],
             selectedExperiment: null,
-            optimizationTechniqueParameters: [],
-            selectedOptimizationParameter: null,
+            tacticParameters: [],
+            selectedTacticParameter: null,
         };
     },
     computed: {
         isFormValid() {
             return (
-                this.selectedModel !== null &&
-                this.selectedOptimizationTechnique !== null &&
-                this.selectedOptimizationParameter !== null &&
+                this.selectedModelArchitecture !== null &&
+                this.selectedMlTactic !== null &&
+                this.selectedTacticParameter !== null &&
                 this.selectedExperiment !== null
             );
         },
     },
     methods: {
-        async refreshModels() {
+        async refreshModelArchitectures() {
             const response = await modelArchitectures.list();
             if (response && response.data) {
-                this.models = response.data;
+                this.modelArchitectures = response.data;
             }
         },
-        async refreshOptimizationTechniques() {
-            const response = await mlTactics.getCompatibleTacticsWithArchitecture(this.selectedModel);
+        async refreshMlTactics() {
+            const response = await mlTactics.getCompatibleTacticsWithArchitecture(this.selectedModelArchitecture);
             if (response && response.data) {
-                this.optimizationTechniques = response.data;
+                this.mlTactics = response.data;
             }
         },
-        async refreshOptimizationTechniqueParameters() {
-            const response = await tacticParameters.list(this.selectedOptimizationTechnique);
+        async refreshTacticParameters() {
+            const response = await tacticParameters.list(this.selectedMlTactic);
             if (response && response.data) {
-                this.optimizationTechniqueParameters = response.data;
+                this.tacticParameters = response.data;
             }
         },
-        async onModelChange() {
-            this.selectedOptimizationTechnique = null;
-            this.optimizationTechniqueParameters = [];
-            this.selectedOptimizationParameter = null;
+        async onModelArchitectureChange() {
+            this.selectedMlTactic = null;
+            this.tacticParameters = [];
+            this.selectedTacticParameter = null;
             this.experiments = [];
             this.selectedExperiment = null;
-            await this.refreshOptimizationTechniques();
+            await this.refreshMlTactics();
         },
-        async onOptimizationTechniqueChange() {
-            this.selectedOptimizationParameter = null;
+        async onMlTacticChange() {
+            this.selectedTacticParameter = null;
             this.experiments = [];
             this.selectedExperiment = null;
 
-            await this.refreshOptimizationTechniqueParameters();
+            await this.refreshTacticParameters();
         },
-        async onOptimizationParameterChange() {
+        async onTacticParameterChange() {
             this.experiments = [];
             this.selectedExperiment = null;
             await this.refreshExperiments();
         },
         async refreshExperiments() {
             let params = {
-                model_architecture_id: this.selectedModel,
-                tactic_parameter_option_id: this.selectedOptimizationParameter,
-                tactic_id: this.selectedOptimizationTechnique,
+                model_architecture_id: this.selectedModelArchitecture,
+                tactic_parameter_option_id: this.selectedTacticParameter,
+                tactic_id: this.selectedMlTactic,
             };
             
-            if (this.selectedModel && this.selectedOptimizationParameter && this.selectedOptimizationTechnique) {
+            if (this.selectedModelArchitecture && this.selectedTacticParameter && this.selectedMlTactic) {
                 const response = await roiAnalyses.list(params);
                 if (response && response.data) {
                     this.experiments = response.data;
@@ -164,12 +164,28 @@ export default {
         formatData,
     },
     async mounted() {
-        await this.refreshModels();
+        await this.refreshModelArchitectures();
     },
 };
 </script>
 
 <style scoped>
+h1 {
+    color: var(--gaissa_green);
+    margin-bottom: 0.5rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.description {
+    margin-bottom: 20px;
+    margin-top: 20px;
+    font-size: 20px;
+}
+
 .form-container {
     max-width: 600px;
     margin: 0;

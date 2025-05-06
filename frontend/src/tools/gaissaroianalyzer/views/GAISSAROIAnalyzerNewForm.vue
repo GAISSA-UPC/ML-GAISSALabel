@@ -379,7 +379,6 @@ export default {
 <style scoped>
 h1 {
     color: var(--gaissa_green);
-    font-size: 2rem;
     margin-bottom: 0.5rem;
 }
 
