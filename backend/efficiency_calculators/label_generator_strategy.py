@@ -167,7 +167,7 @@ def generate_efficency_label(results, meanings, frate, model_name, task_type, ur
 
     # Draw the background
     canvas.drawInlineImage(os.path.join(PARTS_DIR, f"bg_new_logo.png"), 0, 0)
-
+    
     # Definition of text styles
     canvas.setFillColor(black)
     canvas.setLineWidth(3)
