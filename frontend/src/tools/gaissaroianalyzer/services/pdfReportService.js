@@ -17,6 +17,16 @@ export default {
             
             // Create a clone of the element to avoid modifying the original
             const clonedElement = element.cloneNode(true);
+
+            // Hide unnecessary elements
+            const clonedExportButtonContainer = clonedElement.querySelector('.export-button-container');
+            if (clonedExportButtonContainer) {
+                clonedExportButtonContainer.style.display = 'none';
+            }
+            const clonedViewToggle = clonedElement.querySelector('.view-toggle');
+            if (clonedViewToggle) {
+                clonedViewToggle.style.display = 'none';
+            }
             
             // Apply styles to prepare for PDF
             clonedElement.style.width = '1200px';
@@ -83,14 +93,14 @@ export default {
             
             try {
                 const canvas = await html2canvas(clonedElement, {
-                    scale: 1.5,
+                    scale: 4,
                     useCORS: true,
                     logging: false,
                     foreignObjectRendering: false,
                     removeContainer: true,
                 });
 
-                const imgData = canvas.toDataURL('image/png', 1.0);
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
 
                 const canvasOriginalWidth = canvas.width;    // Width of the canvas (in pixels)
                 const canvasOriginalHeight = canvas.height;  // Height of the canvas (in pixels)
@@ -119,7 +129,8 @@ export default {
                     imageXOffsetOnPdf,
                     yPositionOfImageSegmentOnPdf,
                     imageWidthOnPdf,
-                    imageHeightOnPdfTotal
+                    imageHeightOnPdfTotal,
+                    'FAST',
                 );
 
                 remainingImageHeightToPrint -= pdfPageHeight; // Subtract one page height
@@ -134,7 +145,8 @@ export default {
                         imageXOffsetOnPdf,
                         yPositionOfImageSegmentOnPdf, // Negative offset shows the next part of the image
                         imageWidthOnPdf,
-                        imageHeightOnPdfTotal
+                        imageHeightOnPdfTotal,
+                        'FAST',
                     );
                     remainingImageHeightToPrint -= pdfPageHeight;
                 }
