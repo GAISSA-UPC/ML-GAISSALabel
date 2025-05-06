@@ -122,6 +122,20 @@
             <br>
         </div>
 
+        <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Location Information") }}</h3>
+        <p>{{ $t("Please specify the country or region where the model is being deployed.") }}</p><br>
+
+        <el-form-item :label="$t('Country')" prop="country">
+            <el-input 
+                v-model="formData.country" 
+                placeholder="e.g., Italy, Canada"
+                class="model-select"></el-input>
+            <el-alert type="info" show-icon :closable="false" style="margin-top: 10px">
+                <p style="font-size: 14px">{{ $t('The region specified will not be used in the analysis calculus, but it might be useful to contextualize the results.') }}</p>
+            </el-alert>
+        </el-form-item>
+        <br>
+
         <el-button
             class="action-button"
             @click="generateROI"
@@ -153,6 +167,7 @@ export default {
                 modelArchitecture: null,
                 mlTactic: null,
                 tacticParameter: null,
+                country: null,
             },
             metricValues: {},
             energyCostRates: {},
@@ -163,7 +178,7 @@ export default {
     },
     computed: {
         formIsValid() {
-            const basicFormValid = this.formData.modelArchitecture && this.formData.mlTactic && this.formData.tacticParameter;
+            const basicFormValid = this.formData.modelArchitecture && this.formData.mlTactic && this.formData.tacticParameter && this.formData.country;
             
             // Check if we have metric values for all applicable metrics
             const metricsValid = this.applicableMetrics.every(metric => 
@@ -316,7 +331,7 @@ export default {
                     model_architecture_id: parseInt(this.formData.modelArchitecture),
                     tactic_parameter_option_id: parseInt(this.formData.tacticParameter),
                     metric_values_data: metricValuesData,
-                    country: "Catalunya",
+                    country: this.formData.country,
                     analysis_type: "calculation" // Explicitly set analysis type
                 };
                                 
