@@ -5,25 +5,30 @@ const HomeView = () => import('@/views/HomeView.vue')
 const AboutView = () => import('@/views/AboutView.vue')
 
 // Training routes
-const TrainingForm = () => import('@/views/TrainingForm.vue')
-const TrainingPreSaved = () => import('@/views/TrainingPreSaved.vue')
-const TrainingFile = () => import('@/views/TrainingFile.vue')
-const TrainingLabelInfo = () => import('@/views/TrainingLabelInfo.vue')
+const TrainingForm = () => import('@/tools/gaissalabel/views/TrainingForm.vue')
+const TrainingPreSaved = () => import('@/tools/gaissalabel/views/TrainingPreSaved.vue')
+const TrainingFile = () => import('@/tools/gaissalabel/views/TrainingFile.vue')
+const TrainingLabelInfo = () => import('@/tools/gaissalabel/views/TrainingLabelInfo.vue')
 
 // Inference routes
-const InferenceForm = () => import('@/views/InferenceForm.vue')
-const InferencePreSaved = () => import('@/views/InferencePreSaved.vue')
-const InferenceFile = () => import('@/views/InferenceFile.vue')
-const InferenceDeploy = () => import('@/views/InferenceDeploy.vue')
-const InferenceLabelInfo = () => import('@/views/InferenceLabelInfo.vue')
+const InferenceForm = () => import('@/tools/gaissalabel/views/InferenceForm.vue')
+const InferencePreSaved = () => import('@/tools/gaissalabel/views/InferencePreSaved.vue')
+const InferenceFile = () => import('@/tools/gaissalabel/views/InferenceFile.vue')
+const InferenceDeploy = () => import('@/tools/gaissalabel/views/InferenceDeploy.vue')
+const InferenceLabelInfo = () => import('@/tools/gaissalabel/views/InferenceLabelInfo.vue')
+
+// GAISSA ROI Analyzer routes
+const GAISSAROIAnalyzerPreSaved = () => import('@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzerPreSaved.vue')
+const GAISSAROIAnalyzer = () => import("@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzer.vue")
+const GAISSAROIAnalyzerNewForm = () => import("@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzerNewForm.vue")
 
 // Admin routes
-const AdminMetriquesInfo = () => import('@/views/AdminMetriquesInfo.vue')
-const AdminMetrica = () => import('@/views/AdminMetrica.vue')
-const AdminInformacio = () => import('@/views/AdminInformacio.vue')
-const AdminEines = () => import('@/views/AdminEines.vue')
-const AdminEina = () => import('@/views/AdminEina.vue')
-const AdminSincro = () => import('@/views/AdminSincro.vue')
+const AdminMetriquesInfo = () => import('@/tools/gaissalabel/views/AdminMetriquesInfo.vue')
+const AdminMetrica = () => import('@/tools/gaissalabel/views/AdminMetrica.vue')
+const AdminInformacio = () => import('@/tools/gaissalabel/views/AdminInformacio.vue')
+const AdminEines = () => import('@/tools/gaissalabel/views/AdminEines.vue')
+const AdminEina = () => import('@/tools/gaissalabel/views/AdminEina.vue')
+const AdminSincro = () => import('@/tools/gaissalabel/views/AdminSincro.vue')
 const AdminLogin = () => import('@/views/AdminLogin.vue')
 
 const router = createRouter({
@@ -82,6 +87,24 @@ const router = createRouter({
       path: '/models/:id_model/inferences/:id_inference',
       name: 'Label info for inference',
       component: InferenceLabelInfo
+    },
+    {
+      path: '/gaissa-roi-analyzer/gaissa-roi-analyzer-pre',
+      name: 'GAISSA ROI Analyzer PreSaved Consult',
+      component: GAISSAROIAnalyzerPreSaved,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/gaissa-roi-analyzer/gaissa-roi-analysis/:id_experiment',
+      name: "GAISSA ROI Analyzer",
+      component: GAISSAROIAnalyzer,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/gaissa-roi-analyzer/new-form',
+      name: 'GAISSA ROI Analyzer New Form',
+      component: GAISSAROIAnalyzerNewForm,
+      meta: { requiresAuth: true }
     },
     {
       path: '/admin/metriquesinfo',

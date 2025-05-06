@@ -1,19 +1,19 @@
 // PreSaved.spec.js
 import { mount } from '@vue/test-utils';
 import { formatData } from '@/utils';
-import PreSaved from '@/components/PreSaved.vue';
+import PreSaved from '@/tools/gaissalabel/components/PreSaved.vue';
 import ElementPlus from 'element-plus';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { i18n } from '@/i18n';
-import models from '@/controllers/models';
-import trainings from '@/controllers/trainings';
-import inferencies from '@/controllers/inferencies';
+import models from '@/tools/gaissalabel/services/models';
+import trainings from '@/tools/gaissalabel/services/trainings';
+import inferencies from '@/tools/gaissalabel/services/inferencies';
 import flushPromises from 'flush-promises';
 
 // Mock controllers
-vi.mock('@/controllers/models');
-vi.mock('@/controllers/trainings');
-vi.mock('@/controllers/inferencies');
+vi.mock('@/tools/gaissalabel/services/models');
+vi.mock('@/tools/gaissalabel/services/trainings');
+vi.mock('@/tools/gaissalabel/services/inferencies');
 
 // Mock data
 export const mockModelsResponse = {

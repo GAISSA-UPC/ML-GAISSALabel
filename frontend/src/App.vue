@@ -9,7 +9,7 @@
                 />
             </el-header>
             <el-container class="main-container" :class="{ 'mobile': isMobile }">
-                <el-aside :class="{ 'mobile': isMobile }" :width="isMobile ? 'auto' : (collapse ? '64px' : '200px')">
+                <el-aside :class="{ 'mobile': isMobile }" :width="isMobile ? 'auto' : (collapse ? '64px' : '225px')">
                     <MenuLateral
                         :collapsed="collapse"
                         :class="{ 'mobile': isMobile }"

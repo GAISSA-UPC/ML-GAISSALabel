@@ -1,11 +1,11 @@
 import { mount } from '@vue/test-utils';
-import DialogNewModel from '@/components/DialogNewModel.vue';
+import DialogNewModel from '@/tools/gaissalabel/components/DialogNewModel.vue';
 import ElementPlus from 'element-plus';
 import { i18n } from '@/i18n';
-import models from '@/controllers/models';
+import models from '@/tools/gaissalabel/services/models';
 import flushPromises from 'flush-promises';
 
-vi.mock('@/controllers/models');
+vi.mock('@/tools/gaissalabel/services/models');
 
 describe('DialogNewModel.vue', () => {
     let wrapper;
@@ -27,7 +27,6 @@ describe('DialogNewModel.vue', () => {
     it('renders dialog with correct form fields', async () => {
         await wrapper.vm.$nextTick();
         const formItems = wrapper.findAllComponents({ name: 'el-form-item' });
-        console.log(wrapper.html());
         expect(formItems).toHaveLength(3);
         
         expect(formItems[0].props('label')).toBe('Name');

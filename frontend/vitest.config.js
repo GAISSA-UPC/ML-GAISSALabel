@@ -12,6 +12,16 @@ export default mergeConfig(
       root: fileURLToPath(new URL('./', import.meta.url)),
       transformMode: {
         web: [/\.[jt]sx$/]
+      },
+      setupFiles: ['./vitest.setup.js'],
+      // Mock css imports during tests
+      css: {
+        modules: {
+          classNameStrategy: 'non-scoped'
+        }
+      },
+      deps: {
+        inline: ['element-plus']
       }
     }
   })

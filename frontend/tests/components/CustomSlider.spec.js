@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import CustomSlider from '@/components/CustomSlider.vue';
+import CustomSlider from '@/tools/gaissalabel/components/CustomSlider.vue';
 import ElementPlus from 'element-plus';
 
 describe('CustomSlider.vue', () => {
@@ -8,7 +8,7 @@ describe('CustomSlider.vue', () => {
         values: [20, 80],
         marks: { 0: '', 50: '', 100: '' },
         max: 100,
-        color: '#ff0000'
+        color: '#ff0000',
     };
 
     beforeEach(() => {
