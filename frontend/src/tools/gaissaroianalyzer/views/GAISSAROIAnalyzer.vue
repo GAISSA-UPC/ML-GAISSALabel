@@ -46,13 +46,13 @@
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
                     <h2 class="section-title">{{ $t("Metrics Chart") }}</h2>
                     <p class="chart-description">
-                        {{ $t("This chart illustrates the evolution of the metrics affected by the tactic over a range of inferences.") }}
+                        {{ $t("This chart illustrates the expected effect of the tactic over a set of the metrics.") }}
                     </p>
                     <div ref="metricsRadialChartContainer" class="chart-container">
                         <!-- Chart will be rendered here -->
                     </div>
                     <p>
-                        The Metrics Chart shows the evolution of the metrics affected by the tactic over a range of inferences. The chart displays the baseline and new expected values for each metric, allowing you to visualize the impact of the optimization.
+                        The chart displays the baseline and new expected values for each metric, allowing the visualization of the impact of the tactic.
                     </p>
                 </el-card>
             </el-col>
@@ -648,8 +648,12 @@ export default {
                     parseFloat(metric.new_expected_value) || 0
                 ) * 1.2;
                 
+                const displayName = metric.unit ? 
+                    `${metric.metric_name} (${metric.unit})` : 
+                    metric.metric_name;
+                
                 return {
-                    name: metric.metric_name,
+                    name: displayName,
                     max: maxValue
                 };
             });
