@@ -44,6 +44,18 @@
         </el-sub-menu>
         <el-sub-menu index="3" v-if="$store.getters.isLogged">
             <template #title>
+                <font-awesome-icon :icon="['fas', 'chart-line']" class="icon"/>
+                <span class="wrap-title">{{ $t('GAISSA ROI Analyzer') }}</span>
+            </template>
+            <el-menu-item index="GAISSA ROI Analyzer New Form" @click="$router.push({name: 'GAISSA ROI Analyzer New Form'})">
+                {{ $t('New from Form') }}
+            </el-menu-item>
+            <el-menu-item index="GAISSA ROI Analyzer PreSaved Consult" @click="$router.push({name: 'GAISSA ROI Analyzer PreSaved Consult'})">
+                {{ $t('Consult') }}
+            </el-menu-item>
+        </el-sub-menu>
+        <el-sub-menu index="4" v-if="$store.getters.isLogged">
+            <template #title>
                 <font-awesome-icon :icon="['fas', 'screwdriver-wrench']" class="icon"/>
                 <span>{{ $t('Administration') }}</span>
             </template>
@@ -87,14 +99,68 @@ export default {
 .el-menu-vertical:not(.el-menu--collapse) {
     width: 200px;
 }
+
 .el-menu-vertical {
     min-height: 95%;
 }
+
+.el-menu-vertical.mobile {
+    width: 100% !important;
+    min-height: auto;
+    margin: 0 !important;
+}
+
 .el-menu-item.is-active {
     color: var(--gaissa_green)
 }
+
 .icon {
     width: 20px;
     margin-right: 10px;
+}
+
+.wrap-title {
+    display: inline-block;
+    text-align: left;
+    line-height: 1.2;
+    white-space: normal;
+}
+
+@media (max-width: 768px) {
+    .el-menu-vertical {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .el-menu-vertical .el-menu-item,
+    .el-menu-vertical .el-sub-menu__title {
+        width: auto;
+        min-width: 60px;
+        text-align: center;
+        padding: 0 20px;
+    }
+    .el-menu-vertical .el-menu-item .icon,
+    .el-menu-vertical .el-sub-menu__title .icon {
+        margin-right: 5px;
+    }
+    .el-menu-vertical .el-menu--popup {
+        min-width: 60px;
+    }
+
+    .el-menu-vertical .el-menu--popup .el-menu-item {
+        text-align: center;
+        padding: 0 20px;
+    }
+}
+
+@media (min-width: 769px) {
+    .el-menu-vertical {
+        display: block;
+    }
+
+    .el-menu-vertical.el-menu--collapse {
+        width: 64px !important;
+    }
 }
 </style>

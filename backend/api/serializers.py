@@ -1,6 +1,7 @@
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
@@ -8,26 +9,26 @@ from django.contrib.auth.hashers import check_password
 
 from api.models import Model, Entrenament, Inferencia, Metrica, Qualificacio, Interval, ResultatEntrenament, \
     ResultatInferencia, InfoAddicional, ValorInfoEntrenament, ValorInfoInferencia, EinaCalcul, TransformacioMetrica, \
-    TransformacioInformacio, Administrador
+    TransformacioInformacio, Administrador, ModelArchitecture, TacticSource, MLTactic, TacticParameterOption, \
+    ROIAnalysis, ROIAnalysisCalculation, ROIAnalysisResearch, ROIMetric, AnalysisMetricValue, EnergyAnalysisMetricValue, \
+    ExpectedMetricReduction, Configuracio, Administrador
 
+from efficiency_calculators.roi_metrics_calculator import ROIMetricsCalculator
 
 class ModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Model
         fields = '__all__'
 
-
 class EntrenamentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Entrenament
         fields = '__all__'
 
-
 class InferenciaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Inferencia
         fields = '__all__'
-
 
 class MetricaSerializer(serializers.ModelSerializer):
     intervals = serializers.ListField(write_only=True)
@@ -47,18 +48,15 @@ class MetricaSerializer(serializers.ModelSerializer):
         model = Metrica
         fields = ('id', 'nom', 'fase', 'pes', 'unitat', 'influencia', 'descripcio', 'calcul', 'recomanacions', 'intervals')
 
-
 class QualificacioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Qualificacio
         fields = '__all__'
 
-
 class IntervalBasicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Interval
         fields = ('qualificacio', 'limitSuperior', 'limitInferior')
-
 
 class IntervalSerializer(IntervalBasicSerializer):
     limitSuperior = serializers.SerializerMethodField(read_only=True)
@@ -84,14 +82,12 @@ class IntervalSerializer(IntervalBasicSerializer):
         model = Interval
         fields = '__all__'
 
-
 class MetricaAmbLimitsSerializer(MetricaSerializer):
     intervals = IntervalBasicSerializer(many=True, read_only=True)
 
     class Meta:
         model = Metrica
         fields = '__all__'
-
 
 class EntrenamentAmbResultatSerializer(serializers.ModelSerializer):
     resultats = serializers.SerializerMethodField(read_only=True)
@@ -138,7 +134,6 @@ class EntrenamentAmbResultatSerializer(serializers.ModelSerializer):
         model = Entrenament
         fields = ('model', 'id', 'dataRegistre', 'resultats', 'resultats_info', 'infoAddicional', 'infoAddicional_valors')
 
-
 class InferenciaAmbResultatSerializer(serializers.ModelSerializer):
     resultats = serializers.SerializerMethodField(read_only=True)
     resultats_info = serializers.JSONField(write_only=True)
@@ -184,7 +179,6 @@ class InferenciaAmbResultatSerializer(serializers.ModelSerializer):
         model = Inferencia
         fields = ('model', 'id', 'dataRegistre', 'resultats', 'resultats_info', 'infoAddicional', 'infoAddicional_valors')
 
-
 class InfoAddicionalSerializer(serializers.ModelSerializer):
     opcions_list = serializers.SerializerMethodField(read_only=True)
 
@@ -197,7 +191,6 @@ class InfoAddicionalSerializer(serializers.ModelSerializer):
     class Meta:
         model = InfoAddicional
         fields = '__all__'
-
 
 class EinaCalculBasicSerializer(serializers.ModelSerializer):
     transformacionsMetriques = serializers.ListField(write_only=True, required=False)
@@ -224,7 +217,6 @@ class EinaCalculBasicSerializer(serializers.ModelSerializer):
         model = EinaCalcul
         fields = ('id', 'nom', 'descripcio', 'transformacionsMetriques', 'transformacionsInformacions')
 
-
 class EinaCalculSerializer(EinaCalculBasicSerializer):
     transformacionsMetriques = serializers.SerializerMethodField(read_only=True)
     transformacionsInformacions = serializers.SerializerMethodField(read_only=True)
@@ -245,18 +237,372 @@ class EinaCalculSerializer(EinaCalculBasicSerializer):
         model = EinaCalcul
         fields = ('id', 'nom', 'descripcio', 'transformacionsMetriques', 'transformacionsInformacions')
 
-
 class TransformacioMetricaSerializer(serializers.ModelSerializer):
     class Meta:
         model = TransformacioMetrica
         fields = '__all__'
-
 
 class TransformacioInformacioSerializer(serializers.ModelSerializer):
     class Meta:
         model = TransformacioInformacio
         fields = '__all__'
 
+# GAISSA ROI Analyzer Serializers
+class ModelArchitectureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ModelArchitecture
+        fields = '__all__'
+
+class TacticSourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TacticSource
+        fields = '__all__'
+
+class MLTacticSerializer(serializers.ModelSerializer):
+    sources = TacticSourceSerializer(many=True, read_only=True)
+    source_ids = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=TacticSource.objects.all(), write_only=True, source='sources', required=True
+    )
+
+    class Meta:
+        model = MLTactic
+        fields = ['id', 'name', 'information', 'sources', 'source_ids']
+
+class TacticParameterOptionSerializer(serializers.ModelSerializer):
+    tactic_name = serializers.CharField(source='tactic.name', read_only=True)
+    tactic_id = serializers.PrimaryKeyRelatedField(
+        queryset=MLTactic.objects.all(), write_only=True, source='tactic'
+    )
+
+    class Meta:
+        model = TacticParameterOption
+        fields = ['id', 'tactic', 'tactic_id', 'tactic_name', 'name', 'value']
+        read_only_fields = ['tactic'] # tactic is set via tactic_id
+
+class ROIMetricSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ROIMetric
+        fields = '__all__'
+
+class AnalysisMetricValueSerializer(serializers.ModelSerializer):
+    metric_name = serializers.CharField(source='metric.name', read_only=True)
+    metric_id = serializers.PrimaryKeyRelatedField(
+        queryset=ROIMetric.objects.all(), write_only=True, source='metric'
+    )
+
+    class Meta:
+        model = AnalysisMetricValue
+        fields = ['id', 'analysis', 'metric', 'metric_id', 'metric_name', 'baselineValue']
+        read_only_fields = ['metric'] # metric is set via metric_id
+
+class EnergyAnalysisMetricValueSerializer(serializers.ModelSerializer):
+    metric_name = serializers.CharField(source='metric.name', read_only=True)
+    metric_id = serializers.PrimaryKeyRelatedField(
+        queryset=ROIMetric.objects.filter(is_energy_related=True), write_only=True, source='metric'
+    )
+    cost_savings = serializers.SerializerMethodField(read_only=True)
+    
+    class Meta:
+        model = EnergyAnalysisMetricValue
+        fields = ['id', 'analysis', 'metric', 'metric_id', 'metric_name', 'baselineValue', 
+                 'energy_cost_rate', 'implementation_cost', 'cost_savings']
+        read_only_fields = ['metric'] # metric is set via metric_id
+    
+    def validate_metric_id(self, value):
+        if not value.is_energy_related:
+            raise serializers.ValidationError(_("Only energy-related metrics can be used with EnergyAnalysisMetricValue."))
+        return value
+    
+    def get_cost_savings(self, obj):
+        # Default calculation for 10 million inferences if not specified
+        num_inferences = self.context.get('num_inferences', 10000000)
+        
+        try:
+            expected_reduction = ExpectedMetricReduction.objects.get(
+                model_architecture=obj.analysis.model_architecture,
+                tactic_parameter_option=obj.analysis.tactic_parameter_option,
+                metric=obj.metric
+            )
+            
+            # Use the calculator to get cost savings
+            calculator = ROIMetricsCalculator()
+            return calculator.calculate_cost_savings(
+                obj,
+                expected_reduction.expectedReductionValue,
+                num_inferences
+            )
+        except ExpectedMetricReduction.DoesNotExist:
+            return {'error': f"No expected reduction found for this metric ({obj.metric.name})"}
+        except Exception as e:
+            return {'error': str(e)}
+
+class ROIAnalysisSerializer(serializers.ModelSerializer):
+    model_architecture_name = serializers.CharField(source='model_architecture.name', read_only=True)
+    tactic_parameter_option_details = TacticParameterOptionSerializer(source='tactic_parameter_option', read_only=True)
+    metric_values = AnalysisMetricValueSerializer(many=True, read_only=True)
+    metrics_analysis = serializers.SerializerMethodField(read_only=True)
+    
+    # Fields from subclasses
+    dateRegistration = serializers.SerializerMethodField(read_only=True)
+    country = serializers.SerializerMethodField(read_only=True)
+    source = serializers.SerializerMethodField(read_only=True)
+
+    # Writeable fields for relations
+    model_architecture_id = serializers.PrimaryKeyRelatedField(
+        queryset=ModelArchitecture.objects.all(), write_only=True, source='model_architecture'
+    )
+    tactic_parameter_option_id = serializers.PrimaryKeyRelatedField(
+        queryset=TacticParameterOption.objects.all(), write_only=True, source='tactic_parameter_option'
+    )
+    # For creating metric values alongside analysis
+    metric_values_data = serializers.ListField(
+        child=serializers.DictField(), write_only=True, required=False
+    )
+
+    class Meta:
+        model = ROIAnalysis
+        fields = [
+            'id', 'model_architecture', 'model_architecture_id', 'model_architecture_name',
+            'tactic_parameter_option', 'tactic_parameter_option_id', 'tactic_parameter_option_details',
+            'metric_values', 'metric_values_data', 'metrics_analysis', 'dateRegistration', 'country', 
+            'source'
+        ]
+        read_only_fields = ['model_architecture', 'tactic_parameter_option']
+    
+    def get_metrics_analysis(self, obj):
+        calculator = ROIMetricsCalculator()
+        return calculator.calculate_metrics_for_analysis(obj.id)
+    
+    def get_dateRegistration(self, obj):
+        if hasattr(obj, 'roianalysiscalculation'):
+            return obj.roianalysiscalculation.dateRegistration
+        return None
+    
+    def get_country(self, obj):
+        if hasattr(obj, 'roianalysiscalculation'):
+            return obj.roianalysiscalculation.country
+        return None
+        
+    def get_source(self, obj):
+        if hasattr(obj, 'roianalysisresearch'):
+            source = obj.roianalysisresearch.source
+            return {
+                'id': source.id,
+                'title': source.title,
+                'url': source.url
+            } if source else None
+        return None
+
+    def validate(self, data):
+        """Check compatibility between the selected tactic and model architecture."""
+        model_architecture = data.get('model_architecture')
+        tactic_parameter_option = data.get('tactic_parameter_option')
+
+        if model_architecture and tactic_parameter_option:
+            tactic = tactic_parameter_option.tactic
+            if not tactic.compatible_architectures.filter(pk=model_architecture.pk).exists():
+                raise ValidationError(
+                    _("The selected tactic '%(tactic)s' is not compatible with the model architecture '%(arch)s'.") % {
+                        'tactic': tactic.name,
+                        'arch': model_architecture.name
+                    }
+                )
+
+        return data
+
+    def _validate_metric_values_against_expected_reduction(self, metric_values_data, model_architecture, tactic_parameter_option):
+        """Method to validate metric values against ExpectedMetricReduction."""
+        if not metric_values_data:
+            raise ValidationError("Missing Metrics data for validation.")
+
+        if not model_architecture or not tactic_parameter_option:
+            raise ValidationError("Missing Model Architecture or Tactic Parameter Option for validation.")
+
+        metrics_to_create = []
+        tactic = tactic_parameter_option.tactic
+        
+        for metric_data in metric_values_data:
+            metric_id = metric_data.get('metric_id')
+            baseline_value = metric_data.get('baselineValue')
+            if metric_id is None or baseline_value is None:
+                 raise ValidationError("Each entry in metric_values_data must include 'metric_id' and 'baselineValue'.")
+
+            # Validate metric existence
+            try:
+                metric = ROIMetric.objects.get(pk=metric_id)
+            except ROIMetric.DoesNotExist:
+                raise ValidationError(f"ROIMetric with id {metric_id} does not exist.")
+                
+            # Constraint 3: Check if the metric is applicable for the tactic
+            if not tactic.applicable_metrics.filter(pk=metric.pk).exists():
+                raise ValidationError(
+                    _("The metric '%(metric)s' is not applicable for the tactic '%(tactic)s'.") % {
+                        'metric': metric.name,
+                        'tactic': tactic.name
+                    }
+                )
+
+            # Constraint 2: ExpectedMetricReduction existence check
+            exists = ExpectedMetricReduction.objects.filter(
+                model_architecture=model_architecture,
+                tactic_parameter_option=tactic_parameter_option,
+                metric=metric
+            ).exists()
+            if not exists:
+                raise ValidationError(
+                    f"No matching ExpectedMetricReduction found for the combination of "
+                    f"Model Architecture '{model_architecture}', "
+                    f"Tactic Parameter Option '{tactic_parameter_option}', and Metric '{metric}'."
+                )
+
+            # Check if energy-related metrics have energy cost information
+            if metric.is_energy_related:
+                energy_cost_rate = metric_data.get('energy_cost_rate')
+                implementation_cost = metric_data.get('implementation_cost')
+                if energy_cost_rate is None or implementation_cost is None:
+                    raise ValidationError(
+                        f"Energy-related metric '{metric.name}' requires 'energy_cost_rate' and 'implementation_cost' values."
+                    )
+                metrics_to_create.append({
+                    'metric': metric, 
+                    'baselineValue': baseline_value,
+                    'is_energy_related': True,
+                    'energy_cost_rate': energy_cost_rate,
+                    'implementation_cost': implementation_cost
+                })
+            else:
+                metrics_to_create.append({'metric': metric, 'baselineValue': baseline_value, 'is_energy_related': False})
+        return metrics_to_create
+
+    def create(self, validated_data):
+        metric_values_data = validated_data.pop('metric_values_data', [])
+        model_architecture = validated_data.get('model_architecture')
+        tactic_parameter_option = validated_data.get('tactic_parameter_option')
+
+        # Validate metric values against expected reductions
+        metrics_to_create = self._validate_metric_values_against_expected_reduction(
+            metric_values_data, model_architecture, tactic_parameter_option
+        )
+
+        # If validation passed, create the analysis and then the metric values
+        analysis = ROIAnalysis.objects.create(**validated_data)
+        
+        for metric_info in metrics_to_create:
+            # Create the appropriate metric value type based on whether it's energy-related
+            if metric_info['is_energy_related']:
+                EnergyAnalysisMetricValue.objects.create(
+                    analysis=analysis,
+                    metric=metric_info['metric'],
+                    baselineValue=metric_info['baselineValue'],
+                    energy_cost_rate=metric_info['energy_cost_rate'],
+                    implementation_cost=metric_info['implementation_cost']
+                )
+            else:
+                AnalysisMetricValue.objects.create(
+                    analysis=analysis,
+                    metric=metric_info['metric'],
+                    baselineValue=metric_info['baselineValue']
+                )
+        return analysis
+
+class ROIAnalysisCalculationSerializer(ROIAnalysisSerializer):
+    country = serializers.CharField(max_length=255, required=True)
+    
+    class Meta(ROIAnalysisSerializer.Meta):
+        model = ROIAnalysisCalculation
+        fields = ROIAnalysisSerializer.Meta.fields + ['dateRegistration', 'country']
+
+    def create(self, validated_data):
+        metric_values_data = validated_data.pop('metric_values_data', [])
+        model_architecture = validated_data.get('model_architecture')
+        tactic_parameter_option = validated_data.get('tactic_parameter_option')
+
+        # Validate metric values against expected reductions
+        metrics_to_create = self._validate_metric_values_against_expected_reduction(
+            metric_values_data, model_architecture, tactic_parameter_option
+        )
+
+        # If validation passed, create the specific analysis type and then the metric values
+        analysis = ROIAnalysisCalculation.objects.create(**validated_data)
+        
+        for metric_info in metrics_to_create:
+            # Create the appropriate metric value type based on whether it's energy-related
+            if metric_info['is_energy_related']:
+                EnergyAnalysisMetricValue.objects.create(
+                    analysis=analysis,
+                    metric=metric_info['metric'],
+                    baselineValue=metric_info['baselineValue'],
+                    energy_cost_rate=metric_info['energy_cost_rate'],
+                    implementation_cost=metric_info['implementation_cost']
+                )
+            else:
+                AnalysisMetricValue.objects.create(
+                    analysis=analysis,
+                    metric=metric_info['metric'],
+                    baselineValue=metric_info['baselineValue']
+                )
+        return analysis
+
+class ROIAnalysisResearchSerializer(ROIAnalysisSerializer):
+     class Meta(ROIAnalysisSerializer.Meta):
+        model = ROIAnalysisResearch
+        fields = ROIAnalysisSerializer.Meta.fields + ['source']
+
+     def create(self, validated_data):
+        metric_values_data = validated_data.pop('metric_values_data', [])
+        model_architecture = validated_data.get('model_architecture')
+        tactic_parameter_option = validated_data.get('tactic_parameter_option')
+
+        # Validate metric values against expected reductions
+        metrics_to_create = self._validate_metric_values_against_expected_reduction(
+            metric_values_data, model_architecture, tactic_parameter_option
+        )
+
+        # If validation passed, create the specific analysis type and then the metric values
+        analysis = ROIAnalysisResearch.objects.create(**validated_data)
+        
+        for metric_info in metrics_to_create:
+            # Create the appropriate metric value type based on whether it's energy-related
+            if metric_info['is_energy_related']:
+                EnergyAnalysisMetricValue.objects.create(
+                    analysis=analysis,
+                    metric=metric_info['metric'],
+                    baselineValue=metric_info['baselineValue'],
+                    energy_cost_rate=metric_info['energy_cost_rate'],
+                    implementation_cost=metric_info['implementation_cost']
+                )
+            else:
+                AnalysisMetricValue.objects.create(
+                    analysis=analysis,
+                    metric=metric_info['metric'],
+                    baselineValue=metric_info['baselineValue']
+                )
+        return analysis
+
+class ExpectedMetricReductionSerializer(serializers.ModelSerializer):
+    model_architecture_name = serializers.CharField(source='model_architecture.name', read_only=True)
+    tactic_parameter_option_details = TacticParameterOptionSerializer(source='tactic_parameter_option', read_only=True)
+    metric_name = serializers.CharField(source='metric.name', read_only=True)
+
+    # Writeable fields for relations
+    model_architecture_id = serializers.PrimaryKeyRelatedField(
+        queryset=ModelArchitecture.objects.all(), write_only=True, source='model_architecture'
+    )
+    tactic_parameter_option_id = serializers.PrimaryKeyRelatedField(
+        queryset=TacticParameterOption.objects.all(), write_only=True, source='tactic_parameter_option'
+    )
+    metric_id = serializers.PrimaryKeyRelatedField(
+        queryset=ROIMetric.objects.all(), write_only=True, source='metric'
+    )
+
+    class Meta:
+        model = ExpectedMetricReduction
+        fields = [
+            'id', 'model_architecture', 'model_architecture_id', 'model_architecture_name',
+            'tactic_parameter_option', 'tactic_parameter_option_id', 'tactic_parameter_option_details',
+            'metric', 'metric_id', 'metric_name', 'expectedReductionValue'
+        ]
+        read_only_fields = ['model_architecture', 'tactic_parameter_option', 'metric']
 
 # LOGIN
 def validacioLogin(data):
@@ -274,13 +620,11 @@ def validacioLogin(data):
         raise serializers.ValidationError("Contrasenya incorrecta.")
     return user
 
-
 def creacioLogin(data, user):
     token, created = Token.objects.get_or_create(user=user)
     data['token'] = token.key
     data['created'] = created
     return data
-
 
 class LoginAdminSerializer(serializers.ModelSerializer):
     username = serializers.CharField()

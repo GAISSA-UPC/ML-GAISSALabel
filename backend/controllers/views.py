@@ -3,24 +3,29 @@ import pytz
 
 from rest_framework import viewsets, filters, status, mixins
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 from django.shortcuts import get_object_or_404
 
 from django_filters.rest_framework import DjangoFilterBackend
 
 from api.models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, Interval, EinaCalcul, \
-    TransformacioMetrica, TransformacioInformacio, Administrador, Configuracio
+    TransformacioMetrica, TransformacioInformacio, Administrador, Configuracio, \
+    ModelArchitecture, TacticSource, MLTactic, TacticParameterOption, ROIAnalysis, ROIAnalysisCalculation, \
+    ROIAnalysisResearch, ROIMetric, AnalysisMetricValue, EnergyAnalysisMetricValue, ExpectedMetricReduction
 from api.serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
     EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer, \
     IntervalBasicSerializer, MetricaSerializer, EinaCalculBasicSerializer, EinaCalculSerializer, \
-    TransformacioMetricaSerializer, TransformacioInformacioSerializer, LoginAdminSerializer
+    TransformacioMetricaSerializer, TransformacioInformacioSerializer, LoginAdminSerializer, \
+    ModelArchitectureSerializer, TacticSourceSerializer, MLTacticSerializer, TacticParameterOptionSerializer, \
+    ROIAnalysisSerializer, ROIAnalysisCalculationSerializer, ROIAnalysisResearchSerializer, ROIMetricSerializer, \
+    AnalysisMetricValueSerializer, EnergyAnalysisMetricValueSerializer, ExpectedMetricReductionSerializer
 
 from api import permissions
 from efficiency_calculators.rating_calculator import calculateRating
 from efficiency_calculators.label_generator import generateLabel
 from efficiency_calculators.efficiency_calculator import calculateEfficiency
 from connectors import adaptador_huggingface
-
 
 class ModelsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Model.objects.all()
@@ -35,6 +40,12 @@ class ModelsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Create
     search_fields = ['nom']
     ordering_fields = ['nom', 'dataCreacio']
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        has_roi_analysis = self.request.query_params.get('has_roi_analysis')
+        if has_roi_analysis == 'true':
+            queryset = queryset.filter(gaissa_roi_analyses__isnull=False).distinct()
+        return queryset
 
 class EntrenamentsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     models = Entrenament
@@ -89,7 +100,6 @@ class EntrenamentsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-
 class InferenciesView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     models = Inferencia
     serializer_class = InferenciaSerializer
@@ -143,7 +153,6 @@ class InferenciesView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.C
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-
 class QualificacionsView(mixins.ListModelMixin, viewsets.GenericViewSet):
     models = Qualificacio
     serializer_class = QualificacioSerializer
@@ -151,7 +160,6 @@ class QualificacionsView(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     ordering_fields = ['ordre']
-
 
 class MetriquesView(viewsets.ModelViewSet):
     models = Metrica
@@ -195,7 +203,6 @@ class MetriquesView(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-
 class InfoAddicionalsView(viewsets.ModelViewSet):
     model = InfoAddicional
     serializer_class = InfoAddicionalSerializer
@@ -211,7 +218,6 @@ class InfoAddicionalsView(viewsets.ModelViewSet):
     search_fields = ['nom', 'fase']
     ordering_fields = ['id', 'nom', 'fase']
 
-
 class CalculadorInferenciaView(mixins.CreateModelMixin, viewsets.GenericViewSet):
     def get_serializer_class(self):
         pass
@@ -223,7 +229,6 @@ class CalculadorInferenciaView(mixins.CreateModelMixin, viewsets.GenericViewSet)
             return Response("Cal donar els atributs endpoint i input!", status=status.HTTP_400_BAD_REQUEST)
         resultats = calculateEfficiency(endpoint, data)
         return Response(resultats, status=status.HTTP_201_CREATED)
-
 
 class EinesCalculView(viewsets.ModelViewSet):
     models = EinaCalcul
@@ -271,12 +276,10 @@ class EinesCalculView(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-
 class LoginAdminView(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Administrador.objects.all()
     serializer_class = LoginAdminSerializer
     models = Administrador
-
 
 class SincroView(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     permission_classes = [permissions.IsAdmin]
@@ -298,7 +301,6 @@ class SincroView(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.Generi
         else:
             return Response({'Created models': creats, 'Updated models': actualitzats}, status=status.HTTP_200_OK)
 
-
 class EstadistiquesView(mixins.ListModelMixin, viewsets.GenericViewSet):
     def get_serializer_class(self):
         pass
@@ -310,3 +312,167 @@ class EstadistiquesView(mixins.ListModelMixin, viewsets.GenericViewSet):
             "numInferencies": Inferencia.objects.count(),
         }
         return Response(data, status=status.HTTP_200_OK)
+
+# GAISSA ROI Analyzer Views
+class ModelArchitectureView(viewsets.ModelViewSet):
+    queryset = ModelArchitecture.objects.all()
+    serializer_class = ModelArchitectureSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['id', 'name']
+    search_fields = ['name', 'information']
+    ordering_fields = ['name']
+
+    
+    # Define new endpoint to get compatible tactics for a specific architecture
+    @action(detail=True, methods=['get'], url_path='compatible-tactics')
+    def get_compatible_tactics(self, request, pk=None):
+        architecture = self.get_object()
+        compatible_tactics = architecture.compatible_tactics.all()
+        
+        # Serialize the tactics and return them
+        serializer = MLTacticSerializer(compatible_tactics, many=True)
+        return Response(serializer.data)
+
+class TacticSourceView(viewsets.ModelViewSet):
+    queryset = TacticSource.objects.all()
+    serializer_class = TacticSourceSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['id', 'title', 'url']
+    search_fields = ['title', 'url']
+    ordering_fields = ['title']
+
+class MLTacticView(viewsets.ModelViewSet):
+    queryset = MLTactic.objects.all()
+    serializer_class = MLTacticSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['id', 'name', 'sources']
+    search_fields = ['name', 'information']
+    ordering_fields = ['name']
+
+    # Define new endpoint to get applicable metrics for a specific tactic
+    @action(detail=True, methods=['get'], url_path='applicable-metrics')
+    def get_applicable_metrics(self, request, pk=None):
+        tactic = self.get_object()
+        applicable_metrics = tactic.applicable_metrics.all()
+        
+        # Serialize the metrics and return them
+        serializer = ROIMetricSerializer(applicable_metrics, many=True)
+        return Response(serializer.data)
+
+class TacticParameterOptionView(viewsets.ModelViewSet):
+    queryset = TacticParameterOption.objects.all()
+    serializer_class = TacticParameterOptionSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['id', 'tactic', 'name', 'value']
+    search_fields = ['name', 'value', 'tactic__name']
+    ordering_fields = ['tactic__name', 'name', 'value']
+
+class ROIMetricView(viewsets.ModelViewSet):
+    queryset = ROIMetric.objects.all()
+    serializer_class = ROIMetricSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['id', 'name', 'unit']
+    search_fields = ['name', 'description']
+    ordering_fields = ['name']
+
+class ROIAnalysisViewSet(viewsets.ModelViewSet):
+    queryset = ROIAnalysis.objects.all()
+    serializer_class = ROIAnalysisSerializer
+    
+    # Allow anyone to create ROI analyses, for other actions use default permissions
+    def get_permissions(self):
+        if self.action == 'create':
+            return []
+        return [permissions.IsAdminEditOthersRead()]
+    
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = {
+        'model_architecture': ['exact'],
+        'tactic_parameter_option': ['exact'],
+        'tactic_parameter_option__tactic': ['exact'],
+        'metric_values__metric': ['exact'],
+        'roianalysiscalculation__country': ['exact', 'icontains'],
+        'roianalysiscalculation__dateRegistration': ['date__gte', 'date__lte'],
+    }
+    search_fields = [
+        'model_architecture__name',
+        'tactic_parameter_option__tactic__name',
+        'tactic_parameter_option__name',
+        'tactic_parameter_option__value',
+        'roianalysiscalculation__country'
+    ]
+    ordering_fields = ['id', 'model_architecture__name', 'tactic_parameter_option__tactic__name']
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            analysis_type = self.request.data.get('analysis_type', 'calculation')
+            
+            # If no analysis_type is provided, determine type by looking at provided fields
+            if not analysis_type:
+                if 'source' in self.request.data:
+                    analysis_type = 'research'
+                elif 'country' in self.request.data:
+                    analysis_type = 'calculation'
+
+            if analysis_type == 'calculation':
+                return ROIAnalysisCalculationSerializer
+            elif analysis_type == 'research':
+                return ROIAnalysisResearchSerializer
+            
+        if self.action == 'retrieve':
+            instance = self.get_object()
+            if hasattr(instance, 'roianalysiscalculation'):
+                return ROIAnalysisCalculationSerializer
+            elif hasattr(instance, 'roianalysisresearch'):
+                return ROIAnalysisResearchSerializer
+        return ROIAnalysisSerializer
+        
+    def get_object(self):
+        obj = super().get_object()
+        if hasattr(obj, 'roianalysiscalculation'):
+            return obj.roianalysiscalculation
+        elif hasattr(obj, 'roianalysisresearch'):
+            return obj.roianalysisresearch
+        return obj
+
+class AnalysisMetricValueView(viewsets.ModelViewSet):
+    queryset = AnalysisMetricValue.objects.all()
+    serializer_class = AnalysisMetricValueSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['analysis', 'metric']
+    ordering_fields = ['analysis', 'metric']
+
+class EnergyAnalysisMetricValueView(viewsets.ModelViewSet):
+    queryset = EnergyAnalysisMetricValue.objects.all()
+    serializer_class = EnergyAnalysisMetricValueSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['analysis', 'metric']
+    ordering_fields = ['analysis', 'metric']
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        
+        # Allow custom number of inferences for cost savings calculations
+        num_inferences = self.request.query_params.get('num_inferences')
+        if num_inferences:
+            try:
+                context['num_inferences'] = int(num_inferences)
+            except ValueError:
+                pass  # Use the default value
+        
+        return context
+
+class ExpectedMetricReductionView(viewsets.ModelViewSet):
+    queryset = ExpectedMetricReduction.objects.all()
+    serializer_class = ExpectedMetricReductionSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['model_architecture', 'tactic_parameter_option', 'metric']
+    ordering_fields = ['model_architecture', 'tactic_parameter_option', 'metric']

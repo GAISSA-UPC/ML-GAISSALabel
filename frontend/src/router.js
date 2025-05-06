@@ -1,22 +1,35 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
-import AboutView from '@/views/AboutView.vue'
-import TrainingForm from '@/views/TrainingForm.vue'
-import TrainingPreSaved from '@/views/TrainingPreSaved.vue'
-import TrainingFile from '@/views/TrainingFile.vue'
-import InferenceForm from '@/views/InferenceForm.vue'
-import InferencePreSaved from '@/views/InferencePreSaved.vue'
-import InferenceFile from '@/views/InferenceFile.vue'
-import InferenceDeploy from '@/views/InferenceDeploy.vue'
-import TrainingLabelInfo from "@/views/TrainingLabelInfo.vue"
-import InferenceLabelInfo from "@/views/InferenceLabelInfo.vue"
-import AdminMetriquesInfo from "@/views/AdminMetriquesInfo.vue"
-import AdminMetrica from "@/views/AdminMetrica.vue"
-import AdminInformacio from "@/views/AdminInformacio.vue"
-import AdminEines from "@/views/AdminEines.vue"
-import AdminEina from "@/views/AdminEina.vue"
-import AdminSincro from "@/views/AdminSincro.vue"
-import AdminLogin from "@/views/AdminLogin.vue"
+
+// Core routes
+const HomeView = () => import('@/views/HomeView.vue')
+const AboutView = () => import('@/views/AboutView.vue')
+
+// Training routes
+const TrainingForm = () => import('@/tools/gaissalabel/views/TrainingForm.vue')
+const TrainingPreSaved = () => import('@/tools/gaissalabel/views/TrainingPreSaved.vue')
+const TrainingFile = () => import('@/tools/gaissalabel/views/TrainingFile.vue')
+const TrainingLabelInfo = () => import('@/tools/gaissalabel/views/TrainingLabelInfo.vue')
+
+// Inference routes
+const InferenceForm = () => import('@/tools/gaissalabel/views/InferenceForm.vue')
+const InferencePreSaved = () => import('@/tools/gaissalabel/views/InferencePreSaved.vue')
+const InferenceFile = () => import('@/tools/gaissalabel/views/InferenceFile.vue')
+const InferenceDeploy = () => import('@/tools/gaissalabel/views/InferenceDeploy.vue')
+const InferenceLabelInfo = () => import('@/tools/gaissalabel/views/InferenceLabelInfo.vue')
+
+// GAISSA ROI Analyzer routes
+const GAISSAROIAnalyzerPreSaved = () => import('@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzerPreSaved.vue')
+const GAISSAROIAnalyzer = () => import("@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzer.vue")
+const GAISSAROIAnalyzerNewForm = () => import("@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzerNewForm.vue")
+
+// Admin routes
+const AdminMetriquesInfo = () => import('@/tools/gaissalabel/views/AdminMetriquesInfo.vue')
+const AdminMetrica = () => import('@/tools/gaissalabel/views/AdminMetrica.vue')
+const AdminInformacio = () => import('@/tools/gaissalabel/views/AdminInformacio.vue')
+const AdminEines = () => import('@/tools/gaissalabel/views/AdminEines.vue')
+const AdminEina = () => import('@/tools/gaissalabel/views/AdminEina.vue')
+const AdminSincro = () => import('@/tools/gaissalabel/views/AdminSincro.vue')
+const AdminLogin = () => import('@/views/AdminLogin.vue')
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -74,6 +87,24 @@ const router = createRouter({
       path: '/models/:id_model/inferences/:id_inference',
       name: 'Label info for inference',
       component: InferenceLabelInfo
+    },
+    {
+      path: '/gaissa-roi-analyzer/gaissa-roi-analyzer-pre',
+      name: 'GAISSA ROI Analyzer PreSaved Consult',
+      component: GAISSAROIAnalyzerPreSaved,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/gaissa-roi-analyzer/gaissa-roi-analysis/:id_experiment',
+      name: "GAISSA ROI Analyzer",
+      component: GAISSAROIAnalyzer,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/gaissa-roi-analyzer/new-form',
+      name: 'GAISSA ROI Analyzer New Form',
+      component: GAISSAROIAnalyzerNewForm,
+      meta: { requiresAuth: true }
     },
     {
       path: '/admin/metriquesinfo',

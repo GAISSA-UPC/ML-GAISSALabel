@@ -2,7 +2,6 @@ import '@/assets/base.css'
 import '@/assets/common.scss'
 
 import { createApp } from 'vue'
-import elementplus from 'element-plus'
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
@@ -13,19 +12,72 @@ import router from './router'
 import store from './store'
 import {i18n} from './i18n.js'
 
-import '@fortawesome/fontawesome-free/css/all.css';
+// ElementPlus Components 
+import {
+    // Layout
+    ElContainer,
+    ElHeader,
+    ElAside,
+    ElMain,
+    
+    // Form
+    ElInput,
+    ElFormItem,
+    ElButton,
+    ElUpload,
+    ElSelect,
+    ElOption,
+    ElInputNumber,
+    
+    // Data
+    ElDescriptions,
+    ElDescriptionsItem,
+    
+    // Navigation
+    ElMenu,
+    ElMenuItem,
+    ElSubMenu,
+    
+    // Feedback
+    ElAlert,
+    ElDialog,
+    
+    // Basic
+    ElRow,
+    ElCol,
+    ElCard,
+    ElImage,
+    ElIcon,
+    ElSlider,
+    
+    // Config Provider
+    ElConfigProvider
+} from 'element-plus'
+  
+const elcomponents = [
+    ElContainer, ElHeader, ElAside, ElMain,
+    ElInput, ElFormItem, ElButton, ElUpload, ElSelect, ElOption, ElInputNumber,
+    ElDescriptions, ElDescriptionsItem,
+    ElMenu, ElMenuItem, ElSubMenu,
+    ElAlert, ElDialog,
+    ElRow, ElCol, ElCard, ElImage, ElIcon, ElSlider,
+    ElConfigProvider
+]  
+
+// Font Awesome: Llibreria d'icones, importem els tipus de icones que farem servir
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { far } from '@fortawesome/free-regular-svg-icons';
 import { fas } from '@fortawesome/free-solid-svg-icons';
-import { fab } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-// Font Awesome: Llibreria d'icones, importem tots els gratuits.
-library.add(far);
+// Font Awesome: Llibreria d'icones, importem els tipus de icones que farem servir
 library.add(fas);
-library.add(fab);
 
 const app = createApp(App)
+
+// Register Element Plus components
+elcomponents.forEach(component => {
+    app.component(component.name, component)
+})  
 
 router.beforeEach((to, from, next) => {
     const isAuthenticated = store.getters.isLogged;
@@ -40,9 +92,6 @@ router.beforeEach((to, from, next) => {
         next();
     }
 });
-
-// ElementPlus i Vuetify: Llibreries amb components per facilitar disseny de les templates
-app.use(elementplus)
 
 const vuetify = createVuetify({
     components,

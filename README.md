@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10532066.svg)](https://doi.org/10.5281/zenodo.10532066)
+
 # GAISSALabel
 
 GAISSALabel allows data scientists, software engineers, and end-users of AI models to analyze, understand, and contribute to improving the energy efficiency of artificial intelligence models during both training and inference stages.
@@ -19,10 +21,10 @@ Firstly, for both training and inference, a form is provided to collect results 
 
 Regardless of the chosen method, users have the ability to retrieve previous evaluations of training and inference. This includes all energy efficiency results calculated from the data collected from various artificial intelligence repositories.
 
-### Administration
-On the other hand, GAISSALabel has sections restricted to certain tool administrators. These administrators have access to three additional sections.
+### Management
+On the other hand, GAISSALabel has sections restricted to certain tool QA Managers. These managers have access to three additional sections.
 
-The first involves the management of synchronizations with external machine learning model providers, such as Hugging Face. Secondly, administrators can manage the metrics and additional information used to evaluate training and inferences. Finally, a management screen is provided for the calculation tools offered to users as options for obtaining energy efficiency results from files.
+The first involves the management of synchronizations with external machine learning model providers, such as Hugging Face. Secondly, managers can manage the metrics and additional information used to evaluate training and inferences. Finally, a management screen is provided for the calculation tools offered to users as options for obtaining energy efficiency results from files.
 
 ## Application Architecture and Repository Structure
 
@@ -30,9 +32,9 @@ The architecture of the application follows a three-layer structure: the present
 
 ![Application architecture](./Architecture.png)
 
-Starting with the client, on the right side of the figure, there are a series of views and controllers that respond to the various functionalities described earlier. These components can be grouped into those displaying energy efficiency results, those collecting user data, and, finally, those related to administration.
+Starting with the client (frontend), on the right side of the figure, there are a series of views and controllers that respond to the various functionalities described earlier. These components can be grouped into those displaying energy efficiency results, those collecting user data, and, finally, those related to management.
 
-On the other hand, the server is a web server. In this sense, it has an Application Programming Interface (API) from which the client has access to all the functionalities offered. Each of these functionalities is controlled by different domain controllers, which interact with the other components of the server's domain layer.
+On the other hand, the server (backend) is a web server. In this sense, it has an Application Programming Interface (API) from which the client has access to all the functionalities offered. Each of these functionalities is controlled by different domain controllers, which interact with the other components of the server's domain layer.
 
 Firstly, the efficiency calculator is responsible for evaluating the efficiency of the studied trainings and inferences. It receives the corresponding data and generates results. On the other hand, adapters or connectors with model providers allow connection to external repositories to update system data. Finally, data interfaces are elements corresponding to the logical domain layer of the application. They enable the interaction of controllers from this layer with the database of the logical persistence layer through persistence controllers.
 
@@ -149,6 +151,10 @@ Would you like to download the repository locally and run it? Follow these steps
      ```
      npm run dev
      ```
+
+## Acknowledgements
+
+We acknowledge the raphischer/strep [repository](https://github.com/raphischer/strep) for its closely related work, particularly in the design of our energy efficiency labels. For transparency, the MIT license has been applied in line with this collaboration on the affected files. Explore [raphischer/strep](https://github.com/raphischer/strep) on GitHub for further details. Our approach to indexing and classification also draws upon industry standards, streamlining comparisons within our tool. We're thankful for these contributions that have shaped our project.
 
 ## About Us and How to Contribute
 

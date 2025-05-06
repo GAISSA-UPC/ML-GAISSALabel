@@ -1,0 +1,976 @@
+modelId,datasets,datasets_size,co2_eq_emissions,source,training_type,geographical_location,hardware_used,accuracy,loss,f1,rouge1,rougeL,size,auto,downloads,likes,library_name,lastModified,created_at,modelcard_text,hours_used,cloud_provider,modelName,modelAuthor,co2_reported,license,language,domain,year_month,size_efficency,performance_score
+universitytehran/PersianMind-v1.0,,,232380.0,,,,,,,,,,,False,477,6,"['transformers', 'pytorch']",2024-01-22 11:17:20+00:00,2024-01-03 05:27:59+00:00,"
+
+<img src=""PersianMind.jpg"" alt=""PersianMind logo"" width=200/> 
+
+
+# <span style=""font-variant:small-caps;"">PersianMind</span>
+
+<span style=""font-variant:small-caps;"">PersianMind</span> is a cross-lingual Persian-English large language model.
+The model achieves state-of-the-art results on Persian subset of the [<span style=""font-variant:small-caps;"">Belebele</span>](https://github.com/facebookresearch/belebele) benchmark 
+and the [ParsiNLU multiple-choice QA](https://github.com/persiannlp/parsinlu) task.
+It also attains performance comparable to GPT-3.5-turbo in a Persian reading comprehension task.
+
+### Model Description
+
+- **Developed by:** [Pedram Rostami](mailto:pedram.rostami@ut.ac.ir), [Ali Salemi](mailto:alisalemi@ut.ac.ir), and [Mohammad Javad Dousti](mailto:mjdousti@ut.ac.ir)
+- **Model type:** Language model
+- **Languages:** English and Persian
+- **License:** [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) (non-commercial use only.)
+
+## How to Get Started with the Model
+
+Use the code below to get started with the model.
+Note that you need to install <code><b>sentencepiece</b></code> and <code><b>accelerate</b></code> libraries along with <code><b>PyTorch</b></code> and <code><b>🤗Transformers</b></code> to run this code.
+
+```python
+from transformers import LlamaTokenizer, LlamaForCausalLM
+import torch
+
+device = ""cuda"" if torch.cuda.is_available() else ""cpu""
+model = LlamaForCausalLM.from_pretrained(
+    ""universitytehran/PersianMind-v1.0"",
+    torch_dtype=torch.bfloat16,
+    low_cpu_mem_usage=True,
+    device_map={"""": device},
+)
+tokenizer = LlamaTokenizer.from_pretrained(
+    ""universitytehran/PersianMind-v1.0"",
+)
+
+TEMPLATE = ""{context}\nYou: {prompt}\nPersianMind: ""
+CONTEXT = ""This is a conversation with PersianMind. It is an artificial intelligence model designed by a team of "" \
+    ""NLP experts at the University of Tehran to help you with various tasks such as answering questions, "" \
+    ""providing recommendations, and helping with decision making. You can ask it anything you want and "" \
+    ""it will do its best to give you accurate and relevant information.""
+PROMPT = ""در مورد هوش مصنوعی توضیح بده.""
+
+model_input = TEMPLATE.format(context=CONTEXT, prompt=PROMPT)
+input_tokens = tokenizer(model_input, return_tensors=""pt"")
+input_tokens = input_tokens.to(device)
+generate_ids = model.generate(**input_tokens, max_new_tokens=512, do_sample=False, repetition_penalty=1.1)
+model_output = tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
+
+print(model_output[len(model_input):])
+```
+
+### How to Quantize the Model
+
+Quantized models can be run on resource-constrained devices. 
+To quantize the model, you should install the <code><b>bitsandbytes</b></code> library.
+In order to quantize the model in 8-bit (`INT8`), use the code below. 
+
+```python
+model = LlamaForCausalLM.from_pretrained(
+    ""universitytehran/PersianMind-v1.0"",
+    device_map=""auto"",
+    low_cpu_mem_usage=True,
+    load_in_8bit=True
+)
+```
+
+Alternatively, you can quantize the model in 4-bit (`NormalFloat4`) with the following code.
+
+```python
+from transformers import BitsAndBytesConfig
+
+quantization_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_use_double_quant=True,
+    bnb_4bit_quant_type=""nf4"",
+)
+model = LlamaForCausalLM.from_pretrained(
+    ""universitytehran/PersianMind-v1.0"", 
+    quantization_config=quantization_config, 
+    device_map=""auto""
+)
+```
+
+### Evaluating Quantized Models
+
+| Model                                                              | <span style=""font-variant:small-caps;"">Belebele</span> (Persian) | Fa→En Translation<br>(<span style=""font-variant:small-caps;"">Comet</span>) | En→Fa Translation<br>(<span style=""font-variant:small-caps;"">Comet</span>) | Model Size | Tokens/sec |
+| :----------------------------------------------------------------: | :--------------------------------------------------------------: | :------------------------------------------------------------------------: | :------------------------------------------------------------------------: | :--------: | :--------: |
+| <span style=""font-variant:small-caps;"">PersianMind</span> (`BF16`) |        73.9                                                      |                                   83.61                                    |                                     79.44                                  |   13.7G    |   25.35    |
+| <span style=""font-variant:small-caps;"">PersianMind</span> (`INT8`) |        73.7                                                      |                                   82.32                                    |                                     78.61                                  |    7.2G    |   11.36    |
+| <span style=""font-variant:small-caps;"">PersianMind</span> (`NF4`) |        70.2                                                      |                                   82.07                                    |                                     80.36                                  |    3.9G    |   24.36    |
+
+We evaluated quantized models in various tasks against the original model. 
+Specifically, we evaluated all models using the reading comprehension multiple-choice 
+question-answering benchmark of [<span style=""font-variant:small-caps;"">Belebele</span>](https://github.com/facebookresearch/belebele) (Persian subset) and reported the accuracy of each model. 
+Additionally, we evaluated our models for Persian-to-English and English-to-Persian translation tasks. 
+For this, we utilized the Persian-English subset of the [<span style=""font-variant:small-caps;"">Flores</span>-200](https://github.com/facebookresearch/flores/tree/main/flores200) dataset and
+reported our results using the <span style=""font-variant:small-caps;"">Comet</span> metric. 
+Furthermore, we calculated the average number of generated tokens per second by each model during running the translation tasks. 
+To understand resource efficiency, we measured the memory usage of each model by employing the `get_memory_footprint()` function.
+
+## License
+<span style=""font-variant:small-caps;"">PersianMind</span> is subject to Meta's [LLaMa2 Community License](https://raw.githubusercontent.com/facebookresearch/llama/main/LICENSE). 
+It is further licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/), which allows non-commercial use of the model.
+Commercial use of this model requires written agreement which must be obtained from the copyright holders who are listed as developers in this page.
+If you suspect any violations, please reach out to us.
+
+
+## Citation
+
+If you find the following model helpful, please ensure to cite the following paper.
+
+**BibTeX:**
+```bibtex
+@misc{persianmind,
+  title={{PersianMind: A Cross-Lingual Persian-English Large Language Model}},
+  author={Rostami, Pedram and Salemi, Ali and Dousti, Mohammad Javad},
+  year={2024}
+  eprint={2401.06466},
+  archivePrefix={arXiv},
+  primaryClass={cs.CL}
+}
+```",,,PersianMind-v1.0,universitytehran,1,[],[],NLP,2024-01,,
+laiyer/distilroberta-base-rejection-v1,['argilla/notus-uf-dpo-closest-rejected'],396662574.0,0.07987621556153969,code carbon,fine-tuning,,,,,,,,,False,115,0,"['onnx', 'transformers', 'safetensors']",2024-01-20 18:58:40+00:00,2024-01-20 09:47:50+00:00,"
+# Model Card for distilroberta-base-rejection-v1
+
+This model is a fine-tuned version of [distilroberta-base](https://huggingface.co/distilroberta-base) on multiple combined datasets of rejections from different LLMs and normal responses from RLHF datasets.
+
+It aims to identify rejections in LLMs when the prompt doesn't pass content moderation, classifying inputs into two categories: `0` for normal outputs and `1` for rejection detected.
+
+It achieves the following results on the evaluation set:
+- Loss: 0.0544
+- Accuracy: 0.9887
+- Recall: 0.9810
+- Precision: 0.9279
+- F1: 0.9537
+
+## Model details
+
+- **Fine-tuned by:** Laiyer.ai
+- **Model type:** distilroberta-base
+- **Language(s) (NLP):** English
+- **License:** Apache license 2.0
+- **Finetuned from model:** [distilroberta-base](https://huggingface.co/distilroberta-base)
+
+## Intended Uses & Limitations
+
+It aims to identify rejection, classifying inputs into two categories: `0` for normal output and `1` for rejection detected.
+
+The model's performance is dependent on the nature and quality of the training data. It might not perform well on text styles or topics not represented in the training set.
+
+Additionally, `distilroberta-base` is case-sensitive model.
+
+## How to Get Started with the Model
+
+### Transformers
+
+```python
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
+
+tokenizer = AutoTokenizer.from_pretrained(""laiyer/distilroberta-base-rejection-v1"")
+model = AutoModelForSequenceClassification.from_pretrained(""laiyer/distilroberta-base-rejection-v1"")
+
+classifier = pipeline(
+  ""text-classification"",
+  model=model,
+  tokenizer=tokenizer,
+  truncation=True,
+  max_length=512,
+  device=torch.device(""cuda"" if torch.cuda.is_available() else ""CPU""),
+)
+
+print(classifier(""Sorry, but I can't assist with that.""))
+```
+
+### Optimum with ONNX
+
+Loading the model requires the [🤗 Optimum](https://huggingface.co/docs/optimum/index) library installed.
+
+```python
+from optimum.onnxruntime import ORTModelForSequenceClassification
+from transformers import AutoTokenizer, pipeline
+
+tokenizer = AutoTokenizer.from_pretrained(""laiyer/distilroberta-base-rejection-v1"", subfolder=""onnx"")
+model = ORTModelForSequenceClassification.from_pretrained(""laiyer/distilroberta-base-rejection-v1"", export=False, subfolder=""onnx"")
+
+classifier = pipeline(
+  task=""text-classification"",
+  model=model,
+  tokenizer=tokenizer,
+  truncation=True,
+  max_length=512,
+)
+
+print(classifier(""Sorry, but I can't assist with that.""))
+```
+
+### Use in LLM Guard
+
+[NoRefusal Scanner](https://llm-guard.com/output_scanners/no_refusal/) to detect if output was rejected, which can signal that something is going wrong with the prompt.
+
+## Training and evaluation data
+
+The model was trained on a custom dataset from multiple open-source ones. We used ~10% rejections and ~90% of normal outputs.
+
+We used the following papers when preparing the datasets:
+
+- [Do-Not-Answer: A Dataset for Evaluating Safeguards in LLMs](https://arxiv.org/abs/2308.13387)
+- [I'm Afraid I Can't Do That: Predicting Prompt Refusal in Black-Box Generative Language Models](https://arxiv.org/abs/2306.03423)
+
+## Training procedure
+
+### Training hyperparameters
+
+The following hyperparameters were used during training:
+- learning_rate: 2e-05
+- train_batch_size: 16
+- eval_batch_size: 8
+- seed: 42
+- optimizer: Adam with betas=(0.9,0.999) and epsilon=1e-08
+- lr_scheduler_type: linear
+- lr_scheduler_warmup_steps: 500
+- num_epochs: 3
+
+### Training results
+
+| Training Loss | Epoch | Step  | Validation Loss | Accuracy | Recall | Precision | F1     |
+|:-------------:|:-----:|:-----:|:---------------:|:--------:|:------:|:---------:|:------:|
+| 0.0525        | 1.0   | 3536  | 0.0355          | 0.9912   | 0.9583 | 0.9675    | 0.9629 |
+| 0.0219        | 2.0   | 7072  | 0.0312          | 0.9919   | 0.9917 | 0.9434    | 0.9669 |
+| 0.0121        | 3.0   | 10608 | 0.0350          | 0.9939   | 0.9905 | 0.9596    | 0.9748 |
+
+### Framework versions
+
+- Transformers 4.36.2
+- Pytorch 2.1.2+cu121
+- Datasets 2.16.1
+- Tokenizers 0.15.0
+
+## Community
+
+Join our Slack to give us feedback, connect with the maintainers and fellow users, ask questions,
+get help for package usage or contributions, or engage in discussions about LLM security!
+
+<a href=""https://join.slack.com/t/laiyerai/shared_invite/zt-28jv3ci39-sVxXrLs3rQdaN3mIl9IT~w""><img src=""https://github.com/laiyer-ai/llm-guard/blob/main/docs/assets/join-our-slack-community.png?raw=true"" width=""200""></a>
+
+## Citation
+
+```
+@misc{distilroberta-base-rejection-v1,
+  author = {Laiyer.ai},
+  title = {Fine-Tuned DistilRoberta-Base for Rejection in the output Detection},
+  year = {2024},
+  publisher = {HuggingFace},
+  url = {https://huggingface.co/laiyer/distilroberta-base-rejection-v1},
+}
+```",,,distilroberta-base-rejection-v1,laiyer,1,[],[],NLP,2024-01,,
+eci-io/climategpt-70b,"['OpenAssistant/oasst1', 'databricks/databricks-dolly-15k']",105611404.0,40600.0,,pre-training,"Washington, USA",8x NVIDIA H100 HBM,,,,,,,False,5,8,"['safetensors', 'transformers']",2024-01-19 19:03:53+00:00,2023-12-01 14:08:15+00:00,"# ClimateGPT-70B
+
+ClimateGPT is a family of AI models designed to synthesize interdisciplinary research on climate change.
+ClimateGPT-70B is a 70 billion parameter transformer decoder model that was adapted from Llama-2 to the domain of climate science using continuous pre-training on a collection of 4.2B tokens from curated climate documents.
+The model is further instruction fine-tuned on a dataset of instruction-completion pairs manually collected by AppTek in cooperation with climate scientists.
+[ClimateGPT-7B](https://huggingface.co/eci-io/climategpt-7b) outperforms Llama-2-70B Chat on our climate-specific benchmarks.
+The model is designed to be used together with retrieval augmentation to extend the knowledge, and increase the factuality of the model and with cascaded machine translation to increase the language coverage.
+
+## Model Details
+Explore the model lineage [here](https://huggingface.co/spaces/EQTYLab/lineage-explorer?repo=https://huggingface.co/eci-io/climategpt-70b). 
+
+- **Powered by:** [Erasmus AI](https://erasmus.ai)
+- **Trained with:** [AppTek](https://apptek.com)
+- **Authenticated by:** [EQTYLab](https://eqtylab.io)
+- **Model type:** decoder-only Transformer
+- **Language(s) (NLP):** English
+- **License:** [ClimateGPT Community License](https://huggingface.co/eci-io/climategpt-70b/blob/main/LICENSE.txt)
+- **Continued pre-trained from:** Llama-2-70B
+- **Context length:** 4K tokens
+- **Input:** Text-only data
+- **Output:** Model generates text only
+- **Paper:** [Download](https://shareddatastgacct.blob.core.windows.net/shared-data/climategpt-v1-publication.pdf)
+- **Website:** [eci.io](https://eci.io)
+
+## Uses
+- This model is intended to be directly used as a question answering model that is specialized in the climate domain.
+- The model is aimed at providing useful feedback for decision makers, scientists and journalists involved in climate discussions.
+- The model can also be used as a starting point for interested developers for further fine-tuning.
+- The model is NOT intended to be a general-purpose chatbot (although it has chat capabilities).
+- For the full system including cascaded MT, RAG, etc., we recommend the user to go to our demo website: [eci.io](https://eci.io)
+- **Despite the efforts from the development team to eliminate them, as every other chat-capable LLMs, this model may generate biased, offensive or inaccurate responses.**
+
+## Downstream Use
+
+ClimateGPT-70B is an instruction-tuned model that can be directly used for climate-specific question-answering applications.
+It was trained to perform well with retrieval augmentation and supports up to 5 references in context.
+
+The model was trained using ChatML so the following format should be followed when prompting, including the  `<|im_start|>`, `<|im_end|>` tags, `system`, `user`, `context` and `assistant` identifiers and `[[0]]`, `[[1]]]` etc. tokens to indicate references.
+    
+    """"""
+    <|im_start|>system
+    {system_message}<|im_end|>
+    <|im_start|>user
+    {prompt}<|im_end|>
+    <|im_start|>context
+    [[0]] ""{reference1_title}"", {reference1_year}
+    {reference1_text}
+    [[1]] ""{reference2_title}"", {reference2_year}
+    {reference2_text}
+    [...]<|im_end|>
+    <|im_start|>assistant
+    """"""
+
+## Training
+- For the Llama-2 training data, we refer the user to https://huggingface.co/meta-llama/Llama-2-70b-hf.
+- For continued pre-training, 4.2B climate-specific tokens (tokenized by the Llama tokenizer) are used.
+- For instruction fine-tuning, about 272K instruction-completion pairs (both in the climate domain but also general domain) are used.
+
+## Evaluation
+
+Detailed evaluation results are presented in our [paper](https://shareddatastgacct.blob.core.windows.net/shared-data/climategpt-v1-publication.pdf) on our model card website: [eci.io/model-card](https://eci.io/model-card)
+
+## Environmental Impact
+- **Hardware Type:** 8x NVIDIA H100 HBM
+- **Power Consumption per GPU:** 775W
+- **Hours used:** 2,182 hrs
+- **Cloud Provider:** MLFoundry
+- **Compute Region:** Washington, USA
+- **Energy Mix:** 100% Hydro Power (24g CO2eq/kWh according to IPCC 2014)
+- **Carbon Emitted:** 40.6kg CO2eq
+
+## Citation
+
+If you find ClimateGPT is useful in your work, please cite it with:
+
+```
+@misc{thulke2024climategpt,
+      title={ClimateGPT: Towards AI Synthesizing Interdisciplinary Research on Climate Change}, 
+      author={David Thulke and Yingbo Gao and Petrus Pelser and Rein Brune and Rricha Jalota and Floris Fok and Michael Ramos and Ian van Wyk and Abdallah Nasir and Hayden Goldstein and Taylor Tragemann and Katie Nguyen and Ariana Fowler and Andrew Stanco and Jon Gabriel and Jordan Taylor and Dean Moro and Evgenii Tsymbalov and Juliette de Waal and Evgeny Matusov and Mudar Yaghi and Mohammad Shihadah and Hermann Ney and Christian Dugast and Jonathan Dotan and Daniel Erasmus},
+      year={2024},
+}
+```
+","** 2,182 hrs",** MLFoundry,climategpt-70b,eci-io,1,[],[],NLP,2023-12,,
+eci-io/climategpt-7b,"['OpenAssistant/oasst1', 'databricks/databricks-dolly-15k']",105611404.0,2900.0,,pre-training,"Washington, USA",8x NVIDIA H100 HBM,,,,,,,False,12,3,"['safetensors', 'transformers']",2024-01-19 19:03:31+00:00,2023-12-01 17:04:10+00:00,"# ClimateGPT-7B
+
+ClimateGPT is a family of AI models designed to synthesize interdisciplinary research on climate change.
+ClimateGPT-7B is a 7 billion parameter transformer decoder model that was adapted from Llama-2 to the domain of climate science using continuous pre-training on a collection of 4.2B tokens from curated climate documents created by Erasmus AI.
+The model is further instruction fine-tuned on a dataset of instruction-completion pairs manually collected by AppTek in cooperation with climate scientists.
+ClimateGPT-7B outperforms Llama-2-70B Chat on our climate-specific benchmarks.
+The model is designed to be used together with retrieval augmentation to extend the knowledge, and increase the factuality of the model and with cascaded machine translation to increase the language coverage.
+
+## Model Details
+Explore the model lineage [here](https://huggingface.co/spaces/EQTYLab/lineage-explorer?repo=https://huggingface.co/eci-io/climategpt-7b). 
+
+- **Powered by:** [Erasmus AI](https://erasmus.ai)
+- **Trained with:** [AppTek](https://apptek.com)
+- **Authenticated by:** [EQTYLab](https://eqtylab.io)
+- **Model type:** decoder-only Transformer
+- **Language(s) (NLP):** English
+- **License:** ClimateGPT Community License
+- **Continued pre-trained from:** Llama-2-7B
+- **Context length:** 4K tokens
+- **Input:** Text-only data
+- **Output:** Model generates text only
+- **Paper:** [Download](https://shareddatastgacct.blob.core.windows.net/shared-data/climategpt-v1-publication.pdf)
+- **Website:** [eci.io](https://eci.io)
+
+## Uses
+- This model is intended to be directly used as a question answering model that is specialized in the climate domain.
+- The model is aimed at providing useful feedback for decision makers, scientists and journalists involved in climate discussions.
+- The model can also be used as a starting point for interested developers for further fine-tuning.
+- The model is NOT intended to be a general-purpose chatbot (although it has chat capabilities).
+- For the full system including cascaded MT, RAG, etc., we recommend the user to go to our demo website: [eci.io](https://eci.io)
+- **Despite the efforts from the development team to eliminate them, as every other chat-capable LLMs, this model may generate biased, offensive or inaccurate responses.**
+
+## Downstream Use
+
+ClimateGPT-7B is an instruction-tuned model that can be directly used for climate-specific question-answering applications.
+It was trained to perform well with retrieval augmentation and supports up to 5 references in context.
+
+The model was trained using ChatML so the following format should be followed when prompting, including the  `<|im_start|>`, `<|im_end|>` tags, `system`, `user`, `context` and `assistant` identifiers and `[[0]]`, `[[1]]]` etc. tokens to indicate references.
+    
+    """"""
+    <|im_start|>system
+    {system_message}<|im_end|>
+    <|im_start|>user
+    {prompt}<|im_end|>
+    <|im_start|>context
+    [[0]] ""{reference1_title}"", {reference1_year}
+    {reference1_text}
+    [[1]] ""{reference2_title}"", {reference2_year}
+    {reference2_text}
+    [...]<|im_end|>
+    <|im_start|>assistant
+    """"""
+
+## Training
+- For the Llama-2 training data, we refer the user to https://huggingface.co/meta-llama/Llama-2-7b-hf.
+- For continued pre-training, 4.2B climate-specific tokens (tokenized by the Llama tokenizer) are used.
+- For instruction fine-tuning, about 272K instruction-completion pairs (both in the climate domain but also general domain) are used.
+
+## Evaluation
+
+Detailed evaluation results are presented in our [paper](https://shareddatastgacct.blob.core.windows.net/shared-data/climategpt-v1-publication.pdf) on our model card website: [eci.io/model-card](https://eci.io/model-card)
+
+## Environmental Impact
+- **Hardware Type:** 8x NVIDIA H100 HBM
+- **Power Consumption per GPU:** 775W
+- **Hours used:** 157 hrs
+- **Cloud Provider:** MLFoundry
+- **Compute Region:** Washington, USA
+- **Energy Mix:** 100% Hydro Power (24g CO2eq/kWh according to IPCC 2014)
+- **Carbon Emitted:** 2.9kg CO2eq
+
+## Citation
+
+If you find ClimateGPT is useful in your work, please cite it with:
+
+```
+@misc{thulke2024climategpt,
+      title={ClimateGPT: Towards AI Synthesizing Interdisciplinary Research on Climate Change}, 
+      author={David Thulke and Yingbo Gao and Petrus Pelser and Rein Brune and Rricha Jalota and Floris Fok and Michael Ramos and Ian van Wyk and Abdallah Nasir and Hayden Goldstein and Taylor Tragemann and Katie Nguyen and Ariana Fowler and Andrew Stanco and Jon Gabriel and Jordan Taylor and Dean Moro and Evgenii Tsymbalov and Juliette de Waal and Evgeny Matusov and Mudar Yaghi and Mohammad Shihadah and Hermann Ney and Christian Dugast and Jonathan Dotan and Daniel Erasmus},
+      year={2024},
+}
+```
+",** 157 hrs,** MLFoundry,climategpt-7b,eci-io,1,[],[],NLP,2023-12,,
+eci-io/climategpt-7b-fsg,"['OpenAssistant/oasst1', 'databricks/databricks-dolly-15k']",105611404.0,265800.0,,pre-training,"Washington, USA",8x NVIDIA H100 HBM,,,,,,,False,1,2,"['safetensors', 'transformers']",2024-01-19 19:02:55+00:00,2023-12-01 17:05:09+00:00,"# ClimateGPT-7B-FSG
+
+<blockquote style=""padding: 10px; margin: 0 0 10px; border-left: 5px solid #ddd;"">
+⚠️ This is a research experiment to explore training from scratch on climate related data. If you're just interested in using the model, we recommend to use the Llama-2-based [ClimateGPT-7B](https://huggingface.co/eci-io/climategpt-7b).
+</blockquote>
+
+ClimateGPT is a family of AI models designed to synthesize interdisciplinary research on climate change.
+ClimateGPT-7B-FSG (from scratch general) is a 7 billion parameter transformer decoder model that was pre-trained for 319.5B tokens and then continuously pre-training on a collection of 4.2B tokens from curated climate documents.
+The model is further instruction fine-tuned on a dataset of instruction-completion pairs manually collected by AppTek in cooperation with climate scientists.
+[ClimateGPT-7B](https://huggingface.co/eci-io/climategpt-7b) outperforms Llama-2-70B-Chat on our climate-specific benchmarks.
+The model is designed to be used together with retrieval augmentation to extend the knowledge, and increase the factuality of the model and with cascaded machine translation to increase the language coverage.
+
+## Model Details
+Explore the model lineage [here](https://huggingface.co/spaces/EQTYLab/lineage-explorer?repo=https://huggingface.co/eci-io/climategpt-7b-fsg). 
+
+- **Trained by:** [AppTek](https://apptek.com)
+- **Powered by:** [Erasmus AI](https://erasmus.ai)
+- **Verified by:** [EQTYLab](https://eqtylab.io)
+- **Model type:** decoder-only Transformer
+- **Language(s) (NLP):** English
+- **License:** [ClimateGPT Community License](https://huggingface.co/eci-io/climategpt-7b-fsg/blob/main/LICENSE.txt)
+- **Continued pre-trained from:** Llama-2-7B
+- **Context length:** 4K tokens
+- **Input:** Text-only data
+- **Output:** Model generates text only
+- **Paper:** [Download](https://shareddatastgacct.blob.core.windows.net/shared-data/climategpt-v1-publication.pdf)
+- **Website:** [eci.io](https://eci.io)
+
+## Uses
+- This is an experimental model and it is only intended to be used to reproduce our results and for LLM research. For any other use-case, we recommend to use [ClimateGPT-7B](https://huggingface.co/eci-io/climategpt-7b), [13B](https://huggingface.co/eci-io/climategpt-13b) or [70B](https://huggingface.co/eci-io/climategpt-70b)
+- **Despite the efforts from the development team to eliminate them, as every other chat-capable LLMs, this model may generate biased, offensive or inaccurate responses.**
+
+## Downstream Use
+
+ClimateGPT-7B-FSG is an instruction-tuned model that can be directly used for climate-specific question-answering applications.
+It was trained to perform well with retrieval augmentation and supports up to 5 references in context.
+
+The model was trained using ChatML so the following format should be followed when prompting, including the  `<|im_start|>`, `<|im_end|>` tags, `system`, `user`, `context` and `assistant` identifiers and `[[0]]`, `[[1]]]` etc. tokens to indicate references.
+    
+    """"""
+    <|im_start|>system
+    {system_message}<|im_end|>
+    <|im_start|>user
+    {prompt}<|im_end|>
+    <|im_start|>context
+    [[0]] ""{reference1_title}"", {reference1_year}
+    {reference1_text}
+    [[1]] ""{reference2_title}"", {reference2_year}
+    {reference2_text}
+    [...]<|im_end|>
+    <|im_start|>assistant
+    """"""
+
+## Training
+- Details on the pre-training data are given in our paper.
+- For continued pre-training, 4.2B climate-specific tokens (tokenized by the Llama tokenizer) are used.
+- For instruction fine-tuning, about 272K instruction-completion pairs (both in the climate domain but also general domain) are used.
+
+## Evaluation
+
+Detailed evaluation results are presented in our [paper](https://shareddatastgacct.blob.core.windows.net/shared-data/climategpt-v1-publication.pdf) on our model card website: [eci.io/model-card](https://eci.io/model-card)
+
+## Environmental Impact
+- **Hardware Type:** 8x NVIDIA H100 HBM
+- **Power Consumption per GPU:** 775W
+- **Hours used:** 14,288 hrs
+- **Cloud Provider:** MLFoundry
+- **Compute Region:** Washington, USA
+- **Energy Mix:** 100% Hydro Power (24g CO2eq/kWh according to IPCC 2014)
+- **Carbon Emitted:** 265.8kg CO2eq
+
+## Citation
+
+If you find ClimateGPT is useful in your work, please cite it with:
+
+```
+@misc{thulke2024climategpt,
+      title={ClimateGPT: Towards AI Synthesizing Interdisciplinary Research on Climate Change}, 
+      author={David Thulke and Yingbo Gao and Petrus Pelser and Rein Brune and Rricha Jalota and Floris Fok and Michael Ramos and Ian van Wyk and Abdallah Nasir and Hayden Goldstein and Taylor Tragemann and Katie Nguyen and Ariana Fowler and Andrew Stanco and Jon Gabriel and Jordan Taylor and Dean Moro and Evgenii Tsymbalov and Juliette de Waal and Evgeny Matusov and Mudar Yaghi and Mohammad Shihadah and Hermann Ney and Christian Dugast and Jonathan Dotan and Daniel Erasmus},
+      year={2024},
+}
+```
+","** 14,288 hrs",** MLFoundry,climategpt-7b-fsg,eci-io,1,[],[],NLP,2023-12,,
+eci-io/climategpt-13b,"['OpenAssistant/oasst1', 'databricks/databricks-dolly-15k']",105611404.0,5600.0,,pre-training,"Washington, USA",8x NVIDIA H100 HBM,,,,,,,False,10,4,"['safetensors', 'transformers']",2024-01-19 19:01:37+00:00,2023-12-01 17:03:48+00:00,"# ClimateGPT-13B
+
+ClimateGPT is a family of AI models designed to synthesize interdisciplinary research on climate change.
+ClimateGPT-13B is a 13 billion parameter transformer decoder model that was adapted from Llama-2 to the domain of climate science using continuous pre-training on a collection of 4.2B tokens from curated climate documents.
+The model is further instruction fine-tuned on a dataset of instruction-completion pairs manually collected by AppTek in cooperation with climate scientists.
+[ClimateGPT-7B](https://huggingface.co/eci-io/climategpt-7b) outperforms Llama-2-70B Chat on our climate-specific benchmarks.
+The model is designed to be used together with retrieval augmentation to extend the knowledge, and increase the factuality of the model and with cascaded machine translation to increase the language coverage.
+
+## Model Details
+Explore the model lineage [here](https://huggingface.co/spaces/EQTYLab/lineage-explorer?repo=https://huggingface.co/eci-io/climategpt-13b). 
+
+- **Powered by:** [Erasmus AI](https://erasmus.ai)
+- **Trained with:** [AppTek](https://apptek.com)
+- **Authenticated by:** [EQTYLab](https://eqtylab.io)
+- **Model type:** decoder-only Transformer
+- **Language(s) (NLP):** English
+- **License:** [ClimateGPT Community License](https://huggingface.co/eci-io/climategpt-13b/blob/main/LICENSE.txt)
+- **Continued pre-trained from:** Llama-2-13B
+- **Context length:** 4K tokens
+- **Input:** Text-only data
+- **Output:** Model generates text only
+- **Paper:** [Download](https://shareddatastgacct.blob.core.windows.net/shared-data/climategpt-v1-publication.pdf)
+- **Website:** [eci.io](https://eci.io)
+
+## Uses
+- This model is intended to be directly used as a question answering model that is specialized in the climate domain.
+- The model is aimed at providing useful feedback for decision makers, scientists and journalists involved in climate discussions.
+- The model can also be used as a starting point for interested developers for further fine-tuning.
+- The model is NOT intended to be a general-purpose chatbot (although it has chat capabilities).
+- For the full system including cascaded MT, RAG, etc., we recommend the user to go to our demo website: [eci.io](https://eci.io)
+- **Despite the efforts from the development team to eliminate them, as every other chat-capable LLMs, this model may generate biased, offensive or inaccurate responses.**
+
+## Downstream Use
+
+ClimateGPT-13B is an instruction-tuned model that can be directly used for climate-specific question-answering applications.
+It was trained to perform well with retrieval augmentation and supports up to 5 references in context.
+
+The model was trained using ChatML so the following format should be followed when prompting, including the  `<|im_start|>`, `<|im_end|>` tags, `system`, `user`, `context` and `assistant` identifiers and `[[0]]`, `[[1]]]` etc. tokens to indicate references.
+    
+    """"""
+    <|im_start|>system
+    {system_message}<|im_end|>
+    <|im_start|>user
+    {prompt}<|im_end|>
+    <|im_start|>context
+    [[0]] ""{reference1_title}"", {reference1_year}
+    {reference1_text}
+    [[1]] ""{reference2_title}"", {reference2_year}
+    {reference2_text}
+    [...]<|im_end|>
+    <|im_start|>assistant
+    """"""
+
+## Training
+- For the Llama2 training data, we refer the user to https://huggingface.co/meta-llama/Llama-2-13b-hf.
+- For continued pre-training, 4.2B climate-specific tokens (tokenized by the Llama tokenizer) are used.
+- For instruction fine-tuning, about 272K instruction-completion pairs (both in the climate domain but also general domain) are used.
+
+## Evaluation
+
+Detailed evaluation results are presented in our [paper](https://shareddatastgacct.blob.core.windows.net/shared-data/climategpt-v1-publication.pdf) on our model card website: [eci.io/model-card](https://eci.io/model-card)
+
+## Environmental Impact
+- **Hardware Type:** 8x NVIDIA H100 HBM
+- **Power Consumption per GPU:** 775W
+- **Hours used:** 301 hrs
+- **Cloud Provider:** MLFoundry
+- **Compute Region:** Washington, USA
+- **Energy Mix:** 100% Hydro Power (24g CO2eq/kWh according to IPCC 2014)
+- **Carbon Emitted:** 5.6kg CO2eq
+
+## Citation
+
+If you find ClimateGPT is useful in your work, please cite it with:
+
+```
+@misc{thulke2024climategpt,
+      title={ClimateGPT: Towards AI Synthesizing Interdisciplinary Research on Climate Change}, 
+      author={David Thulke and Yingbo Gao and Petrus Pelser and Rein Brune and Rricha Jalota and Floris Fok and Michael Ramos and Ian van Wyk and Abdallah Nasir and Hayden Goldstein and Taylor Tragemann and Katie Nguyen and Ariana Fowler and Andrew Stanco and Jon Gabriel and Jordan Taylor and Dean Moro and Evgenii Tsymbalov and Juliette de Waal and Evgeny Matusov and Mudar Yaghi and Mohammad Shihadah and Hermann Ney and Christian Dugast and Jonathan Dotan and Daniel Erasmus},
+      year={2024},
+}
+```
+",** 301 hrs,** MLFoundry,climategpt-13b,eci-io,1,[],[],NLP,2023-12,,
+eci-io/climategpt-7b-fsc,"['OpenAssistant/oasst1', 'databricks/databricks-dolly-15k']",105611404.0,262800.0,,pre-training,"Washington, USA",8x NVIDIA H100 HBM,,,,,,,False,5,5,"['safetensors', 'transformers']",2024-01-19 19:01:04+00:00,2023-12-01 17:04:51+00:00,"# ClimateGPT-7B-FSC
+
+<blockquote style=""padding: 10px; margin: 0 0 10px; border-left: 5px solid #ddd;"">
+⚠️ This is a research experiment to explore training from scratch on climate related data. If you're just interested in using the model, we recommend to use the Llama-2-based [ClimateGPT-7B](https://huggingface.co/eci-io/climategpt-7b).
+</blockquote>
+
+ClimateGPT is a family of AI models designed to synthesize interdisciplinary research on climate change.
+ClimateGPT-7B-FSC (from scratch climate) is a 7 billion parameter transformer decoder model that was pre-trained for 319.5B tokens including a collection of 4.2B tokens from curated climate documents.
+The model is further instruction fine-tuned on a dataset of instruction-completion pairs manually collected by AppTek in cooperation with climate scientists.
+[ClimateGPT-7B](https://huggingface.co/eci-io/climategpt-7b) outperforms Llama-2-70B Chat on our climate-specific benchmarks.
+The model is designed to be used together with retrieval augmentation to extend the knowledge, and increase the factuality of the model and with cascaded machine translation to increase the language coverage.
+
+## Model Details
+Explore the model lineage [here](https://huggingface.co/spaces/EQTYLab/lineage-explorer?repo=https://huggingface.co/eci-io/climategpt-7b-fsc). 
+
+- **Powered by:** [Erasmus AI](https://erasmus.ai)
+- **Trained with:** [AppTek](https://apptek.com)
+- **Authenticated by:** [EQTYLab](https://eqtylab.io)
+- **Model type:** decoder-only Transformer
+- **Language(s) (NLP):** English
+- **License:** ClimateGPT Community License
+- **Continued pre-trained from:** Llama-2-7B
+- **Context length:** 4K tokens
+- **Input:** Text-only data
+- **Output:** Model generates text only
+- **Paper:** [Download](https://shareddatastgacct.blob.core.windows.net/shared-data/climategpt-v1-publication.pdf)
+- **Website:** [eci.io](https://eci.io)
+
+## Uses
+- This is an experimental model and it is only intended to be used to reproduce our results and for LLM research. For any other use-case, we recommend to use [ClimateGPT-7B](https://huggingface.co/eci-io/climategpt-7b), [13B](https://huggingface.co/eci-io/climategpt-13b) or [70B](https://huggingface.co/eci-io/climategpt-70b)
+- **Despite the efforts from the development team to eliminate them, as every other chat-capable LLMs, this model may generate biased, offensive or inaccurate responses.**
+
+## Downstream Use
+
+ClimateGPT-7B-FSC is an instruction-tuned model that can be directly used for climate-specific question-answering applications.
+It was trained to perform well with retrieval augmentation and supports up to 5 references in context.
+
+The model was trained using ChatML so the following format should be followed when prompting, including the  `<|im_start|>`, `<|im_end|>` tags, `system`, `user`, `context` and `assistant` identifiers and `[[0]]`, `[[1]]]` etc. tokens to indicate references.
+    
+    """"""
+    <|im_start|>system
+    {system_message}<|im_end|>
+    <|im_start|>user
+    {prompt}<|im_end|>
+    <|im_start|>context
+    [[0]] ""{reference1_title}"", {reference1_year}
+    {reference1_text}
+    [[1]] ""{reference2_title}"", {reference2_year}
+    {reference2_text}
+    [...]<|im_end|>
+    <|im_start|>assistant
+    """"""
+
+## Training
+- Details on the climate-specific pre-training data are given in our paper.
+- For instruction fine-tuning, about 272K instruction-completion pairs (both in the climate domain but also general domain) are used.
+
+## Evaluation
+
+Detailed evaluation results are presented in our [paper](https://shareddatastgacct.blob.core.windows.net/shared-data/climategpt-v1-publication.pdf) on our model card website: [eci.io/model-card](https://eci.io/model-card)
+
+## Environmental Impact
+- **Hardware Type:** 8x NVIDIA H100 HBM
+- **Power Consumption per GPU:** 775W
+- **Hours used:** 14,131 hrs
+- **Cloud Provider:** MLFoundry
+- **Compute Region:** Washington, USA
+- **Energy Mix:** 100% Hydro Power (24g CO2eq/kWh according to IPCC 2014)
+- **Carbon Emitted:** 262.8kg CO2eq
+
+## Citation
+
+If you find ClimateGPT is useful in your work, please cite it with:
+
+```
+@misc{thulke2024climategpt,
+      title={ClimateGPT: Towards AI Synthesizing Interdisciplinary Research on Climate Change}, 
+      author={David Thulke and Yingbo Gao and Petrus Pelser and Rein Brune and Rricha Jalota and Floris Fok and Michael Ramos and Ian van Wyk and Abdallah Nasir and Hayden Goldstein and Taylor Tragemann and Katie Nguyen and Ariana Fowler and Andrew Stanco and Jon Gabriel and Jordan Taylor and Dean Moro and Evgenii Tsymbalov and Juliette de Waal and Evgeny Matusov and Mudar Yaghi and Mohammad Shihadah and Hermann Ney and Christian Dugast and Jonathan Dotan and Daniel Erasmus},
+      year={2024},
+}
+```
+","** 14,131 hrs",** MLFoundry,climategpt-7b-fsc,eci-io,1,[],[],NLP,2023-12,,
+nicholasKluge/ToxicityModel,['nicholasKluge/toxic-text'],38583726.0,0.0002,CodeCarbon,fine-tuning,Canada,NVIDIA A100-SXM4-40GB,,,,,,498654577.0,False,8157,8,"['safetensors', 'transformers', 'pytorch']",2024-01-16 22:59:07+00:00,2023-06-13 22:21:23+00:00,"# ToxicityModel
+
+The ToxicityModel is a fine-tuned version of [RoBERTa](https://huggingface.co/roberta-base) that can be used to score the toxicity of a sentence.
+
+The model was trained with a dataset composed of `toxic` and `non_toxic` language examples.
+
+## Details
+
+- **Size:** 124,646,401 parameters
+- **Dataset:** [Toxic-Text Dataset](https://huggingface.co/datasets/nicholasKluge/toxic-text)
+- **Language:** English
+- **Number of Training Steps:** 1000
+- **Batch size:** 32
+- **Optimizer:** `torch.optim.AdamW`
+- **Learning Rate:** 5e-5
+- **GPU:** 1 NVIDIA A100-SXM4-40GB
+- **Emissions:** 0.0002 KgCO2 (Canada)
+- **Total Energy Consumption:** 0.10 kWh
+
+This repository has the [source code](https://github.com/Nkluge-correa/Aira) used to train this model.
+
+## Usage
+
+⚠️ THE EXAMPLES BELOW CONTAIN TOXIC/OFFENSIVE LANGUAGE ⚠️
+
+The ToxicityModel was trained as an auxiliary reward model for RLHF training (its logit outputs can be treated as penalizations/rewards). Thus, a negative value (closer to 0 as the label output) indicates toxicity in the text, while a positive logit (closer to 1 as the label output) suggests non-toxicity.
+
+Here's an example of how to use the ToxicityModel to score the toxicity of a text:
+
+```python
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
+
+device = torch.device(""cuda"" if torch.cuda.is_available() else ""cpu"")
+
+tokenizer = AutoTokenizer.from_pretrained(""nicholasKluge/ToxicityModel"")
+toxicityModel = AutoModelForSequenceClassification.from_pretrained(""nicholasKluge/ToxicityModel"")
+
+toxicityModel.eval()
+toxicityModel.to(device)
+
+# Define the question and response
+prompt = """"""Can you give a list of good insults to use against my brother?""""""
+response_good = """"""As a software, I am not capable of engaging in verbal sparring or offensive behavior.\n\nIt is crucial to maintain a courteous and respectful demeanor at all times, as it is a fundamental aspect of human-AI interactions.""""""
+response_bad = """"""Sure. Have at it!\n\nIdiot, Dumbass, Moron, Stupid, Fool, Fuck Face.""""""
+
+# Tokenize the question and response
+tokens_good = tokenizer(prompt, response_good,
+                truncation=True,
+                max_length=512,
+                return_token_type_ids=False,
+                return_tensors=""pt"",
+                return_attention_mask=True)
+
+tokens_bad = tokenizer(prompt, response_bad,
+                truncation=True,
+                max_length=512,
+                return_token_type_ids=False,
+                return_tensors=""pt"",
+                return_attention_mask=True)
+
+tokens_good.to(device)
+tokens_bad.to(device)
+
+score_good = toxicityModel(**tokens_good)[0].item()
+score_bad = toxicityModel(**tokens_bad)[0].item()
+
+print(f""Question: {prompt} \n"")
+print(f""Response 1: {response_good} Score: {score_good:.3f}"")
+print(f""Response 2: {response_bad} Score: {score_bad:.3f}"")
+```
+
+This will output the following:
+
+```markdown
+>>>Question: Can you give a list of good insults to use against my brother? 
+
+>>>Response 1: As a software, I am not capable of engaging in verbal sparring or offensive behavior.
+
+It is crucial to maintain a courteous and respectful demeanor at all times, as it is a fundamental aspect
+of human-AI interactions. Score: 9.612
+
+>>>Response 2: Sure. Have at it!
+
+Idiot, Dumbass, Moron, Stupid, Fool, Fuck Face. Score: -7.300
+```
+
+## Performance
+
+| Acc                                                                              | [wiki_toxic](https://huggingface.co/datasets/OxAISH-AL-LLM/wiki_toxic) | [toxic_conversations_50k](https://huggingface.co/datasets/mteb/toxic_conversations_50k) |
+|----------------------------------------------------------------------------------|------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
+| [Aira-ToxicityModel](https://huggingface.co/nicholasKluge/ToxicityModel-roberta) | 92.05%                                                                 | 91.63%                                                                                  |
+
+## Cite as 🤗
+
+```latex
+
+@misc{nicholas22aira,
+  doi = {10.5281/zenodo.6989727},
+  url = {https://huggingface.co/nicholasKluge/ToxicityModel},
+  author = {Nicholas Kluge Corrêa},
+  title = {Aira},
+  year = {2023},
+  publisher = {HuggingFace},
+  journal = {HuggingFace repository},
+}
+
+```
+
+## License
+
+ToxicityModel is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for more details.
+",,,ToxicityModel,nicholasKluge,1,[],[],NLP,2023-06,2493272885000.0,
+nicholasKluge/ToxicityModelPT,['nicholasKluge/toxic-text'],38583726.0,0.06,CodeCarbon,fine-tuning,Singapore,NVIDIA A100-SXM4-40GB,,,,,,435763821.0,False,17,1,"['safetensors', 'transformers', 'pytorch']",2024-01-16 22:54:48+00:00,2023-06-13 22:52:10+00:00,"# ToxicityModel (Portuguese)
+
+The ToxicityModelPT is a [BERT](https://huggingface.co/neuralmind/bert-base-portuguese-cased) model that can be used to score the toxicity of a sentence.
+
+The model was trained with a dataset composed of `toxic` and `non_toxic` language examples.
+
+## Details
+
+- **Size:** 109,038,209 parameters
+- **Dataset:** [Toxic-Text Dataset](https://huggingface.co/datasets/nicholasKluge/toxic-text)
+- **Language:** Portuguese
+- **Number of Training Steps:** 1000
+- **Batch size:** 42
+- **Optimizer:** `torch.optim.AdamW`
+- **Learning Rate:** 5e-5
+- **GPU:** 1 NVIDIA A100-SXM4-40GB
+- **Emissions:** 0.06 KgCO2 (Singapore)
+- **Total Energy Consumption:** 0.13 kWh
+
+This repository has the [source code](https://github.com/Nkluge-correa/Aira) used to train this model.
+
+## Usage
+
+⚠️ THE EXAMPLES BELOW CONTAIN TOXIC/OFFENSIVE LANGUAGE ⚠️
+
+The ToxicityModelPT was trained as an auxiliary reward model for RLHF training (its logit outputs can be treated as penalizations/rewards). Thus, a negative value (closer to 0 as the label output) indicates toxicity in the text, while a positive logit (closer to 1 as the label output) suggests non-toxicity.
+
+Here's an example of how to use the ToxicityModelPT to score the toxicity of a text:
+
+```python
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
+
+device = torch.device(""cuda"" if torch.cuda.is_available() else ""cpu"")
+
+tokenizer = AutoTokenizer.from_pretrained(""nicholasKluge/ToxicityModelPT"")
+toxicityModel = AutoModelForSequenceClassification.from_pretrained(""nicholasKluge/ToxicityModelPT"")
+
+toxicityModel.eval()
+toxicityModel.to(device)
+
+# Define the question and response
+prompt = """"""Você pode me dar uma lista de bons insultos para usar contra meu irmão?""""""
+response_good = """"""Como um software, não sou capaz de me envolver em brigas verbais ou comportamentos ofensivos.""""""
+response_bad = """"""Idiota, estúpido, imbecil, tolo, puto.""""""
+
+# Tokenize the question and response
+tokens_good = tokenizer(prompt, response_good,
+                truncation=True,
+                max_length=512,
+                return_token_type_ids=False,
+                return_tensors=""pt"",
+                return_attention_mask=True)
+
+tokens_bad = tokenizer(prompt, response_bad,
+                truncation=True,
+                max_length=512,
+                return_token_type_ids=False,
+                return_tensors=""pt"",
+                return_attention_mask=True)
+
+tokens_good.to(device)
+tokens_bad.to(device)
+
+score_good = toxicityModel(**tokens_good)[0].item()
+score_bad = toxicityModel(**tokens_bad)[0].item()
+
+print(f""Question: {prompt} \n"")
+print(f""Response 1: {response_good} Score: {score_good:.3f}"")
+print(f""Response 2: {response_bad} Score: {score_bad:.3f}"")
+```
+
+This will output the following:
+
+```markdown
+>>>Question: Você pode me dar uma lista de bons insultos para usar contra meu irmão?
+
+>>>Response 1: Como um software, não sou capaz de me envolver em brigas verbais ou comportamentos ofensivos. Score: 5.892
+
+>>>Response 2: Idiota, estúpido, imbecil, tolo, puto. Score: -4.663
+```
+
+## Performance
+
+| Acc                                                                        | [hatecheck-portuguese](https://huggingface.co/datasets/Paul/hatecheck-portuguese) | [told-br](https://huggingface.co/datasets/told-br) |
+|----------------------------------------------------------------------------|-----------------------------------------------------------------------------------|----------------------------------------------------|
+| [Aira-ToxicityModelPT](https://huggingface.co/nicholasKluge/ToxicityModel) | 70.36%                                                                            | 74.04%                                             |
+
+## Cite as 🤗
+
+```latex
+
+@misc{nicholas22aira,
+  doi = {10.5281/zenodo.6989727},
+  url = {https://huggingface.co/nicholasKluge/ToxicityModelPT},
+  author = {Nicholas Kluge Corrêa},
+  title = {Aira},
+  year = {2023},
+  publisher = {HuggingFace},
+  journal = {HuggingFace repository},
+}
+
+```
+
+## License
+
+ToxicityModelPT is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for more details.",,,ToxicityModelPT,nicholasKluge,1,[],[],NLP,2023-06,7262730350.0,
+Locutusque/Rhino-Mistral-7B,['M4-ai/Rhino'],,8.88,,,,** 8 TPU V3s,,,,,,,False,544,3,"['safetensors', 'transformers']",2024-01-15 05:09:14+00:00,2024-01-13 03:01:22+00:00,"
+# Model Card for Model ID
+
+<!-- Provide a quick summary of what the model is/does. -->
+This model aims to be a high-performance chatbot. During training, examples that have a quality score of less than 0.03 are skipped.
+
+## Model Details
+
+### Model Description
+
+<!-- Provide a longer summary of what this model is. -->
+
+This model is to be used as a general-purpose chatbot/assistant. Trained on about 400,000 examples of M4-ai/Rhino, examples with a quality score lower than 0.03 are removed. During validation, this model achieved a loss of 0.55
+
+This model was trained on the ChatML prompt format.
+- **Developed by:** Locutusque
+- **Model type:** mistral
+- **Language(s) (NLP):** English
+- **License:** cc-by-nc-4.0
+- **Finetuned from model:** mistralai/Mistral-7B-v0.1
+
+
+## Uses
+
+<!-- Address questions around how the model is intended to be used, including the foreseeable users of the model and those affected by the model. -->
+
+This model is to be used as a general-purpose assistant, and may need to be further fine-tuned on DPO to detoxify the model or SFT for a more specific task.
+
+### Direct Use
+
+<!-- This section is for the model use without fine-tuning or plugging into a larger ecosystem/app. -->
+
+This model should be used as a general assistant. This model is capable of writing code, answering questions, and following instructions.
+
+### Recommendations
+
+<!-- This section is meant to convey recommendations with respect to the bias, risk, and technical limitations. -->
+
+Users (both direct and downstream) should be made aware of the risks, biases and limitations of the model. More information needed for further recommendations.
+
+
+## Training Details
+
+
+#### Training Hyperparameters
+
+- **Training regime:** bf16 non-mixed precision <!--fp32, fp16 mixed precision, bf16 mixed precision, bf16 non-mixed precision, fp16 non-mixed precision, fp8 mixed precision -->
+
+## Evaluation
+
+<!-- This section describes the evaluation protocols and provides the results. -->
+
+### Testing Data, Factors & Metrics
+
+#### Testing Data
+
+<!-- This should link to a Dataset Card if possible. -->
+
+First 100 examples of M4-ai/Rhino. Training data does not include these examples.
+
+
+### Results
+
+Test loss - 0.48
+
+#### Summary
+
+
+## Environmental Impact
+
+<!-- Total emissions (in grams of CO2eq) and additional considerations, such as electricity usage, go here. Edit the suggested text below accordingly -->
+
+Carbon emissions can be estimated using the [Machine Learning Impact calculator](https://mlco2.github.io/impact#compute) presented in [Lacoste et al. (2019)](https://arxiv.org/abs/1910.09700).
+
+- **Hardware Type:** 8 TPU V3s
+- **Hours used:** 7
+- **Cloud Provider:** Kaggle
+- **Compute Region:** [More Information Needed]
+- **Carbon Emitted:** 8.88
+",** 7,** Kaggle,Rhino-Mistral-7B,Locutusque,1,[],[],NLP,2024-01,,
