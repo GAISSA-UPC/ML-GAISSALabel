@@ -31,14 +31,35 @@
                         <el-descriptions-item :label="$t('Analysis identifier')">
                             {{ analysisData.id }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('Analysis registration date')">
+                        <el-descriptions-item v-if="analysisData.dateRegistration" :label="$t('Analysis registration date')">
                             {{ formatData(analysisData.dateRegistration) }}
                         </el-descriptions-item>
-                        <el-descriptions-item :label="$t('Country deploy')">
+                        <el-descriptions-item v-if="analysisData.country" :label="$t('Country deploy')">
                             {{ analysisData.country }}
+                        </el-descriptions-item>
+                        <el-descriptions-item :label="$t('Analysis type')">
+                            {{ isResearchAnalysis ? $t('Research') : $t('Calculation') }}
                         </el-descriptions-item>
                     </el-descriptions>
                     <p v-else>{{ $t("Loading model information...") }}</p>
+                </el-card>
+                
+                <!-- Source Information card -->
+                <el-card v-if="isResearchAnalysis && analysisData?.source" 
+                         shadow="always" 
+                         :body-style="{ padding: '20px' }" 
+                         style="margin-top: 20px;">
+                    <h2 class="section-title">{{ $t("Source Information") }}</h2>
+                    <el-descriptions :column="1" border>
+                        <el-descriptions-item :label="$t('Title')">
+                            {{ analysisData.source.title }}
+                        </el-descriptions-item>
+                        <el-descriptions-item :label="$t('URL')">
+                            <a :href="analysisData.source.url" target="_blank" rel="noopener noreferrer">
+                                {{ analysisData.source.url }}
+                            </a>
+                        </el-descriptions-item>
+                    </el-descriptions>
                 </el-card>
             </el-col>
 
@@ -465,6 +486,9 @@ export default {
                     num_inferences: costData.num_inferences
                 };
             });
+        },
+        isResearchAnalysis() {
+            return this.analysisData?.source !== null && this.analysisData?.source !== undefined;
         }
     },
     methods: {

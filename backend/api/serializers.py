@@ -544,10 +544,14 @@ class ROIAnalysisCalculationSerializer(ROIAnalysisSerializer):
         return analysis
 
 class ROIAnalysisResearchSerializer(ROIAnalysisSerializer):
+     source_id = serializers.PrimaryKeyRelatedField(
+          queryset=TacticSource.objects.all(), write_only=True, source='source'
+     )
+     
      class Meta(ROIAnalysisSerializer.Meta):
         model = ROIAnalysisResearch
-        fields = ROIAnalysisSerializer.Meta.fields + ['source']
-
+        fields = ROIAnalysisSerializer.Meta.fields + ['source', 'source_id']
+     
      def create(self, validated_data):
         metric_values_data = validated_data.pop('metric_values_data', [])
         model_architecture = validated_data.get('model_architecture')

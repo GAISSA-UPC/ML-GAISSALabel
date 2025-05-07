@@ -435,7 +435,7 @@ class ROIAnalysisViewSet(viewsets.ModelViewSet):
             
             # If no analysis_type is provided, determine type by looking at provided fields
             if not analysis_type:
-                if 'source' in self.request.data:
+                if 'source_id' in self.request.data:
                     analysis_type = 'research'
                 elif 'country' in self.request.data:
                     analysis_type = 'calculation'
