@@ -1,7 +1,7 @@
 <template>
     <div class="gaissa-roi-analyzer-pre">
         <h1>{{ $t("GAISSA ROI Analyzer") }}</h1>
-        <h2>{{ $t("Consult a new ROI Analysis") }}</h2>
+        <h2>{{ $t("Analysis Repository") }}</h2>
 
         <p class="description">
             {{ $t("This page allows you to consult the previously calculated Return on Investment (ROI) of applying a ML tactic to your model architecture.") }}
@@ -55,7 +55,7 @@
             </div>
 
             <el-form-item>
-                <el-button @click="calculateROI" color="var(--gaissa_green)" class="submit-button"
+                <el-button @click="calculateROI" class="action-button"
                     :disabled="!isFormValid">
                     {{ $t("Load ROI Analysis") }}
                 </el-button>
@@ -139,9 +139,9 @@ export default {
         },
         async refreshExperiments() {
             let params = {
-                model_architecture_id: this.selectedModelArchitecture,
-                tactic_parameter_option_id: this.selectedTacticParameter,
-                tactic_id: this.selectedMlTactic,
+                model_architecture: this.selectedModelArchitecture,
+                tactic: this.selectedMlTactic,
+                tactic_parameter_option: this.selectedTacticParameter,
             };
             
             if (this.selectedModelArchitecture && this.selectedTacticParameter && this.selectedMlTactic) {
@@ -209,5 +209,26 @@ h2 {
     margin-top: 20px;
     background-color: var(--gaissa_green);
     color: white;
+}
+
+.action-button {
+    margin-top: 20px;
+    background-color: var(--gaissa_green);
+    color: white;
+    border: none;
+}
+
+.action-button:hover {
+    background-color: var(--gaissa_green);
+    opacity: 0.9;
+}
+
+.action-button.is-disabled,
+.action-button.is-disabled:hover,
+.action-button.is-disabled:focus {
+    background-color: #c0c4cc !important;
+    color: white !important;
+    cursor: not-allowed !important;
+    opacity: 0.7;
 }
 </style>
