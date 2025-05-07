@@ -111,6 +111,15 @@ To access the virtual machine, one needs to connect via SSH to the virtual machi
    npm run build
    ```
 
+   In case nvm is not installed, you can install it using the following command:
+
+      If you're allowed to install user-level tools (no sudo needed):
+      ```
+      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+      export NVM_DIR="$HOME/.nvm"
+      source "$NVM_DIR/nvm.sh"
+      ```
+
 ## Get Started
 
 Would you like to download the repository locally and run it? Follow these steps:

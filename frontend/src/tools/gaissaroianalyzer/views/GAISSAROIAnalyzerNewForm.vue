@@ -225,7 +225,10 @@ export default {
             }
             
             try {
-                const response = await tacticParameters.list(this.formData.mlTactic);
+                const filter = {
+                    model_architecture: this.formData.modelArchitecture,
+                };
+                const response = await tacticParameters.list(this.formData.mlTactic, filter);
                 if (response && response.data) {
                     this.tacticParameters = response.data;
                 }

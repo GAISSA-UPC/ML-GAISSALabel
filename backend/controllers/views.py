@@ -374,8 +374,22 @@ class TacticParameterOptionView(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         tactic_id = self.kwargs.get('tactic_id')
+        
         if tactic_id is not None:
             queryset = queryset.filter(tactic_id=tactic_id)
+        
+        # Check for model_architecture_id in query parameters to filter by ExpectedMetricReduction
+        model_architecture_id = self.request.query_params.get('model_architecture')
+        if model_architecture_id and tactic_id:
+            # Filter to only return parameter options that have an associated ExpectedMetricReduction
+            # for the specified model architecture and tactic combination
+            parameter_options_with_reductions = ExpectedMetricReduction.objects.filter(
+                model_architecture_id=model_architecture_id,
+                tactic_parameter_option__tactic_id=tactic_id
+            ).values_list('tactic_parameter_option_id', flat=True).distinct()
+            
+            queryset = queryset.filter(id__in=parameter_options_with_reductions)
+        
         return queryset
 
 class ROIMetricView(viewsets.ModelViewSet):
