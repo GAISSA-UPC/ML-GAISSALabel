@@ -10,7 +10,7 @@ export default {
             return null;
         }
     },
-    async getById(tacticId, parameterId) {
+    async getById(parameterId) {
         try {
             const response = await axios.get(`/api/roi/tactic-parameter-options/${parameterId}/`);
             return response.data;

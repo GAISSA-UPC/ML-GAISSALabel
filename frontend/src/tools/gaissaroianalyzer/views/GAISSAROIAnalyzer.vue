@@ -144,7 +144,7 @@
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
                     <h2 class="section-title">{{ $t("ROI Results") }}</h2>
                     <p class="results-description">
-                        {{ $t("This table provides a detailed economic analysis of the applied tactic, showing the estimated cost savings and Return on Investment metrics.") }}
+                        {{ $t(`This table provides a detailed economic analysis of the applied tactic, showing the estimated cost savings and Return on Investment metrics for ${costMetricsResults[0]?.num_inferences.toLocaleString()} inferences.`) }}
                     </p>
                     
                     <div v-if="costMetricsResults.length" class="roi-cards-container">
@@ -197,7 +197,7 @@
                             </div>
 
                             <!-- Incurred Cost Metric Card -->
-                            <div class="metric-card roi-metric-card">
+                            <div class="metric-card">
                                 <!-- Percentage Change -->
                                 <div class="change-indicator">
                                     <div class="arrow-container">
@@ -634,7 +634,7 @@ export default {
             );
 
             if (roiEvolutionData.length > 0) {
-                const maxInferences = Math.max(...roiEvolutionData.map(point => point.inferences));
+                const maxInferences = Math.max(...roiEvolutionData.map(point => point[0]));
                 this.roiChartOptions.xAxis.max = maxInferences;
             }
 
@@ -860,7 +860,6 @@ export default {
 .roi-card h3 {
     font-size: 1.2rem;
     font-weight: bold;
-    color: var(--gaissa_green);
     margin-bottom: 15px;
 }
 

@@ -36,7 +36,7 @@ class ROICalculator:
                 # If no positive ROI, default inference range
                 inference_numbers = range(0, 2000001, 10000)
             else:
-                max_inference = int(break_even_point * 20)
+                max_inference = int(break_even_point * 40)
                 inference_numbers = range(0, max_inference + 1, max_inference//200)
 
         roi_evolution = []

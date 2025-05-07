@@ -371,6 +371,13 @@ class TacticParameterOptionView(viewsets.ModelViewSet):
     search_fields = ['name', 'value', 'tactic__name']
     ordering_fields = ['tactic__name', 'name', 'value']
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        tactic_id = self.kwargs.get('tactic_id')
+        if tactic_id is not None:
+            queryset = queryset.filter(tactic_id=tactic_id)
+        return queryset
+
 class ROIMetricView(viewsets.ModelViewSet):
     queryset = ROIMetric.objects.all()
     serializer_class = ROIMetricSerializer
