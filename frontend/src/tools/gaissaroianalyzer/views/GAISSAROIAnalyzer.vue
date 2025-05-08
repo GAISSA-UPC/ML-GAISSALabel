@@ -577,16 +577,25 @@ export default {
             const optimizationCost = metric.implementation_cost;
             const newCostPerInference = metric.new_cost_per_inference;
             const oldCostPerInference = metric.baseline_cost_per_inference;
-            const breakEvenPoint = metric.break_even_inferences === 'Infinity' ? 
-                Infinity : parseInt(metric.break_even_inferences.replace(/[^\d]/g, ''));
+            
+            // Parse break-even point, handling "Infinity" string and number formatting
+            let breakEvenPoint = metric.break_even_inferences;
+            if (typeof breakEvenPoint === 'string') {
+                if (breakEvenPoint === 'Infinity') {
+                    breakEvenPoint = Infinity;
+                } else {
+                    // Remove commas and other formatting from the string
+                    breakEvenPoint = parseInt(breakEvenPoint.replace(/[^\d]/g, ''));
+                }
+            }
 
-            // Chart points when breakEvenPoint is NEGATIVE or INFINITE 
-            if (!isFinite(breakEvenPoint) || breakEvenPoint < 0) {
+            // Handle cases where breakEvenPoint is zero, NEGATIVE or INFINITE
+            if (!isFinite(breakEvenPoint) || breakEvenPoint <= 0) {
                 const maxInferences = 2000000;
-
                 const maxCost = (maxInferences * newCostPerInference) + optimizationCost;
+                const income = (maxInferences * oldCostPerInference);
 
-                const incomeData = [[0, 0], [maxInferences, (maxInferences * oldCostPerInference)]];
+                const incomeData = [[0, 0], [maxInferences, income]];
                 const costsData = [[0, optimizationCost], [maxInferences, maxCost]];
 
                 this.incomeCostsChartOptions.xAxis.max = maxInferences;

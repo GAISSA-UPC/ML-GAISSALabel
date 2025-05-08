@@ -37,7 +37,12 @@ class ROICalculator:
                 inference_numbers = range(0, 2000001, 10000)
             else:
                 max_inference = int(break_even_point * 40)
-                inference_numbers = range(0, max_inference + 1, max_inference//200)
+                # Handle the case where max_inference is too small
+                if max_inference < 50:
+                    max_inference = 50
+                
+                step = max(max_inference//200, 1)
+                inference_numbers = range(0, max_inference + 1, step)
 
         roi_evolution = []
         for num_inferences in inference_numbers:
