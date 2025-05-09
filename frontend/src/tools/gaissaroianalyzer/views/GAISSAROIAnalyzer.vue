@@ -117,6 +117,8 @@
                                 <div class="arrow-container">
                                     <font-awesome-icon v-if="parseFloat(metric.expected_reduction_percent) > 0" :icon="['fas', 'down-long']" 
                                         :class="['change-arrow', isReductionPositive(metric) ? 'positive' : 'negative']"/>
+                                    <font-awesome-icon v-else-if="calculateCostReductionPercent(metric) == 0" :icon="['fas', 'equals']" 
+                                        class="change-arrow positive"/>
                                     <font-awesome-icon v-else :icon="['fas', 'up-long']" 
                                         :class="['change-arrow', isReductionPositive(metric) ? 'positive' : 'negative']"/>                                     
                                 </div>
@@ -222,7 +224,8 @@
                                 <!-- Percentage Change -->
                                 <div class="change-indicator">
                                     <div class="arrow-container">
-                                        <font-awesome-icon v-if="calculateCostReductionPercent(metric) >= 0" :icon="['fas', 'down-long']" class="change-arrow positive"/>
+                                        <font-awesome-icon v-if="calculateCostReductionPercent(metric) > 0" :icon="['fas', 'down-long']" class="change-arrow positive"/>
+                                        <font-awesome-icon v-else-if="calculateCostReductionPercent(metric) == 0" :icon="['fas', 'equals']" class="change-arrow positive"/>
                                         <font-awesome-icon v-else :icon="['fas', 'up-long']" class="change-arrow negative"/>
                                     </div>
                                     <div :class="['change-percentage', calculateCostReductionPercent(metric) >= 0 ? 'positive' : 'negative']">
@@ -518,15 +521,16 @@ export default {
                 return value.toExponential(4);
             } 
             
-            // Adapt number to regional format and appropriate decimal places
-            if (Math.abs(value) >= 1000) {
-                return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+            if (Math.abs(value) >= 1000000) {
+                return (value / 1000000).toLocaleString(undefined, { maximumFractionDigits: 1 }) + 'M';
+            } else if (Math.abs(value) >= 1000) {
+                return (value / 1000).toLocaleString(undefined, { maximumFractionDigits: 1 }) + 'K';
             } else if (Math.abs(value) >= 1) {
-                return value.toLocaleString(undefined, { maximumFractionDigits: 4 });
+                return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
             } else if (Math.abs(value) >= 0.01) {
-                return value.toLocaleString(undefined, { maximumFractionDigits: 6 });
+                return value.toLocaleString(undefined, { maximumFractionDigits: 4 });
             } else {
-                return value.toLocaleString(undefined, { maximumFractionDigits: 8 });
+                return value.toLocaleString(undefined, { maximumFractionDigits: 6 });
             }
         },
         isReductionPositive(metric) {
@@ -957,10 +961,10 @@ export default {
 .change-indicator {
     display: flex;
     flex-direction: row;
-    gap: 8px;               
+    gap: 5px;               
     align-items: center;
     flex: 0;
-    margin-right: 30px;
+    margin-right: 20px;
 }
 
 .change-percentage {
@@ -1013,13 +1017,14 @@ export default {
 .value-label {
     font-size: 0.9rem;
     color: #777;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 
 .value {
     font-size: 1.6rem;
     font-weight: bold;
     letter-spacing: -0.5px;
+    line-height: 0.5;
 }
 
 .value.positive {
@@ -1086,7 +1091,7 @@ export default {
     gap: 8px;
 }
 
-@media (max-width: 1300px) {
+@media (max-width: 1320px) {
     .visual-metrics-container {
         grid-template-columns: 1fr;
     }

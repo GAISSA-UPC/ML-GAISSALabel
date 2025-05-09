@@ -15,7 +15,7 @@
                         :class="{ 'mobile': isMobile }"
                     />
                 </el-aside>
-                <el-main :class="{ 'mobile': isMobile }" style="margin-right: 75px">
+                <el-main :class="{ 'mobile': isMobile }" style="margin-right: 15px">
                     <RouterView />
                 </el-main>
             </el-container>
@@ -50,8 +50,8 @@ export default {
     },
     methods: {
         checkScreenSize() {
-            this.isMobile = window.innerWidth < 768
-            this.collapse = this.isMobile
+            this.isMobile = window.innerWidth < 1360
+            this.collapse = window.innerWidth < 768
         }
     }
 }</script>

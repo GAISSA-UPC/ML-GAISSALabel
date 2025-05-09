@@ -3,7 +3,7 @@
         :default-active="activeRoute"
         class="el-menu-vertical"
         :collapse="collapsed"
-        style="margin-left: 13px; margin-right: 10px"
+        style="margin-left: 10px; margin-right: 10px"
     >
         <el-menu-item index="home" @click="$router.push({name: 'home'})">
             <font-awesome-icon :icon="['fas', 'house']" class="icon"/>
@@ -126,7 +126,7 @@ export default {
     white-space: normal;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1359px) {
     .el-menu-vertical {
         display: flex;
         flex-wrap: wrap;
@@ -154,7 +154,7 @@ export default {
     }
 }
 
-@media (min-width: 769px) {
+@media (min-width: 1360px) {
     .el-menu-vertical {
         display: block;
     }
