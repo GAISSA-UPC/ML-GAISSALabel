@@ -356,12 +356,22 @@ export default {
                     nameLocation: 'middle',
                     nameGap: 30,
                     min: 0,
+                    axisLabel: {
+                        formatter: function(value) {
+                            return this.formatNumber(value);
+                        }.bind(this)
+                    }
                 },
                 yAxis: {
                     type: 'value',
                     name: this.$t('Amount (€)'),
                     nameLocation: 'middle',
                     nameGap: 35,
+                    axisLabel: {
+                        formatter: function(value) {
+                            return this.formatNumber(value);
+                        }.bind(this)
+                    }
                 },
                 series: [
                     {
@@ -429,12 +439,22 @@ export default {
                     name: this.$t('Number of Inferences'),
                     nameLocation: 'middle',
                     nameGap: 30,
+                    axisLabel: {
+                        formatter: function(value) {
+                            return this.formatNumber(value);
+                        }.bind(this)
+                    }
                 },
                 yAxis: {
                     type: 'value',
                     name: this.$t('ROI'),
                     nameLocation: 'middle',
                     nameGap: 35,
+                    axisLabel: {
+                        formatter: function(value) {
+                            return this.formatNumber(value);
+                        }.bind(this)
+                    }
                 },
                 series: [
                     {
@@ -608,18 +628,20 @@ export default {
                 this.incomeCostsChartOptions.series[0].data = incomeData;
                 this.incomeCostsChartOptions.series[1].data = costsData;
                 // Color under the Income line
-                this.incomeCostsChartOptions.series[0].areaStyle.color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                    {
-                        offset: 0,
-                        color: 'rgba(255, 165, 0, 0.2)' // Light orange at top
-                    },
-                    {
-                        offset: 1,
-                        color: 'rgba(255, 165, 0, 0.05)' // Transparent at bottom
-                    }
-                ]);
-                this.incomeCostsChartOptions.series[0].lineStyle.color = 'orange';
-                this.incomeCostsChartOptions.series[0].itemStyle.color = 'orange';
+                if (breakEvenPoint !== 0) {
+                    this.incomeCostsChartOptions.series[0].areaStyle.color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        {
+                            offset: 0,
+                            color: 'rgba(255, 165, 0, 0.2)' // Light orange at top
+                        },
+                        {
+                            offset: 1,
+                            color: 'rgba(255, 165, 0, 0.05)' // Transparent at bottom
+                        }
+                    ]);
+                    this.incomeCostsChartOptions.series[0].lineStyle.color = 'orange';
+                    this.incomeCostsChartOptions.series[0].itemStyle.color = 'orange';
+                }
                 this.incomeCostsChart.setOption(this.incomeCostsChartOptions, false);
                 return;
             }
