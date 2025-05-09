@@ -28,6 +28,9 @@
                     :label="model.name" 
                     :value="model.id" />
             </el-select>
+            <el-alert type="info" show-icon :closable="false" style="margin-top: 10px">
+                <p style="font-size: 14px">{{ $t('Model architecture refers to the specific structure and framework of a machine learning or deep learning system (e.g., SVM, KNN, AlexNet, GoogLeNet). Different architectures have distinct design principles and computational requirements, which influence both their performance and their environmental impact.') }}</p>
+            </el-alert>
         </el-form-item>
 
         <el-form-item :label="$t('ML Tactic')" prop="mlTactic">
@@ -44,6 +47,9 @@
                     :label="tactic.name" 
                     :value="tactic.id" />
             </el-select>
+            <el-alert type="info" show-icon :closable="false" style="margin-top: 10px">
+                <p style="font-size: 14px">{{ $t('ML tactics are optimization techniques applied to machine learning models to enhance efficiency (e.g., pruning). These tactics aim to reduce computational and energy costs while preserving or minimally impacting model performance.') }}</p>
+            </el-alert>
         </el-form-item>
 
         <el-form-item :label="$t('Tactic Parameter')" prop="tacticParameter">
@@ -59,6 +65,9 @@
                     :label="`${parameter.name}: ${parameter.value}`" 
                     :value="parameter.id" />
             </el-select>
+            <el-alert type="info" show-icon :closable="false" style="margin-top: 10px">
+                <p style="font-size: 14px">{{ $t('Tactic parameters define specific configurations or settings for the selected ML tactic. These parameters directly influence how aggressively the optimization is applied.') }}</p>
+            </el-alert>
         </el-form-item>
         <br>
 
