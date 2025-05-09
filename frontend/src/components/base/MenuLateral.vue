@@ -42,7 +42,7 @@
                 {{ $t('Consult') }}
             </el-menu-item>
         </el-sub-menu>
-        <el-sub-menu index="3" v-if="$store.getters.isLogged">
+        <el-sub-menu index="3">
             <template #title>
                 <font-awesome-icon :icon="['fas', 'chart-line']" class="icon"/>
                 <span class="wrap-title">{{ $t('GAISSA ROI Analyzer') }}</span>

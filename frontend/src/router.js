@@ -92,19 +92,16 @@ const router = createRouter({
       path: '/gaissa-roi-analyzer/gaissa-roi-analyzer-pre',
       name: 'GAISSA ROI Analyzer PreSaved Consult',
       component: GAISSAROIAnalyzerPreSaved,
-      meta: { requiresAuth: true }
     },
     {
       path: '/gaissa-roi-analyzer/gaissa-roi-analysis/:id_experiment',
       name: "GAISSA ROI Analyzer",
       component: GAISSAROIAnalyzer,
-      meta: { requiresAuth: true }
     },
     {
       path: '/gaissa-roi-analyzer/new-form',
       name: 'GAISSA ROI Analyzer New Form',
       component: GAISSAROIAnalyzerNewForm,
-      meta: { requiresAuth: true }
     },
     {
       path: '/admin/metriquesinfo',
