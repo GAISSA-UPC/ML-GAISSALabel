@@ -251,6 +251,8 @@ class ROIMetric(models.Model):
     unit = models.CharField(max_length=50, null=True, blank=True, verbose_name=_('Unit'))
     is_energy_related = models.BooleanField(default=False, verbose_name=_('Is Energy Related'))
     higher_is_better = models.BooleanField(default=False, verbose_name=_('Higher is better'))
+    min_value = models.FloatField(null=True, blank=True, verbose_name=_('Minimum Value'))
+    max_value = models.FloatField(null=True, blank=True, verbose_name=_('Maximum Value'))
 
     class Meta:
         verbose_name = _('ROI Metric')
@@ -309,6 +311,25 @@ class AnalysisMetricValue(models.Model):
                 if metric.is_energy_related and self.__class__ == AnalysisMetricValue:
                     raise ValidationError(
                         _("Energy-related metrics must use EnergyAnalysisMetricValue instead of AnalysisMetricValue.")
+                    )
+
+                # Constraint 5: Validate baselineValue against min/max range
+                if metric.min_value is not None and self.baselineValue < metric.min_value:
+                    raise ValidationError(
+                        _("The baseline value %(value)s for metric '%(metric)s' is below the minimum allowed value %(min)s.") % {
+                            'value': self.baselineValue,
+                            'metric': metric.name,
+                            'min': metric.min_value
+                        }
+                    )
+                    
+                if metric.max_value is not None and self.baselineValue > metric.max_value:
+                    raise ValidationError(
+                        _("The baseline value %(value)s for metric '%(metric)s' exceeds the maximum allowed value %(max)s.") % {
+                            'value': self.baselineValue,
+                            'metric': metric.name,
+                            'max': metric.max_value
+                        }
                     )
 
             # These exceptions allow the creation of the object when creating the analysis

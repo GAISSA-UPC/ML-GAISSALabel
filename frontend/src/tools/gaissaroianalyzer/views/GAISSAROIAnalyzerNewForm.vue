@@ -87,11 +87,25 @@
                     v-model="metricValues[metric.id]" 
                     :precision="4" 
                     :step="0.01"
-                    :min="0"
+                    :min="metric.min_value !== null ? metric.min_value : 0"
+                    :max="metric.max_value !== null ? metric.max_value : undefined"
                     style="width: 200px"></el-input-number>
                 <p style="margin-left: 10px">{{ metric.unit }}</p>
                 <el-alert v-if="metric.description" type="info" show-icon :closable="false" style="margin-top: 10px">
                     <p style="font-size: 14px">{{ metric.description }}</p>
+                </el-alert>
+                <el-alert v-if="metric.min_value !== null || metric.max_value !== null" type="warning" show-icon :closable="false" style="margin-top: 10px">
+                    <p style="font-size: 14px">
+                      <template v-if="metric.min_value !== null && metric.max_value !== null">
+                        {{ $t(`Valid range: ${metric.min_value} - ${metric.max_value} ${metric.unit || ''}`) }}
+                      </template>
+                      <template v-else-if="metric.min_value !== null">
+                        {{ $t(`Minimum value: ${metric.min_value} ${metric.unit || ''}`) }}
+                      </template>
+                      <template v-else-if="metric.max_value !== null">
+                        {{ $t(`Maximum value: ${metric.max_value} ${metric.unit || ''}`) }}
+                      </template>
+                    </p>
                 </el-alert>
             </el-form-item>
             <br>

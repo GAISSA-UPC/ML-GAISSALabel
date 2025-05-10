@@ -454,6 +454,25 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
                     f"Model Architecture '{model_architecture}', "
                     f"Tactic Parameter Option '{tactic_parameter_option}', and Metric '{metric}'."
                 )
+                
+            # Constraint 5: Validate baseline value against min/max if set
+            if metric.min_value is not None and baseline_value < metric.min_value:
+                raise ValidationError(
+                    _("The baseline value %(value)s for metric '%(metric)s' is below the minimum allowed value %(min)s.") % {
+                        'value': baseline_value,
+                        'metric': metric.name,
+                        'min': metric.min_value
+                    }
+                )
+                
+            if metric.max_value is not None and baseline_value > metric.max_value:
+                raise ValidationError(
+                    _("The baseline value %(value)s for metric '%(metric)s' exceeds the maximum allowed value %(max)s.") % {
+                        'value': baseline_value,
+                        'metric': metric.name,
+                        'max': metric.max_value
+                    }
+                )
 
             # Check if energy-related metrics have energy cost information
             if metric.is_energy_related:
