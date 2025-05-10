@@ -402,7 +402,7 @@ class ROIMetricView(viewsets.ModelViewSet):
     ordering_fields = ['name']
 
 class ROIAnalysisViewSet(viewsets.ModelViewSet):
-    queryset = ROIAnalysis.objects.all()
+    queryset = ROIAnalysis.objects.all().order_by('-roianalysiscalculation__dateRegistration', '-id')
     
     # Allow anyone to create ROI analyses, for other actions use default permissions
     def get_permissions(self):
@@ -426,7 +426,9 @@ class ROIAnalysisViewSet(viewsets.ModelViewSet):
         'tactic_parameter_option__value',
         'roianalysiscalculation__country'
     ]
-    ordering_fields = ['id', 'model_architecture__name', 'tactic_parameter_option__tactic__name']
+    ordering_fields = ['id', 'model_architecture__name', 'tactic_parameter_option__tactic__name', 
+                      'roianalysiscalculation__dateRegistration']
+    ordering = ('-roianalysiscalculation__dateRegistration', '-id')
 
     def get_serializer_class(self):
         # Use AnalysisListSerializer for list view to improve readability
