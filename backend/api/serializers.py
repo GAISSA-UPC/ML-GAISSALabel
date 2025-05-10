@@ -523,6 +523,47 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
                     baselineValue=metric_info['baselineValue']
                 )
         return analysis
+    
+class AnalysisListSerializer(serializers.ModelSerializer):
+    """
+    A simplified return serializer for ROI Analysis list views.
+    """
+    model_architecture_name = serializers.CharField(source='model_architecture.name', read_only=True)
+    tactic_name = serializers.CharField(source='tactic_parameter_option.tactic.name', read_only=True)
+    parameter_name = serializers.CharField(source='tactic_parameter_option.name', read_only=True)
+    parameter_value = serializers.CharField(source='tactic_parameter_option.value', read_only=True)
+    
+    # Fields from subclasses
+    dateRegistration = serializers.SerializerMethodField(read_only=True)
+    country = serializers.SerializerMethodField(read_only=True)
+    source = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = ROIAnalysis
+        fields = [
+            'id', 'model_architecture', 'model_architecture_name',
+            'tactic_name', 'parameter_name', 'parameter_value',
+            'dateRegistration', 'country', 'source'
+        ]
+    
+    def get_dateRegistration(self, obj):
+        if hasattr(obj, 'roianalysiscalculation'):
+            return obj.roianalysiscalculation.dateRegistration
+        return None
+    
+    def get_country(self, obj):
+        if hasattr(obj, 'roianalysiscalculation'):
+            return obj.roianalysiscalculation.country
+        return None
+        
+    def get_source(self, obj):
+        if hasattr(obj, 'roianalysisresearch'):
+            source = obj.roianalysisresearch.source
+            return {
+                'id': source.id,
+                'title': source.title
+            } if source else None
+        return None
 
 class ROIAnalysisCalculationSerializer(ROIAnalysisSerializer):
     country = serializers.CharField(max_length=255, required=True)

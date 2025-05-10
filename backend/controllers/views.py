@@ -18,7 +18,7 @@ from api.serializers import ModelSerializer, EntrenamentSerializer, InferenciaSe
     IntervalBasicSerializer, MetricaSerializer, EinaCalculBasicSerializer, EinaCalculSerializer, \
     TransformacioMetricaSerializer, TransformacioInformacioSerializer, LoginAdminSerializer, \
     ModelArchitectureSerializer, TacticSourceSerializer, MLTacticSerializer, TacticParameterOptionSerializer, \
-    ROIAnalysisSerializer, ROIAnalysisCalculationSerializer, ROIAnalysisResearchSerializer, ROIMetricSerializer, \
+    ROIAnalysisSerializer, AnalysisListSerializer, ROIAnalysisCalculationSerializer, ROIAnalysisResearchSerializer, ROIMetricSerializer, \
     AnalysisMetricValueSerializer, EnergyAnalysisMetricValueSerializer, ExpectedMetricReductionSerializer
 
 from api import permissions
@@ -403,7 +403,6 @@ class ROIMetricView(viewsets.ModelViewSet):
 
 class ROIAnalysisViewSet(viewsets.ModelViewSet):
     queryset = ROIAnalysis.objects.all()
-    serializer_class = ROIAnalysisSerializer
     
     # Allow anyone to create ROI analyses, for other actions use default permissions
     def get_permissions(self):
@@ -430,6 +429,11 @@ class ROIAnalysisViewSet(viewsets.ModelViewSet):
     ordering_fields = ['id', 'model_architecture__name', 'tactic_parameter_option__tactic__name']
 
     def get_serializer_class(self):
+        # Use AnalysisListSerializer for list view to improve readability
+        if self.action == 'list':
+            return AnalysisListSerializer
+        
+        # For create, update, partial_update operations
         if self.action in ['create', 'update', 'partial_update']:
             analysis_type = self.request.data.get('analysis_type', 'calculation')
             
@@ -445,12 +449,14 @@ class ROIAnalysisViewSet(viewsets.ModelViewSet):
             elif analysis_type == 'research':
                 return ROIAnalysisResearchSerializer
             
+        # For retrieve operations
         if self.action == 'retrieve':
             instance = self.get_object()
             if hasattr(instance, 'roianalysiscalculation'):
                 return ROIAnalysisCalculationSerializer
             elif hasattr(instance, 'roianalysisresearch'):
                 return ROIAnalysisResearchSerializer
+            
         return ROIAnalysisSerializer
         
     def get_object(self):
