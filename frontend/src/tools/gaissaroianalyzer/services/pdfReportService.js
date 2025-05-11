@@ -27,6 +27,11 @@ export default {
             if (clonedViewToggle) {
                 clonedViewToggle.style.display = 'none';
             }
+
+            const clonedInferenceInputControl = clonedElement.querySelector('.inferences-control-container');
+            if (clonedInferenceInputControl) {
+                clonedInferenceInputControl.style.display = 'none';
+            }
             
             // Apply styles to prepare for PDF
             clonedElement.style.width = '1200px';
