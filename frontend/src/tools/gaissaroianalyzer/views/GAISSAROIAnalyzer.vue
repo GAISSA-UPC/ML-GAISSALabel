@@ -363,7 +363,6 @@ export default {
                     indicator: []
                 },
                 label: {
-                    alignTicks: false,
                     show: true,
                     formatter: function (params) {
                         return typeof params.value === 'number' ? 

@@ -421,6 +421,24 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
         metrics_to_create = []
         tactic = tactic_parameter_option.tactic
         
+        # Get all the required metrics for this tactic
+        required_metrics = tactic.applicable_metrics.all()
+        provided_metric_ids = [int(metric_data.get('metric_id')) for metric_data in metric_values_data if metric_data.get('metric_id')]
+        
+        # Check if all required metrics are provided
+        missing_metrics = []
+        for required_metric in required_metrics:
+            if required_metric.id not in provided_metric_ids:
+                missing_metrics.append(required_metric.name)
+        
+        if missing_metrics:
+            raise ValidationError(
+                _("Missing required metrics for tactic '%(tactic)s': %(metrics)s") % {
+                    'tactic': tactic.name,
+                    'metrics': ", ".join(missing_metrics)
+                }
+            )
+        
         for metric_data in metric_values_data:
             metric_id = metric_data.get('metric_id')
             baseline_value = metric_data.get('baselineValue')
