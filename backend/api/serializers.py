@@ -370,8 +370,10 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
         read_only_fields = ['model_architecture', 'tactic_parameter_option']
     
     def get_metrics_analysis(self, obj):
+        # Get the num_inferences from the context if available, otherwise use default
+        num_inferences = self.context.get('num_inferences', 10000000)
         calculator = ROIMetricsCalculator()
-        return calculator.calculate_metrics_for_analysis(obj.id)
+        return calculator.calculate_metrics_for_analysis(obj.id, num_inferences)
     
     def get_dateRegistration(self, obj):
         if hasattr(obj, 'roianalysiscalculation'):

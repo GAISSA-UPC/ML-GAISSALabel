@@ -11,9 +11,9 @@ export default {
         }
     },
     
-    async getAnalysis(analysisId) {
+    async getAnalysis(analysisId, params = {}) {
         try {
-            const response = await axios.get(`/api/roi/analyses/${analysisId}/`);
+            const response = await axios.get(`/api/roi/analyses/${analysisId}/`, { params });
             return response.data;
         } catch (error) {
             console.error(`Error fetching analysis ${analysisId}:`, error);

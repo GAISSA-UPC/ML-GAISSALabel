@@ -6,12 +6,13 @@ class ROIMetricsCalculator:
     Calculates metrics values after applying expected reductions based on tactics.
     """
 
-    def calculate_metrics_for_analysis(self, analysis_id):
+    def calculate_metrics_for_analysis(self, analysis_id, num_inferences=10000000):
         """
         Calculates metrics for a specific ROI analysis.
         
         Args:
             analysis_id: The ID of the ROI analysis to calculate metrics for
+            num_inferences: Number of inferences to use for ROI calculations (default: 10M)
             
         Returns:
             Dictionary containing metric information: metric_id, metric_name, description, unit, 
@@ -66,7 +67,7 @@ class ROIMetricsCalculator:
                             cost_savings = self.calculate_cost_savings(
                                 energy_metric_value, 
                                 expected_reduction.expectedReductionValue, 
-                                10000000
+                                num_inferences
                             )
                             result['cost_savings'] = cost_savings
                             

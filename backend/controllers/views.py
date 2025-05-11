@@ -468,6 +468,19 @@ class ROIAnalysisViewSet(viewsets.ModelViewSet):
         elif hasattr(obj, 'roianalysisresearch'):
             return obj.roianalysisresearch
         return obj
+        
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        
+        # Allow custom number of inferences for cost savings calculations
+        num_inferences = self.request.query_params.get('num_inferences')
+        if num_inferences:
+            try:
+                context['num_inferences'] = int(num_inferences)
+            except ValueError:
+                pass  # Use the default value
+        
+        return context
 
 class AnalysisMetricValueView(viewsets.ModelViewSet):
     queryset = AnalysisMetricValue.objects.all()

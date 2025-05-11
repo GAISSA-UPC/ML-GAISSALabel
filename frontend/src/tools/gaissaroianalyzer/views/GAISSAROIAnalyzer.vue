@@ -191,6 +191,31 @@
             <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" style="margin-top: 20px;">
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
                     <h2 class="section-title">{{ $t("ROI Results") }}</h2>
+                    
+                    <!-- Inferences Input Control -->
+                    <div class="inferences-control-container">
+                        <p class="inferences-control-label">{{ $t("Number of inferences:") }}</p>
+                        <div class="inferences-slider-container">
+                            <el-slider 
+                                v-model="inferenceCount" 
+                                :min="10000" 
+                                :max="100000000"
+                                :step="10000"
+                                @change="updateInferences"
+                                class="inferences-slider"
+                            />
+                        </div>
+                        <div class="inferences-input-container">
+                            <el-input-number 
+                                v-model="inferenceCount" 
+                                :min="10000" 
+                                :controls="false" 
+                                @change="updateInferences"
+                                class="inferences-input"
+                            />
+                        </div>
+                    </div>
+                    
                     <p class="results-description">
                         {{ $t(`This table provides a detailed economic analysis of the applied tactic, showing the estimated cost savings and Return on Investment metrics for ${costMetricsResults[0]?.num_inferences.toLocaleString()} inferences.`) }}
                     </p>
@@ -353,6 +378,7 @@ export default {
             roiChart: null,
             showVisualMetrics: true,
             pdfGenerating: false,
+            inferenceCount: 10000000,
             metricsRadialChartOptions: {
                 legend: {
                     bottom: 0,
@@ -539,7 +565,7 @@ export default {
         },
         isResearchAnalysis() {
             return this.analysisData?.source !== null && this.analysisData?.source !== undefined;
-        }
+        },
     },
     methods: {
         formatData,
@@ -557,6 +583,36 @@ export default {
             const percentage = (reduction / baselineCost) * 100;
             
             return parseFloat(percentage.toFixed(2));
+        },
+        async updateInferences() {
+            // Ensure inferenceCount is at least 10000
+            if (this.inferenceCount < 10000) {
+                this.inferenceCount = 10000;
+            }
+            
+            try {
+                // Re-fetch the analysis with the new inference count
+                const analysisId = this.$route.params.id_experiment;
+                if (!analysisId) return;
+                
+                const data = await roiAnalyses.getAnalysis(analysisId, { num_inferences: this.inferenceCount });
+                if (data) {
+                    this.analysisData = data;
+
+                    this.$nextTick(() => {
+                        this.updateROIChartData();
+                        this.updateIncomeCostsChartData();
+                        this.updateMetricsRadialChartData();
+                    });
+                }
+            } catch (error) {
+                console.error('Error updating inferences count:', error);
+                ElMessage({
+                    message: this.$t('Failed to update with new inference count.'),
+                    type: 'error',
+                    duration: 3000
+                });
+            }
         },
         formatNumber(value) {
             if (value === null || value === undefined || isNaN(value)) {
@@ -607,19 +663,28 @@ export default {
             this.roiChart.setOption(this.roiChartOptions, false);
         },
         async loadAnalysisData() {
-            const { id_experiment } = this.$route.params;
-            
             try {
-                // Fetch the analysis data
-                this.analysisData = await roiAnalyses.getAnalysis(id_experiment);
+                const analysisId = this.$route.params.id_experiment;
+                if (!analysisId) return;
                 
-                // If it's a calculation-type analysis, fetch the tactic sources
-                if (this.analysisData?.tactic_parameter_option_details && !this.isResearchAnalysis) {
-                    const tacticId = this.analysisData.tactic_parameter_option;
-                    if (tacticId) {
+                // Include inference count in the request
+                const data = await roiAnalyses.getAnalysis(analysisId, { num_inferences: this.inferenceCount });
+                if (data) {
+                    this.analysisData = data;
+                    
+                    // For calculation-type analyses, fetch the sources for the tactic
+                    if (!this.isResearchAnalysis) {
+                        const tacticId = this.analysisData.tactic_parameter_option;
                         const resultTactic = await mlTactics.getById(tacticId);
                         this.tacticSources = resultTactic.sources;
                     }
+                    
+                    // Update charts after data is loaded
+                    this.$nextTick(() => {
+                        this.updateMetricsRadialChartData();
+                        this.updateROIChartData();
+                        this.updateIncomeCostsChartData();
+                    });
                 }
             } catch (error) {
                 console.error("Error loading analysis data:", error);
@@ -879,8 +944,8 @@ export default {
     },
     mounted() {
         window.addEventListener('resize', this.resizeCharts);
-        this.loadAnalysisData();
         this.initializeIncomeCostsChart();
+        this.loadAnalysisData();
     },
     beforeDestroy() {
         window.removeEventListener('resize', this.resizeCharts);
@@ -939,6 +1004,32 @@ export default {
     background-color: var(--gaissa_green);
     color: white;
     border-color: var(--gaissa_green);
+}
+
+.inferences-control-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 12px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.inferences-control-label {
+    font-weight: bold;
+    margin-right: 12px;
+    min-width: 150px;
+    margin-bottom: 0;
+}
+
+.inferences-slider-container {
+    flex-grow: 1;
+    margin-right: 20px;
+}
+
+.inferences-input-container {
+    width: 150px;
 }
 
 .roi-cards-container {
@@ -1175,6 +1266,24 @@ export default {
     .metric-card {
         flex-direction: column;
         align-items: center;
+    }
+    
+    .inferences-control-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .inferences-control-label {
+        margin-bottom: 10px;
+    }
+    
+    .inferences-slider-container {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+    
+    .inferences-input-container {
+        width: 100%;
     }
 }
 </style>
