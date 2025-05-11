@@ -649,6 +649,77 @@ export default {
                 maxInferences
             };
         },
+        metricsRadialChartData() {
+            if (!this.analysisData?.metrics_analysis || this.analysisData.metrics_analysis.length === 0) {
+                return null;
+            }
+
+            const metrics = this.analysisData.metrics_analysis;
+            const hasIncurredCost = this.costMetricsResults && this.costMetricsResults.length > 0;
+            
+            // Create indicators from metrics (slightly higher than the highest value)
+            const indicators = metrics.map(metric => {
+                const maxValue = Math.max(
+                    parseFloat(metric.baseline_value) || 0,
+                    parseFloat(metric.new_expected_value) || 0
+                ) * 1.2;
+                
+                const displayName = metric.unit ? 
+                    `${metric.metric_name} (${metric.unit})` : 
+                    metric.metric_name;
+                
+                return {
+                    name: displayName,
+                    max: maxValue
+                };
+            });
+
+            // Add incurred cost (of the first cost metric) indicator if exists
+            if (hasIncurredCost) {
+                const costMetric = this.costMetricsResults[0];
+                const maxIncurredCost = Math.max(
+                    parseFloat(costMetric.total_baseline_cost) || 0,
+                    parseFloat(costMetric.total_new_cost) || 0
+                ) * 1.2;
+
+                indicators.push({
+                    name: 'Incurred Cost (€)',
+                    max: maxIncurredCost
+                });
+            }
+            
+            // Create data series
+            const baselineValues = metrics.map(metric => parseFloat(metric.baseline_value) || 0);
+            const newValues = metrics.map(metric => parseFloat(metric.new_expected_value) || 0);
+            
+            // Add incurred cost values if they exist
+            if (hasIncurredCost) {
+                const costMetric = this.costMetricsResults[0];
+                baselineValues.push(parseFloat(costMetric.total_baseline_cost) || 0);
+                newValues.push(parseFloat(costMetric.total_new_cost) || 0);
+            }
+            
+            return {
+                indicators,
+                seriesData: [
+                    {
+                        value: baselineValues,
+                        name: 'Baseline',
+                        itemStyle: {
+                            color: 'orange'
+                        }
+                    },
+                    {
+                        value: newValues,
+                        name: 'Optimized',
+                        itemStyle: {
+                            color: 'green'
+                        }
+                    }
+                ],
+                legendData: ['Baseline', 'Optimized']
+            };
+        },
     },
     methods: {
         formatData,
@@ -837,70 +908,15 @@ export default {
                 return;
             }
 
-            const metrics = this.analysisData.metrics_analysis;
-            const hasIncurredCost = this.costMetricsResults && this.costMetricsResults.length > 0;
-            
-            // Create indicators from metrics (slightly higher than the highest value)
-            const indicators = metrics.map(metric => {
-                const maxValue = Math.max(
-                    parseFloat(metric.baseline_value) || 0,
-                    parseFloat(metric.new_expected_value) || 0
-                ) * 1.2;
-                
-                const displayName = metric.unit ? 
-                    `${metric.metric_name} (${metric.unit})` : 
-                    metric.metric_name;
-                
-                return {
-                    name: displayName,
-                    max: maxValue
-                };
-            });
-
-            // Add incurred cost (of the first cost metric) indicator if exists
-            if (hasIncurredCost) {
-                const costMetric = this.costMetricsResults[0];
-                const maxIncurredCost = Math.max(
-                    parseFloat(costMetric.total_baseline_cost) || 0,
-                    parseFloat(costMetric.total_new_cost) || 0
-                ) * 1.2;
-
-                indicators.push({
-                    name: 'Incurred Cost (€)',
-                    max: maxIncurredCost
-                });
+            const chartData = this.metricsRadialChartData;
+            if (!chartData) {
+                return;
             }
-            
-            // Create data series
-            const baselineValues = metrics.map(metric => parseFloat(metric.baseline_value) || 0);
-            const newValues = metrics.map(metric => parseFloat(metric.new_expected_value) || 0);
-            
-            // Add incurred cost values if they exist
-            if (hasIncurredCost) {
-                const costMetric = this.costMetricsResults[0];
-                baselineValues.push(parseFloat(costMetric.total_baseline_cost) || 0);
-                newValues.push(parseFloat(costMetric.total_new_cost) || 0);
-            }
-            
+
             // Update chart options
-            this.metricsRadialChartOptions.radar.indicator = indicators;
-            this.metricsRadialChartOptions.legend.data = ['Baseline', 'Optimized'];
-            this.metricsRadialChartOptions.series[0].data = [
-                {
-                    value: baselineValues,
-                    name: 'Baseline',
-                    itemStyle: {
-                        color: 'orange'
-                    }
-                },
-                {
-                    value: newValues,
-                    name: 'Optimized',
-                    itemStyle: {
-                        color: 'green'
-                    }
-                }
-            ];
+            this.metricsRadialChartOptions.radar.indicator = chartData.indicators;
+            this.metricsRadialChartOptions.legend.data = chartData.legendData;
+            this.metricsRadialChartOptions.series[0].data = chartData.seriesData;
             
             // Update chart with new data
             this.metricsRadialChart.setOption(this.metricsRadialChartOptions, false);
