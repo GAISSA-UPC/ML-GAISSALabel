@@ -566,6 +566,89 @@ export default {
         isResearchAnalysis() {
             return this.analysisData?.source !== null && this.analysisData?.source !== undefined;
         },
+        incomeCostsChartData() {
+            if (!this.costMetricsResults || this.costMetricsResults.length === 0) {
+                return null;
+            }
+
+            // Use the first metric for the chart
+            const metric = this.costMetricsResults[0];
+            
+            const optimizationCost = metric.implementation_cost;
+            const newCostPerInference = metric.new_cost_per_inference;
+            const oldCostPerInference = metric.baseline_cost_per_inference;
+            
+            // Parse break-even point, handling "Infinity" string and number formatting
+            let breakEvenPoint = metric.break_even_inferences;
+            if (typeof breakEvenPoint === 'string') {
+                if (breakEvenPoint === 'Infinity') {
+                    breakEvenPoint = Infinity;
+                } else {
+                    // Remove commas and other formatting from the string
+                    breakEvenPoint = parseInt(breakEvenPoint.replace(/[^\d]/g, ''));
+                }
+            }
+
+            // Handle cases where breakEvenPoint is zero, NEGATIVE or INFINITE
+            if (!isFinite(breakEvenPoint) || breakEvenPoint <= 0) {
+                const maxInferences = 2000000;
+                const maxCost = (maxInferences * newCostPerInference) + optimizationCost;
+                const income = (maxInferences * oldCostPerInference);
+
+                const incomeData = [[0, 0], [maxInferences, income]];
+                const costsData = [[0, optimizationCost], [maxInferences, maxCost]];
+
+                return {
+                    incomeData,
+                    costsData,
+                    maxInferences,
+                    breakEvenType: (breakEvenPoint === 0) ? 'zero' : 'infinity',
+                }; 
+            }
+
+            // Chart points when breakEvenPoint is POSITIVE 
+            const maxInferences = breakEvenPoint * 2; // Extend the chart beyond the Break-Even Point in a defined range
+            const maxCost = (maxInferences * newCostPerInference) + optimizationCost;
+
+            const incomeData = [[0, 0], [maxInferences, (maxInferences * oldCostPerInference)]];
+            const costsData = [[0, optimizationCost], [maxInferences, maxCost]];
+
+            return {
+                incomeData,
+                costsData,
+                maxInferences,
+                breakEvenType: 'normal',
+            };
+        },
+        roiChartData() {
+            if (!this.analysisData?.metrics_analysis) {
+                return null;
+            }
+
+            // Find the first energy metric with ROI evolution data
+            const metricWithROIData = this.analysisData.metrics_analysis.find(metric => 
+                metric.roi_evolution_chart_data && metric.roi_evolution_chart_data.length > 0
+            );
+
+            if (!metricWithROIData) {
+                console.warn('No ROI evolution chart data found in metrics analysis');
+                return null;
+            }
+
+            const roiEvolutionData = metricWithROIData.roi_evolution_chart_data.map(item => 
+                [item.inferences, item.roi]
+            );
+
+            let maxInferences = 0;
+            if (roiEvolutionData.length > 0) {
+                maxInferences = Math.max(...roiEvolutionData.map(point => point[0]));
+            }
+
+            return {
+                roiEvolutionData,
+                maxInferences
+            };
+        },
     },
     methods: {
         formatData,
@@ -692,114 +775,61 @@ export default {
             }
         },
         updateIncomeCostsChartData() {
-            if (!this.costMetricsResults || this.costMetricsResults.length === 0) {
+            const chartData = this.incomeCostsChartData;
+            if (!chartData) {
                 return;
             }
 
-            // Use the first metric for the chart
-            const metric = this.costMetricsResults[0];
-            
-            const optimizationCost = metric.implementation_cost;
-            const newCostPerInference = metric.new_cost_per_inference;
-            const oldCostPerInference = metric.baseline_cost_per_inference;
-            
-            // Parse break-even point, handling "Infinity" string and number formatting
-            let breakEvenPoint = metric.break_even_inferences;
-            if (typeof breakEvenPoint === 'string') {
-                if (breakEvenPoint === 'Infinity') {
-                    breakEvenPoint = Infinity;
-                } else {
-                    // Remove commas and other formatting from the string
-                    breakEvenPoint = parseInt(breakEvenPoint.replace(/[^\d]/g, ''));
-                }
+            // Update chart options with the computed data
+            this.incomeCostsChartOptions.xAxis.max = chartData.maxInferences;
+            this.incomeCostsChartOptions.series[0].data = chartData.incomeData;
+            this.incomeCostsChartOptions.series[1].data = chartData.costsData;
+
+            // Update colors based on break-even type
+            if (chartData.breakEvenType === 'infinite') {
+                // Orange theme for infinite/negative break-even
+                this.incomeCostsChartOptions.series[0].areaStyle.color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    {
+                        offset: 0,
+                        color: 'rgba(255, 165, 0, 0.2)' // Light orange at top
+                    },
+                    {
+                        offset: 1,
+                        color: 'rgba(255, 165, 0, 0.05)' // Transparent at bottom
+                    }
+                ]);
+                this.incomeCostsChartOptions.series[0].lineStyle.color = 'orange';
+                this.incomeCostsChartOptions.series[0].itemStyle.color = 'orange';
+            } else {
+                // Green theme for positive break-even
+                this.incomeCostsChartOptions.series[0].areaStyle.color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    {
+                        offset: 0,
+                        color: 'rgba(0, 255, 0, 0.2)' // Light green at top
+                    },
+                    {
+                        offset: 1,
+                        color: 'rgba(0, 255, 0, 0)' // Transparent at bottom
+                    }
+                ]);
+                this.incomeCostsChartOptions.series[0].lineStyle.color = 'green';
+                this.incomeCostsChartOptions.series[0].itemStyle.color = 'green';
             }
 
-            // Handle cases where breakEvenPoint is zero, NEGATIVE or INFINITE
-            if (!isFinite(breakEvenPoint) || breakEvenPoint <= 0) {
-                const maxInferences = 2000000;
-                const maxCost = (maxInferences * newCostPerInference) + optimizationCost;
-                const income = (maxInferences * oldCostPerInference);
-
-                const incomeData = [[0, 0], [maxInferences, income]];
-                const costsData = [[0, optimizationCost], [maxInferences, maxCost]];
-
-                this.incomeCostsChartOptions.xAxis.max = maxInferences;
-
-                // Set chart with new data
-                this.incomeCostsChartOptions.series[0].data = incomeData;
-                this.incomeCostsChartOptions.series[1].data = costsData;
-                // Color under the Income line
-                if (breakEvenPoint !== 0) {
-                    this.incomeCostsChartOptions.series[0].areaStyle.color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        {
-                            offset: 0,
-                            color: 'rgba(255, 165, 0, 0.2)' // Light orange at top
-                        },
-                        {
-                            offset: 1,
-                            color: 'rgba(255, 165, 0, 0.05)' // Transparent at bottom
-                        }
-                    ]);
-                    this.incomeCostsChartOptions.series[0].lineStyle.color = 'orange';
-                    this.incomeCostsChartOptions.series[0].itemStyle.color = 'orange';
-                }
-                this.incomeCostsChart.setOption(this.incomeCostsChartOptions, false);
-                return;
-            }
-
-            // Chart points when breakEvenPoint is POSITIVE 
-            const maxInferences = breakEvenPoint * 2; // Extend the chart beyond the Break-Even Point in a defined range
-            const maxCost = (maxInferences * newCostPerInference) + optimizationCost;
-
-            const incomeData = [[0, 0], [maxInferences, (maxInferences * oldCostPerInference)]];
-            const costsData = [[0, optimizationCost], [maxInferences, maxCost]];
-
-            this.incomeCostsChartOptions.xAxis.max = maxInferences;
-
-            // Set chart with new data
-            this.incomeCostsChartOptions.series[0].data = incomeData;
-            this.incomeCostsChartOptions.series[1].data = costsData;
-            // Color under the Income line
-            this.incomeCostsChartOptions.series[0].areaStyle.color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                {
-                    offset: 0,
-                    color: 'rgba(0, 255, 0, 0.2)' // Light green at top
-                },
-                {
-                    offset: 1,
-                    color: 'rgba(0, 255, 0, 0)' // Transparent at bottom
-                }
-            ]);
-            this.incomeCostsChartOptions.series[0].lineStyle.color = 'green';
-            this.incomeCostsChartOptions.series[0].itemStyle.color = 'green';
+            // Render the chart
             this.incomeCostsChart.setOption(this.incomeCostsChartOptions, false);
         },
         updateROIChartData() {
-            if (!this.analysisData?.metrics_analysis) {
+            const chartData = this.roiChartData;
+            if (!chartData) {
                 return;
             }
 
-            // Find the first energy metric with ROI evolution data
-            const metricWithROIData = this.analysisData.metrics_analysis.find(metric => 
-                metric.roi_evolution_chart_data && metric.roi_evolution_chart_data.length > 0
-            );
-
-            if (!metricWithROIData) {
-                console.warn('No ROI evolution chart data found in metrics analysis');
-                return;
-            }
-
-            const roiEvolutionData = metricWithROIData.roi_evolution_chart_data.map(item => 
-                [item.inferences, item.roi]
-            );
-
-            if (roiEvolutionData.length > 0) {
-                const maxInferences = Math.max(...roiEvolutionData.map(point => point[0]));
-                this.roiChartOptions.xAxis.max = maxInferences;
-            }
-
-            // Update chart data
-            this.roiChartOptions.series[0].data = roiEvolutionData;
+            // Update chart options
+            this.roiChartOptions.xAxis.max = chartData.maxInferences;
+            this.roiChartOptions.series[0].data = chartData.roiEvolutionData;
+            
+            // Render the chart
             this.roiChart.setOption(this.roiChartOptions, false);
         },
         updateMetricsRadialChartData() {
