@@ -44,7 +44,7 @@
                     <p v-else>{{ $t("Loading model information...") }}</p>
                 </el-card>
                 
-                <!-- Source Information card -->
+                <!-- Source Information card for research-type analyses -->
                 <el-card v-if="isResearchAnalysis && analysisData?.source" 
                          shadow="always" 
                          :body-style="{ padding: '20px' }" 
@@ -57,6 +57,31 @@
                         <el-descriptions-item :label="$t('URL')">
                             <a :href="analysisData.source.url" target="_blank" rel="noopener noreferrer">
                                 {{ analysisData.source.url }}
+                            </a>
+                        </el-descriptions-item>
+                    </el-descriptions>
+                </el-card>
+
+                <!-- Tactic Sources card for calculation-type analyses -->
+                <el-card v-if="!isResearchAnalysis && tacticSources && tacticSources.length > 0" 
+                         shadow="always" 
+                         :body-style="{ padding: '20px' }" 
+                         style="margin-top: 20px;">
+                    <h2 class="section-title">{{ $t("Tactic Sources") }}</h2>
+                    <p class="results-description">
+                        {{ $t("This analysis provides an estimation of the expected effects of applying the tactic. The estimated reductions and efficiency improvements are calculated based on the data and results obtained from the following research studies:") }}
+                    </p>
+                    <el-descriptions v-for="(source, index) in tacticSources" 
+                                     :key="index" 
+                                     :column="1" 
+                                     border
+                                     :style="{ marginBottom: index < tacticSources.length - 1 ? '15px' : '0' }">
+                        <el-descriptions-item :label="$t('Title')">
+                            {{ source.title }}
+                        </el-descriptions-item>
+                        <el-descriptions-item :label="$t('URL')">
+                            <a :href="source.url" target="_blank" rel="noopener noreferrer">
+                                {{ source.url }}
                             </a>
                         </el-descriptions-item>
                     </el-descriptions>
@@ -312,6 +337,7 @@
 import { formatData } from "@/utils";
 import * as echarts from 'echarts';
 import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
+import mlTactics from "@/tools/gaissaroianalyzer/services/mlTactics";
 import pdfReportService from "@/tools/gaissaroianalyzer/services/pdfReportService";
 import { ElMessage } from 'element-plus';
 import 'element-plus/es/components/message/style/css';
@@ -321,6 +347,7 @@ export default {
     data() {
         return {
             analysisData: null,
+            tacticSources: [],
             metricsRadialChart: null,
             incomeCostsChart: null,
             roiChart: null,
@@ -336,6 +363,7 @@ export default {
                     indicator: []
                 },
                 label: {
+                    alignTicks: false,
                     show: true,
                     formatter: function (params) {
                         return typeof params.value === 'number' ? 
@@ -585,6 +613,15 @@ export default {
             try {
                 // Fetch the analysis data
                 this.analysisData = await roiAnalyses.getAnalysis(id_experiment);
+                
+                // If it's a calculation-type analysis, fetch the tactic sources
+                if (this.analysisData?.tactic_parameter_option_details && !this.isResearchAnalysis) {
+                    const tacticId = this.analysisData.tactic_parameter_option;
+                    if (tacticId) {
+                        const resultTactic = await mlTactics.getById(tacticId);
+                        this.tacticSources = resultTactic.sources;
+                    }
+                }
             } catch (error) {
                 console.error("Error loading analysis data:", error);
                 this.$message.error("Failed to load ROI analysis data. Please try again.");
