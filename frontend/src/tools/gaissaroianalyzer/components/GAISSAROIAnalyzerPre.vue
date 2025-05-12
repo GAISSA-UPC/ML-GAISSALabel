@@ -164,7 +164,7 @@ export default {
         },
         async calculateROI() {
             this.$router.push({
-                name: "GAISSA ROI Analyzer",
+                name: "GAISSA ROI Analyzer Analysis",
                 params: {
                     id_experiment: this.selectedExperiment,
                 },

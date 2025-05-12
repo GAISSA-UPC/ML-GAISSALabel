@@ -373,7 +373,7 @@ export default {
                     
                     // Redirect to analysis view page
                     this.$router.push({
-                        name: 'GAISSA ROI Analyzer',
+                        name: 'GAISSA ROI Analyzer Analysis',
                         params: {
                             id_experiment: response.data.id 
                         }
