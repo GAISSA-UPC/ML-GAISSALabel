@@ -96,7 +96,7 @@
                             :tacticName="analysisData?.tactic_parameter_option_details?.tactic_name"
                             :showTitle="costMetricsResults.length > 1" :columnCount="getDescriptionsColumnCount()">
                             <template v-slot:costMetricCard>
-                                <CostMetricCard :costMetric="metric" :formatNumber="formatNumber" />
+                                <MetricCard :metric="metric" :formatNumber="formatNumber" />
                             </template>
                         </ROIDetailsCard>
                     </div>
@@ -135,7 +135,6 @@ import TacticSourcesCard from '../components/TacticSourcesCard.vue';
 import MetricsRadialChart from '../components/MetricsRadialChart.vue';
 import MetricCard from '../components/MetricCard.vue';
 import ROIDetailsCard from '../components/ROIDetailsCard.vue';
-import CostMetricCard from '../components/CostMetricCard.vue';
 import ROIEvolutionChart from '../components/ROIEvolutionChart.vue';
 import IncomeCostsChart from '../components/IncomeCostsChart.vue';
 
@@ -148,7 +147,6 @@ export default {
         MetricsRadialChart,
         MetricCard,
         ROIDetailsCard,
-        CostMetricCard,
         ROIEvolutionChart,
         IncomeCostsChart
     },
@@ -169,9 +167,23 @@ export default {
                 metric.cost_savings && !metric.cost_savings.error
             ).map(metric => {
                 const costData = metric.cost_savings;
-
+                
+                // Create a metric-compatible object for cost data
                 return {
-                    metric_name: metric.metric_name,
+                    // Original cost metric properties
+                    metric_name: this.$t('Incurred Cost'),
+                    description: this.$t('Total cost associated with running the model for') + ' ' + 
+                        this.formatNumber(costData.num_inferences) + ' ' + this.$t('inferences.'),
+                    baseline_value: parseFloat(costData.total_baseline_cost),
+                    new_expected_value: parseFloat(costData.total_new_cost),
+                    unit: '€',
+                    expected_reduction_percent: this.calculateCostReductionPercent(
+                        parseFloat(costData.total_baseline_cost),
+                        parseFloat(costData.total_new_cost)
+                    ),
+                    higher_is_better: false,
+                    
+                    // Keep original cost-specific properties for ROIDetailsCard
                     total_new_cost: parseFloat(costData.total_new_cost),
                     total_baseline_cost: parseFloat(costData.total_baseline_cost),
                     baseline_cost_per_inference: parseFloat(costData.baseline_cost_per_inference),
@@ -347,6 +359,18 @@ export default {
     },
     methods: {
         formatData,
+        calculateCostReductionPercent(baselineCost, newCost) {
+            // Handle cases where baseline cost is zero or non-numeric
+            if (isNaN(baselineCost) || isNaN(newCost)) return 0;
+            if (baselineCost === 0) {
+                return -Infinity;
+            }
+
+            const reduction = baselineCost - newCost;
+            const percentage = (reduction / baselineCost) * 100;
+
+            return percentage.toFixed(2);
+        },
         async updateInferences() {
             // Ensure inferenceCount is at least 10000
             if (this.inferenceCount < 10000) {
