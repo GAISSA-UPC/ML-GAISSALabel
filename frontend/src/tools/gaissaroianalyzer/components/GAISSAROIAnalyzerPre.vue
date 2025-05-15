@@ -11,7 +11,7 @@
             <h3 class="section-title">{{ $t("Model Architecture") }}</h3>
             <p class="field-description">{{ $t("Please, indicate the model architecture you are interested in.") }}</p>
             <el-form-item>
-                <el-select v-model="selectedModelArchitecture" @change="onModelArchitectureChange" placeholder="Select" class="full-width"
+                <el-select v-model="selectedModelArchitecture" @change="onModelArchitectureChange" placeholder="Select"
                     filterable>
                     <el-option v-for="(modelArchitecture, i) in modelArchitectures" :key="i" :value="modelArchitecture.id" :label="modelArchitecture.name" />
                 </el-select>
@@ -26,7 +26,7 @@
                     }}</p>
                 <el-form-item>
                     <el-select v-model="selectedMlTactic" @change="onMlTacticChange"
-                        placeholder="Select" class="full-width">
+                        placeholder="Select">
                         <el-option v-for="(mlTactic, i) in mlTactics" :key="i" :value="mlTactic.id"
                             :label="mlTactic.name" />
                     </el-select>
@@ -40,7 +40,7 @@
                 <p class="field-description">{{ $t("Please, specify the parameter for the chosen tactic.") }}</p>
                 <el-form-item>
                     <el-select v-model="selectedTacticParameter" @change="onTacticParameterChange"
-                        placeholder="Select a parameter" class="full-width">
+                        placeholder="Select a parameter">
                         <el-option v-for="parameter in tacticParameters" :key="parameter.id"
                             :value="parameter.id" :label="`${parameter.name}: ${parameter.value}`" />
                     </el-select>
@@ -56,7 +56,7 @@
                     {{ $t('Now specify the') }} {{ fase }} {{ $t('from which you want to get the evaluation.') }}
                 </p>
                 <el-form-item>
-                    <el-select v-model="selectedExperiment" placeholder="Select" class="full-width">
+                    <el-select v-model="selectedExperiment" placeholder="Select">
                         <el-option v-for="(experiment, i) in experiments" :key="i" :value="experiment.id"
                             :label="formatData(experiment.dateRegistration)" />
                     </el-select>
@@ -196,7 +196,7 @@ h2 {
 }
 
 .form-container {
-    max-width: 600px;
+    
     margin: 0;
 }
 
@@ -210,8 +210,8 @@ h2 {
     margin-bottom: 10px;
 }
 
-.full-width {
-    width: 100%;
+.el-select {
+    max-width: 600px;
 }
 
 .submit-button {
