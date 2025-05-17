@@ -106,7 +106,6 @@ To access the virtual machine, one needs to connect via SSH to the virtual machi
    ```
    cd frontend
    npm install
-   nvm install 18.17.0
    nvm install --lts
    npm run build
    ```
@@ -115,7 +114,7 @@ To access the virtual machine, one needs to connect via SSH to the virtual machi
 
       If you're allowed to install user-level tools (no sudo needed):
       ```
-      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
       export NVM_DIR="$HOME/.nvm"
       source "$NVM_DIR/nvm.sh"
       ```
