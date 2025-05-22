@@ -1,10 +1,10 @@
 <template>
     <div class="gaissa-roi-analyzer-pre">
         <h1>{{ $t("GAISSA ROI Analyzer") }}</h1>
-        <h2>{{ $t("Analysis Repository") }}</h2>
+        <h2>{{ repositoryTitle }}</h2>
 
         <p class="description">
-            {{ $t("This page allows you to consult the previously calculated Return on Investment (ROI) of applying a ML tactic to your model architecture.") }}
+            {{ repositoryDescription }}
         </p>
 
         <el-form label-position="top" class="form-container">
@@ -53,18 +53,18 @@
             <div v-if="selectedMlTactic !== null && selectedTacticParameter !== null">
                 <h3 class="section-title">{{ $t("Analysis") }}</h3>
                 <p class="field-description">
-                    {{ $t('Now specify the') }} {{ fase }} {{ $t('from which you want to get the evaluation.') }}
+                    {{ analysisSelectionDescription }}
                 </p>
                 <el-form-item>
                     <el-select v-model="selectedExperiment" placeholder="Select">
                         <el-option v-for="(experiment, i) in experiments" :key="i" :value="experiment.id"
-                            :label="formatData(experiment.dateRegistration)" />
+                            :label="formatLabel(experiment)" />
                     </el-select>
                 </el-form-item>
             </div>
 
             <el-form-item>
-                <el-button @click="calculateROI" class="action-button"
+                <el-button @click="loadAnalysis" class="action-button"
                     :disabled="!isFormValid">
                     {{ $t("Load ROI Analysis") }}
                 </el-button>
@@ -81,9 +81,27 @@ import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
 import { formatData } from "@/utils";
 
 export default {
-    name: "GAISSAROIAnalyzerPre",
+    name: "GAISSAROIAnalyzerRepository",
     props: {
-        fase: { required: true, type: String },
+        analysisType: { 
+            required: true, 
+            type: String,
+            validator: function (value) {
+                return ['calculation', 'research'].includes(value);
+            }
+        },
+        repositoryTitle: {
+            required: true, 
+            type: String
+        },
+        repositoryDescription: {
+            required: true, 
+            type: String
+        },
+        analysisSelectionDescription: {
+            required: true, 
+            type: String
+        }
     },
     data() {
         return {
@@ -151,6 +169,7 @@ export default {
                 model_architecture: this.selectedModelArchitecture,
                 tactic: this.selectedMlTactic,
                 tactic_parameter_option: this.selectedTacticParameter,
+                analysis_type: this.analysisType
             };
             
             if (this.selectedModelArchitecture && this.selectedTacticParameter && this.selectedMlTactic) {
@@ -162,7 +181,16 @@ export default {
                 this.experiments = [];
             }
         },
-        async calculateROI() {
+        formatLabel(experiment) {
+            // Format the label differently based on analysis type
+            if (this.analysisType === 'calculation' && experiment.dateRegistration) {
+                return formatData(experiment.dateRegistration);
+            } else if (this.analysisType === 'research' && experiment.source) {
+                return experiment.source.title;
+            }
+            return `Analysis ${experiment.id}`;
+        },
+        async loadAnalysis() {
             this.$router.push({
                 name: "GAISSA ROI Analyzer Analysis",
                 params: {
@@ -196,7 +224,6 @@ h2 {
 }
 
 .form-container {
-    
     margin: 0;
 }
 
