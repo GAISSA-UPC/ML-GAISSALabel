@@ -409,6 +409,23 @@ class ROIAnalysisViewSet(viewsets.ModelViewSet):
         if self.action == 'create':
             return []
         return [permissions.IsAdminEditOthersRead()]
+        
+    def get_queryset(self):
+        """
+        Filter analyses by type if analysis_type parameter is provided.
+        """
+        queryset = super().get_queryset()
+        analysis_type = self.request.query_params.get('analysis_type')
+        
+        if analysis_type:
+            if analysis_type == 'calculation':
+                # Filter to include only ROIAnalysisCalculation instances
+                queryset = queryset.filter(roianalysiscalculation__isnull=False)
+            elif analysis_type == 'research':
+                # Filter to include only ROIAnalysisResearch instances
+                queryset = queryset.filter(roianalysisresearch__isnull=False)
+                
+        return queryset
     
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = {

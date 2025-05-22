@@ -341,6 +341,7 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
     tactic_parameter_option_details = TacticParameterOptionSerializer(source='tactic_parameter_option', read_only=True)
     metric_values = AnalysisMetricValueSerializer(many=True, read_only=True)
     metrics_analysis = serializers.SerializerMethodField(read_only=True)
+    analysis_type = serializers.SerializerMethodField(read_only=True)
     
     # Fields from subclasses
     dateRegistration = serializers.SerializerMethodField(read_only=True)
@@ -365,7 +366,7 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
             'id', 'model_architecture', 'model_architecture_id', 'model_architecture_name',
             'tactic_parameter_option', 'tactic_parameter_option_id', 'tactic_parameter_option_details',
             'metric_values', 'metric_values_data', 'metrics_analysis', 'dateRegistration', 'country', 
-            'source'
+            'source', 'analysis_type'
         ]
         read_only_fields = ['model_architecture', 'tactic_parameter_option']
     
@@ -393,6 +394,16 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
                 'title': source.title,
                 'url': source.url
             } if source else None
+        return None
+        
+    def get_analysis_type(self, obj):
+        """
+        Return the analysis type as a string: 'calculation' or 'research'
+        """
+        if hasattr(obj, 'roianalysiscalculation'):
+            return 'calculation'
+        elif hasattr(obj, 'roianalysisresearch'):
+            return 'research'
         return None
 
     def validate(self, data):
@@ -552,6 +563,7 @@ class AnalysisListSerializer(serializers.ModelSerializer):
     tactic_name = serializers.CharField(source='tactic_parameter_option.tactic.name', read_only=True)
     parameter_name = serializers.CharField(source='tactic_parameter_option.name', read_only=True)
     parameter_value = serializers.CharField(source='tactic_parameter_option.value', read_only=True)
+    analysis_type = serializers.SerializerMethodField(read_only=True)
     
     # Fields from subclasses
     dateRegistration = serializers.SerializerMethodField(read_only=True)
@@ -563,7 +575,7 @@ class AnalysisListSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'model_architecture', 'model_architecture_name',
             'tactic_name', 'parameter_name', 'parameter_value',
-            'dateRegistration', 'country', 'source'
+            'dateRegistration', 'country', 'source', 'analysis_type'
         ]
     
     def get_dateRegistration(self, obj):
@@ -574,6 +586,16 @@ class AnalysisListSerializer(serializers.ModelSerializer):
     def get_country(self, obj):
         if hasattr(obj, 'roianalysiscalculation'):
             return obj.roianalysiscalculation.country
+        return None
+        
+    def get_analysis_type(self, obj):
+        """
+        Return the analysis type as a string: 'calculation' or 'research'
+        """
+        if hasattr(obj, 'roianalysiscalculation'):
+            return 'calculation'
+        elif hasattr(obj, 'roianalysisresearch'):
+            return 'research'
         return None
         
     def get_source(self, obj):

@@ -75,8 +75,8 @@
                     <div class="inferences-control-container">
                         <p class="inferences-control-label">{{ $t("Number of inferences:") }}</p>
                         <div class="inferences-slider-container">
-                            <el-slider v-model="inferenceCount" :min="10000" :max="100000000" :step="10000"
-                                @change="updateInferences" class="inferences-slider" />
+                            <el-slider v-model="sliderInferenceCount" :min="10000" :max="100000000" :step="10000"
+                                @change="updateInferencesFromSlider" class="inferences-slider" />
                         </div>
                         <div class="inferences-input-container">
                             <el-input-number v-model="inferenceCount" :min="10000" :controls="false"
@@ -160,6 +160,15 @@ export default {
         };
     },
     computed: {
+        sliderInferenceCount: {
+            get() {
+                const max = 100000000;
+                return Math.min(this.inferenceCount, max);
+            },
+            set(value) {
+                this.inferenceCount = value;
+            }
+        },
         costMetricsResults() {
             if (!this.analysisData?.metrics_analysis) return [];
 
@@ -200,7 +209,7 @@ export default {
             });
         },
         isResearchAnalysis() {
-            return this.analysisData?.source !== null && this.analysisData?.source !== undefined;
+            return this.analysisData?.analysis_type === 'research';
         },
         incomeCostsChartData() {
             if (!this.costMetricsResults || this.costMetricsResults.length === 0) {
@@ -370,6 +379,11 @@ export default {
             const percentage = (reduction / baselineCost) * 100;
 
             return percentage.toFixed(2);
+        },
+        async updateInferencesFromSlider(value) {
+            // We need to treat the slider value separately to allow a greater range for the input container
+            this.inferenceCount = value;
+            await this.updateInferences();
         },
         async updateInferences() {
             // Ensure inferenceCount is at least 10000
