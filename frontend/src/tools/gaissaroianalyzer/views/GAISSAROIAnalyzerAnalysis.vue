@@ -87,7 +87,7 @@
                     <p class="results-description" v-if="costMetricsResults.length">
                         {{ $t(`This table provides a detailed economic analysis of the applied tactic, showing the
                         estimated cost savings and Return on Investment metrics for
-                        ${costMetricsResults[0]?.num_inferences.toLocaleString()} inferences.`) }}
+                        ${costMetricsResults[0]?.num_inferences.toLocaleString('en-US')} inferences.`) }}
                     </p>
 
                     <div v-if="costMetricsResults.length" class="roi-cards-container">
@@ -419,16 +419,18 @@ export default {
                 return value.toExponential(4);
             }
 
-            if (Math.abs(value) >= 1000000) {
-                return (value / 1000000).toLocaleString(undefined, { maximumFractionDigits: 1 }) + 'M';
+            if (Math.abs(value) >= 1000000000) {
+                return (value / 1000000000).toLocaleString('en-US', { maximumFractionDigits: 1 }) + 'B';
+            } else if (Math.abs(value) >= 1000000) {
+                return (value / 1000000).toLocaleString('en-US', { maximumFractionDigits: 1 }) + 'M';
             } else if (Math.abs(value) >= 1000) {
-                return (value / 1000).toLocaleString(undefined, { maximumFractionDigits: 1 }) + 'K';
+                return (value / 1000).toLocaleString('en-US', { maximumFractionDigits: 1 }) + 'K';
             } else if (Math.abs(value) >= 1) {
-                return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+                return value.toLocaleString('en-US', { maximumFractionDigits: 2 });
             } else if (Math.abs(value) >= 0.01) {
-                return value.toLocaleString(undefined, { maximumFractionDigits: 4 });
+                return value.toLocaleString('en-US', { maximumFractionDigits: 4 });
             } else {
-                return value.toLocaleString(undefined, { maximumFractionDigits: 6 });
+                return value.toLocaleString('en-US', { maximumFractionDigits: 6 });
             }
         },
         getDescriptionsColumnCount() {
