@@ -50,6 +50,7 @@ class ModelsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Create
     queryset = Model.objects.all()
     serializer_class = ModelSerializer
     models = Model
+    permission_classes = [permissions.IsGAISSALabelEnabled]
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = {
@@ -69,6 +70,7 @@ class ModelsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Create
 class EntrenamentsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     models = Entrenament
     serializer_class = EntrenamentSerializer
+    permission_classes = [permissions.IsGAISSALabelEnabled]
 
     def get_queryset(self):
         # Aconseguim el model que ens arriba del paràmetre
@@ -122,6 +124,7 @@ class EntrenamentsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.
 class InferenciesView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     models = Inferencia
     serializer_class = InferenciaSerializer
+    permission_classes = [permissions.IsGAISSALabelEnabled]
 
     def get_queryset(self):
         # Aconseguim el model que ens arriba del paràmetre
@@ -176,6 +179,7 @@ class QualificacionsView(mixins.ListModelMixin, viewsets.GenericViewSet):
     models = Qualificacio
     serializer_class = QualificacioSerializer
     queryset = Qualificacio.objects.all()
+    permission_classes = [permissions.IsGAISSALabelEnabled]
 
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     ordering_fields = ['ordre']
@@ -183,7 +187,7 @@ class QualificacionsView(mixins.ListModelMixin, viewsets.GenericViewSet):
 class MetriquesView(viewsets.ModelViewSet):
     models = Metrica
     queryset = Metrica.objects.all()
-    permission_classes = [permissions.IsAdminEditOthersRead]
+    permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSALabelEnabled]
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = {
@@ -226,7 +230,7 @@ class InfoAddicionalsView(viewsets.ModelViewSet):
     model = InfoAddicional
     serializer_class = InfoAddicionalSerializer
     queryset = InfoAddicional.objects.all()
-    permission_classes = [permissions.IsAdminEditOthersRead]
+    permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSALabelEnabled]
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = {
@@ -238,6 +242,8 @@ class InfoAddicionalsView(viewsets.ModelViewSet):
     ordering_fields = ['id', 'nom', 'fase']
 
 class CalculadorInferenciaView(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    permission_classes = [permissions.IsGAISSALabelEnabled]
+    
     def get_serializer_class(self):
         pass
 
@@ -253,7 +259,7 @@ class EinesCalculView(viewsets.ModelViewSet):
     models = EinaCalcul
     queryset = EinaCalcul.objects.all()
     serializer_class = EinaCalculSerializer
-    permission_classes = [permissions.IsAdminEditOthersRead]
+    permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSALabelEnabled]
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -297,7 +303,7 @@ class EinesCalculView(viewsets.ModelViewSet):
 
 
 class SincroView(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
-    permission_classes = [permissions.IsAdmin]
+    permission_classes = [permissions.IsAdmin & permissions.IsGAISSALabelEnabled]
 
     def get_serializer_class(self):
         pass
@@ -317,6 +323,8 @@ class SincroView(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.Generi
             return Response({'Created models': creats, 'Updated models': actualitzats}, status=status.HTTP_200_OK)
 
 class EstadistiquesView(mixins.ListModelMixin, viewsets.GenericViewSet):
+    permission_classes = [permissions.IsGAISSALabelEnabled]
+    
     def get_serializer_class(self):
         pass
 
