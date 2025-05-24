@@ -31,5 +31,7 @@ router.register(r'roi/expected-reductions', views.ExpectedMetricReductionView, b
 
 urlpatterns = [
     path('', include(router.urls)),
+    # Add explicit path for configuracio since it's a singleton
+    path('configuracio/', views.ConfiguracioView.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update'})),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

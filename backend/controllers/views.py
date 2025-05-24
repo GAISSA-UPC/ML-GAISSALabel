@@ -19,7 +19,7 @@ from api.serializers import ModelSerializer, EntrenamentSerializer, InferenciaSe
     TransformacioMetricaSerializer, TransformacioInformacioSerializer, LoginAdminSerializer, \
     ModelArchitectureSerializer, TacticSourceSerializer, MLTacticSerializer, TacticParameterOptionSerializer, \
     ROIAnalysisSerializer, AnalysisListSerializer, ROIAnalysisCalculationSerializer, ROIAnalysisResearchSerializer, ROIMetricSerializer, \
-    AnalysisMetricValueSerializer, EnergyAnalysisMetricValueSerializer, ExpectedMetricReductionSerializer
+    AnalysisMetricValueSerializer, EnergyAnalysisMetricValueSerializer, ExpectedMetricReductionSerializer, ConfiguracioSerializer
 
 from api import permissions
 from efficiency_calculators.rating_calculator import calculateRating
@@ -27,6 +27,25 @@ from efficiency_calculators.label_generator import generateLabel
 from efficiency_calculators.efficiency_calculator import calculateEfficiency
 from connectors import adaptador_huggingface
 
+
+class ConfiguracioView(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin):
+    queryset = Configuracio.objects.all()
+    serializer_class = ConfiguracioSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead]
+    
+    def get_object(self):
+        """
+        Return the singleton configuration object
+        """
+        return Configuracio.objects.get_or_create()[0]
+
+class LoginAdminView(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    queryset = Administrador.objects.all()
+    serializer_class = LoginAdminSerializer
+    models = Administrador
+
+
+# GAISSA Label Views
 class ModelsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Model.objects.all()
     serializer_class = ModelSerializer
@@ -276,10 +295,6 @@ class EinesCalculView(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-class LoginAdminView(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    queryset = Administrador.objects.all()
-    serializer_class = LoginAdminSerializer
-    models = Administrador
 
 class SincroView(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     permission_classes = [permissions.IsAdmin]
@@ -313,11 +328,12 @@ class EstadistiquesView(mixins.ListModelMixin, viewsets.GenericViewSet):
         }
         return Response(data, status=status.HTTP_200_OK)
 
+
 # GAISSA ROI Analyzer Views
 class ModelArchitectureView(viewsets.ModelViewSet):
     queryset = ModelArchitecture.objects.all()
     serializer_class = ModelArchitectureSerializer
-    permission_classes = [permissions.IsAdminEditOthersRead]
+    permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSAROIAnalyzerEnabled]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['id', 'name']
     search_fields = ['name', 'information']
@@ -337,7 +353,7 @@ class ModelArchitectureView(viewsets.ModelViewSet):
 class TacticSourceView(viewsets.ModelViewSet):
     queryset = TacticSource.objects.all()
     serializer_class = TacticSourceSerializer
-    permission_classes = [permissions.IsAdminEditOthersRead]
+    permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSAROIAnalyzerEnabled]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['id', 'title', 'url']
     search_fields = ['title', 'url']
@@ -346,7 +362,7 @@ class TacticSourceView(viewsets.ModelViewSet):
 class MLTacticView(viewsets.ModelViewSet):
     queryset = MLTactic.objects.all()
     serializer_class = MLTacticSerializer
-    permission_classes = [permissions.IsAdminEditOthersRead]
+    permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSAROIAnalyzerEnabled]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['id', 'name', 'sources']
     search_fields = ['name', 'information']
@@ -365,7 +381,7 @@ class MLTacticView(viewsets.ModelViewSet):
 class TacticParameterOptionView(viewsets.ModelViewSet):
     queryset = TacticParameterOption.objects.all()
     serializer_class = TacticParameterOptionSerializer
-    permission_classes = [permissions.IsAdminEditOthersRead]
+    permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSAROIAnalyzerEnabled]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['id', 'tactic', 'name', 'value']
     search_fields = ['name', 'value', 'tactic__name']
@@ -395,7 +411,7 @@ class TacticParameterOptionView(viewsets.ModelViewSet):
 class ROIMetricView(viewsets.ModelViewSet):
     queryset = ROIMetric.objects.all()
     serializer_class = ROIMetricSerializer
-    permission_classes = [permissions.IsAdminEditOthersRead]
+    permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSAROIAnalyzerEnabled]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['id', 'name', 'unit']
     search_fields = ['name', 'description']
@@ -407,8 +423,11 @@ class ROIAnalysisViewSet(viewsets.ModelViewSet):
     # Allow anyone to create ROI analyses, for other actions use default permissions
     def get_permissions(self):
         if self.action == 'create':
-            return []
-        return [permissions.IsAdminEditOthersRead()]
+            # Anyone can create, but ROI must be enabled
+            return [permissions.IsGAISSAROIAnalyzerEnabled()]
+        else:
+            # For other actions, both conditions must be met
+            return [permissions.IsAdminEditOthersRead() & permissions.IsGAISSAROIAnalyzerEnabled()]
         
     def get_queryset(self):
         """
@@ -502,7 +521,7 @@ class ROIAnalysisViewSet(viewsets.ModelViewSet):
 class AnalysisMetricValueView(viewsets.ModelViewSet):
     queryset = AnalysisMetricValue.objects.all()
     serializer_class = AnalysisMetricValueSerializer
-    permission_classes = [permissions.IsAdminEditOthersRead]
+    permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSAROIAnalyzerEnabled]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['analysis', 'metric']
     ordering_fields = ['analysis', 'metric']
@@ -510,7 +529,7 @@ class AnalysisMetricValueView(viewsets.ModelViewSet):
 class EnergyAnalysisMetricValueView(viewsets.ModelViewSet):
     queryset = EnergyAnalysisMetricValue.objects.all()
     serializer_class = EnergyAnalysisMetricValueSerializer
-    permission_classes = [permissions.IsAdminEditOthersRead]
+    permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSAROIAnalyzerEnabled]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['analysis', 'metric']
     ordering_fields = ['analysis', 'metric']
@@ -531,7 +550,7 @@ class EnergyAnalysisMetricValueView(viewsets.ModelViewSet):
 class ExpectedMetricReductionView(viewsets.ModelViewSet):
     queryset = ExpectedMetricReduction.objects.all()
     serializer_class = ExpectedMetricReductionSerializer
-    permission_classes = [permissions.IsAdminEditOthersRead]
+    permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSAROIAnalyzerEnabled]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['model_architecture', 'tactic_parameter_option', 'metric']
     ordering_fields = ['model_architecture', 'tactic_parameter_option', 'metric']

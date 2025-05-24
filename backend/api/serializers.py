@@ -732,6 +732,14 @@ def creacioLogin(data, user):
     data['created'] = created
     return data
 
+
+# Configuration
+class ConfiguracioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Configuracio
+        fields = ['id', 'gaissa_label_enabled', 'gaissa_roi_analyzer_enabled', 'ultimaSincronitzacio']
+
+
 class LoginAdminSerializer(serializers.ModelSerializer):
     username = serializers.CharField()
     password = serializers.CharField(max_length=128, write_only=True, required=True)

@@ -384,7 +384,16 @@ class ExpectedMetricReduction(models.Model):
 
 # Configuracio model
 class Configuracio(SingletonModel):
-    ultimaSincronitzacio = models.DateTimeField(verbose_name=_('Última sincronització'))
+    """
+    Singleton configuration model for application-wide settings
+    """
+    gaissa_label_enabled = models.BooleanField(default=True, verbose_name=_('GAISSALabel Enabled'))
+    gaissa_roi_analyzer_enabled = models.BooleanField(default=True, verbose_name=_('GAISSA ROI Analyzer Enabled'))
+    ultimaSincronitzacio = models.DateTimeField(verbose_name=_('Last GAISSA Label Model Synchronization'))
 
     class Meta:
-        verbose_name_plural = _('Configuracions')
+        verbose_name = _('Configuration')
+        verbose_name_plural = _('Configurations')
+        
+    def __str__(self):
+        return "Configuration Settings"
