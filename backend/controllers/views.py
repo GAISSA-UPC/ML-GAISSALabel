@@ -435,7 +435,7 @@ class ROIAnalysisViewSet(viewsets.ModelViewSet):
             return [permissions.IsGAISSAROIAnalyzerEnabled()]
         else:
             # For other actions, both conditions must be met
-            return [permissions.IsAdminEditOthersRead() & permissions.IsGAISSAROIAnalyzerEnabled()]
+            return [permissions.IsAdminEditOthersRead(), permissions.IsGAISSAROIAnalyzerEnabled()]
         
     def get_queryset(self):
         """
