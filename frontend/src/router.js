@@ -30,6 +30,7 @@ const AdminInformacio = () => import('@/tools/gaissalabel/views/AdminInformacio.
 const AdminEines = () => import('@/tools/gaissalabel/views/AdminEines.vue')
 const AdminEina = () => import('@/tools/gaissalabel/views/AdminEina.vue')
 const AdminSincro = () => import('@/tools/gaissalabel/views/AdminSincro.vue')
+const AdminTools = () => import('@/tools/admin/views/AdminTools.vue')
 const AdminLogin = () => import('@/views/AdminLogin.vue')
 
 const router = createRouter({
@@ -161,6 +162,12 @@ const router = createRouter({
       path: '/admin/sincronitzacio',
       name: 'Admin sincronitzacio',
       component: AdminSincro,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/admin/tools',
+      name: 'Admin tools',
+      component: AdminTools,
       meta: { requiresAuth: true }
     },
     {
