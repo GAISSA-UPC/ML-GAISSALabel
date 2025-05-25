@@ -79,20 +79,6 @@ elcomponents.forEach(component => {
     app.component(component.name, component)
 })  
 
-router.beforeEach((to, from, next) => {
-    const isAuthenticated = store.getters['auth/isLogged'];
-
-    if (to.matched.some((record) => record.meta.requiresAuth)) {
-        if (!isAuthenticated) {
-            next({name: 'Admin login'}); // Redirect to login page if not authenticated
-        } else {
-            next();
-        }
-    } else {
-        next();
-    }
-});
-
 const vuetify = createVuetify({
     components,
     directives,

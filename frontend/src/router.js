@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import store from './store'
 
 // Core routes
 const HomeView = () => import('@/views/HomeView.vue')
@@ -48,121 +49,134 @@ const router = createRouter({
     {
       path: '/trainingForm',
       name: 'training form',
-      component: TrainingForm
+      component: TrainingForm,
+      meta: { tool: 'gaissalabel' }
     },
     {
       path: '/trainingPre',
       name: 'training pre saved',
-      component: TrainingPreSaved
+      component: TrainingPreSaved,
+      meta: { tool: 'gaissalabel' }
     },
     {
       path: '/trainingFile',
       name: 'training file',
-      component: TrainingFile
+      component: TrainingFile,
+      meta: { tool: 'gaissalabel' }
     },
     {
       path: '/inferenceForm',
       name: 'inference form',
-      component: InferenceForm
+      component: InferenceForm,
+      meta: { tool: 'gaissalabel' }
     },
     {
       path: '/InferencePre',
       name: 'inference pre saved',
-      component: InferencePreSaved
+      component: InferencePreSaved,
+      meta: { tool: 'gaissalabel' }
     },
     {
       path: '/InferenceFile',
       name: 'inference file',
-      component: InferenceFile
+      component: InferenceFile,
+      meta: { tool: 'gaissalabel' }
     },
     {
       path: '/InferenceDeploy',
       name: 'inference deploy',
-      component: InferenceDeploy
+      component: InferenceDeploy,
+      meta: { tool: 'gaissalabel' }
     },
     {
       path: '/models/:id_model/trainings/:id_training',
       name: 'Label info for training',
-      component: TrainingLabelInfo
+      component: TrainingLabelInfo,
+      meta: { tool: 'gaissalabel' }
     },
     {
       path: '/models/:id_model/inferences/:id_inference',
       name: 'Label info for inference',
-      component: InferenceLabelInfo
+      component: InferenceLabelInfo,
+      meta: { tool: 'gaissalabel' }
     },
     {
       path: '/gaissa-roi-analyzer/calculation-repository',
       name: 'GAISSA ROI Analyzer Calculation Repository',
       component: GAISSAROIAnalyzerCalculationRepository,
+      meta: { tool: 'gaissaroianalyzer' }
     },
     {
       path: '/gaissa-roi-analyzer/research-repository',
       name: 'GAISSA ROI Analyzer Research Repository',
       component: GAISSAROIAnalyzerResearchRepository,
+      meta: { tool: 'gaissaroianalyzer' }
     },
     {
       path: '/gaissa-roi-analyzer/gaissa-roi-analysis/:id_experiment',
       name: "GAISSA ROI Analyzer Analysis",
       component: GAISSAROIAnalyzerAnalysis,
+      meta: { tool: 'gaissaroianalyzer' }
     },
     {
       path: '/gaissa-roi-analyzer/new-form',
       name: 'GAISSA ROI Analyzer New Form',
       component: GAISSAROIAnalyzerNewForm,
+      meta: { tool: 'gaissaroianalyzer' }
     },
     {
       path: '/admin/metriquesinfo',
       name: 'Admin mètriques i informacions',
       component: AdminMetriquesInfo,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, tool: 'gaissalabel' }
     },
     {
       path: '/admin/metriques/:id_metrica',
       name: 'Admin mètrica edit',
       component: AdminMetrica,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, tool: 'gaissalabel' }
     },
     {
       path: '/admin/metriques',
       name: 'Admin mètrica new',
       component: AdminMetrica,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, tool: 'gaissalabel' }
     },
     {
       path: '/admin/informacions/:id_informacio',
       name: 'Admin informació edit',
       component: AdminInformacio,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, tool: 'gaissalabel' }
     },
     {
       path: '/admin/informacions',
       name: 'Admin informació new',
       component: AdminInformacio,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, tool: 'gaissalabel' }
     },
     {
       path: '/admin/listeines',
       name: 'Admin eines',
       component: AdminEines,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, tool: 'gaissalabel' }
     },
     {
       path: '/admin/eines/:id_eina',
       name: 'Admin eina edit',
       component: AdminEina,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, tool: 'gaissalabel' }
     },
     {
       path: '/admin/eines',
       name: 'Admin eina new',
       component: AdminEina,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, tool: 'gaissalabel' }
     },
     {
       path: '/admin/sincronitzacio',
       name: 'Admin sincronitzacio',
       component: AdminSincro,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, tool: 'gaissalabel' }
     },
     {
       path: '/admin/tools',
@@ -177,5 +191,34 @@ const router = createRouter({
     },
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = store.getters['auth/isLogged'];
+
+  // Check authentication for routes that require it
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (!isAuthenticated) {
+      next({ name: 'Admin login' });
+      return;
+    }
+  }
+
+  // Check tool enablement status
+  if (to.matched.some((record) => record.meta.tool === 'gaissalabel')) {
+    if (!store.getters['configuration/isGAISSALabelEnabled']) {
+      next({ name: 'home' });
+      return;
+    }
+  }
+
+  if (to.matched.some((record) => record.meta.tool === 'gaissaroianalyzer')) {
+    if (!store.getters['configuration/isGAISSAROIAnalyzerEnabled']) {
+      next({ name: 'home' });
+      return;
+    }
+  }
+
+  next();
+});
 
 export default router

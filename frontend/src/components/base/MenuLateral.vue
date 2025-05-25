@@ -65,13 +65,13 @@
             <el-menu-item index="Admin tools" @click="$router.push({name: 'Admin tools'})">
                 {{ $t('Tools Configuration') }}
             </el-menu-item>
-            <el-menu-item index="Admin sincronitzacio" @click="$router.push({name: 'Admin sincronitzacio'})">
+            <el-menu-item index="Admin sincronitzacio" v-if="isGAISSALabelEnabled" @click="$router.push({name: 'Admin sincronitzacio'})">
                 {{ $t('Synchronization') }}
             </el-menu-item>
-            <el-menu-item index="Admin mètriques i informacions" @click="$router.push({name: 'Admin mètriques i informacions'})">
+            <el-menu-item index="Admin mètriques i informacions" v-if="isGAISSALabelEnabled" @click="$router.push({name: 'Admin mètriques i informacions'})">
                 {{ $t('Metrics') }}
             </el-menu-item>
-            <el-menu-item index="Admin eines" @click="$router.push({name: 'Admin eines'})">
+            <el-menu-item index="Admin eines" v-if="isGAISSALabelEnabled" @click="$router.push({name: 'Admin eines'})">
                 {{ $t('Calculation tools') }}
             </el-menu-item>
         </el-sub-menu>
