@@ -46,6 +46,7 @@
 <script>
 
 import configurationService from "@/services/configuration";
+import { mapGetters } from 'vuex';
 
 export default {
     name: "AdminTools",
@@ -69,10 +70,10 @@ export default {
     methods: {
         async fetchConfiguration() {
             if (this.isConfigLoaded) {
-                // We use stroed values if they are leaded
+                // We use stored values if they are loaded
                 this.config = {
                     gaissa_label_enabled: this.isGAISSALabelEnabled,
-                    gaissa_label_enabled: this.isGAISSALabelEnabled
+                    gaissa_roi_analyzer_enabled: this.isGAISSAROIAnalyzerEnabled
                 }
             }
             else {
