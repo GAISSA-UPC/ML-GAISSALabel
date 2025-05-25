@@ -57,7 +57,7 @@
                 {{ $t('Calculate ROI') }}
             </el-menu-item>
         </el-sub-menu>
-        <el-sub-menu index="4" v-if="$store.getters.isLogged">
+        <el-sub-menu index="4" v-if="isLogged">
             <template #title>
                 <font-awesome-icon :icon="['fas', 'screwdriver-wrench']" class="icon"/>
                 <span>{{ $t('Administration') }}</span>
@@ -99,7 +99,8 @@ export default {
         ...mapGetters({
             isGAISSALabelEnabled: 'configuration/isGAISSALabelEnabled',
             isGAISSAROIAnalyzerEnabled: 'configuration/isGAISSAROIAnalyzerEnabled',
-            isConfigLoaded: 'configuration/isConfigLoaded'
+            isConfigLoaded: 'configuration/isConfigLoaded',
+            isLogged: 'auth/isLogged'
         })
     },
     watch: {

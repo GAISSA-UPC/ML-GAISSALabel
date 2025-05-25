@@ -46,8 +46,8 @@ export default {
 
             // Si tenim status i és 201 --> Login correcte i tenim token.
             else if (response.status === 201) {
-                this.$store.commit("setToken", response.data['token'])
-                this.$router.push({name: 'Admin mètriques i informacions'})
+                this.$store.dispatch("auth/login", response.data['token'])
+                this.$router.push({name: 'Admin tools'})
             }
 
             // Si no, vol dir que rebem el error. Si status és 404 --> username no trobat.

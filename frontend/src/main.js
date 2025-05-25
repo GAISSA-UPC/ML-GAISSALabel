@@ -80,7 +80,7 @@ elcomponents.forEach(component => {
 })  
 
 router.beforeEach((to, from, next) => {
-    const isAuthenticated = store.getters.isLogged;
+    const isAuthenticated = store.getters['auth/isLogged'];
 
     if (to.matched.some((record) => record.meta.requiresAuth)) {
         if (!isAuthenticated) {

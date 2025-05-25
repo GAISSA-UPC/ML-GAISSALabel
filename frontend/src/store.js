@@ -1,29 +1,12 @@
 import { createStore } from 'vuex'
 import createPersistedState from "vuex-persistedstate";
 import configuration from './store/modules/configuration';
+import auth from './store/modules/auth';
 
 const store = createStore({
     modules: {
-        configuration
-    },
-    state: {
-        token: null,
-    },
-    getters: {
-        getToken(state) {
-            return state.token
-        },
-        isLogged(state) {
-            return state.token !== null
-        }
-    },
-    mutations: {
-        setToken(state, token) {
-            state.token = token
-        },
-        logout(state) {
-            state.token = null
-        }
+        configuration,
+        auth
     },
     plugins: [createPersistedState()],
 })
