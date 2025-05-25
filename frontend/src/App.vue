@@ -44,6 +44,9 @@ export default {
     mounted() {
         this.checkScreenSize()
         window.addEventListener('resize', this.checkScreenSize)
+        
+        // Load configuration on app start
+        this.$store.dispatch('configuration/fetchConfiguration')
     },
     beforeUnmount() {
         window.removeEventListener('resize', this.checkScreenSize)

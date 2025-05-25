@@ -9,7 +9,7 @@
             <font-awesome-icon :icon="['fas', 'house']" class="icon"/>
             <template #title>{{ $t('Home') }}</template>
         </el-menu-item>
-        <el-sub-menu index="1">
+        <el-sub-menu index="1" v-if="isGAISSALabelEnabled">
             <template #title>
                 <font-awesome-icon :icon="['fas', 'dumbbell']" class="icon"/>
                 <span>{{ $t('Training') }}</span>
@@ -24,7 +24,7 @@
                 {{ $t('Consult') }}
             </el-menu-item>
         </el-sub-menu>
-        <el-sub-menu index="2">
+        <el-sub-menu index="2" v-if="isGAISSALabelEnabled">
             <template #title>
                 <font-awesome-icon :icon="['fas', 'bullseye']" class="icon"/>
                 <span>{{ $t('Inference') }}</span>
@@ -42,7 +42,7 @@
                 {{ $t('Consult') }}
             </el-menu-item>
         </el-sub-menu>
-        <el-sub-menu index="3">
+        <el-sub-menu index="3" v-if="isGAISSAROIAnalyzerEnabled">
             <template #title>
                 <font-awesome-icon :icon="['fas', 'chart-line']" class="icon"/>
                 <span class="wrap-title">{{ $t('GAISSA ROI Analyzer') }}</span>
@@ -83,6 +83,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
     name: "MenuLateral",
     props: {
@@ -93,9 +95,22 @@ export default {
             activeRoute: this.$route.name,
         };
     },
+    computed: {
+        ...mapGetters({
+            isGAISSALabelEnabled: 'configuration/isGAISSALabelEnabled',
+            isGAISSAROIAnalyzerEnabled: 'configuration/isGAISSAROIAnalyzerEnabled',
+            isConfigLoaded: 'configuration/isConfigLoaded'
+        })
+    },
     watch: {
         $route(to) {
             this.activeRoute = to.name
+        }
+    },
+    async mounted() {
+        // Only fetch if not already loaded
+        if (!this.isConfigLoaded) {
+            await this.$store.dispatch('configuration/fetchConfiguration');
         }
     }
 }

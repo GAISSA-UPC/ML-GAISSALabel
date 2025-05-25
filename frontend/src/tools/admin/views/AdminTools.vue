@@ -44,6 +44,7 @@
 </template>
 
 <script>
+
 import configurationService from "@/services/configuration";
 
 export default {
@@ -58,22 +59,46 @@ export default {
             statusMessage: ''
         };
     },
+    computed: {
+        ...mapGetters({
+            isConfigLoaded: 'configuration/isConfigLoaded',
+            isGAISSALabelEnabled: 'configuration/isGAISSALabelEnabled',
+            isGAISSAROIAnalyzerEnabled: 'configuration/isGAISSAROIAnalyzerEnabled'
+        })
+    },
     methods: {
         async fetchConfiguration() {
-            const response = await configurationService.getConfiguration();
-            if (response.status === 200) {
-                this.config = response.data;
+            if (this.isConfigLoaded) {
+                // We use stroed values if they are leaded
+                this.config = {
+                    gaissa_label_enabled: this.isGAISSALabelEnabled,
+                    gaissa_label_enabled: this.isGAISSALabelEnabled
+                }
+            }
+            else {
+                // If they are not loaded, we fetch them from the API
+                const response = await configurationService.getConfiguration();
+                if (response.status === 200) {
+                    this.config = response.data;
+                }
             }
         },
         async updateConfiguration() {
-            const response = await configurationService.updateConfiguration(this.config);
-            this.statusMessage = true;
-            if (response.status === 200) {
-                this.status = 'config-update-ok';
-            } else {
+            try {
+                const response = await this.$store.dispatch('configuration/updateConfiguration', this.config);
+                this.statusMessage = true;
+                if (response.status === 200) {
+                    this.status = 'config-update-ok';
+                } else {
+                    this.status = 'config-update-ko';
+                }
+                window.scrollTo({top: 0});
+            } catch (error) {
+                this.statusMessage = true;
                 this.status = 'config-update-ko';
+                console.error('Error updating configuration:', error);
+                window.scrollTo({top: 0});
             }
-            window.scrollTo({top: 0});
         }
     },
     async mounted() {
