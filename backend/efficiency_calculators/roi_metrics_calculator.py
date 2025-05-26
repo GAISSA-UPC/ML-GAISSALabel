@@ -1,6 +1,18 @@
 from api.models import ROIAnalysis, AnalysisMetricValue, ExpectedMetricReduction, EnergyAnalysisMetricValue
 from efficiency_calculators.roi_calculator import ROICalculator
 
+# Static mapping for average grid carbon intensity (kgCO2/kWh)
+COUNTRY_CARBON_INTENSITY = {
+    'Spain': 0.180,
+    'France': 0.050,
+    'Germany': 0.400,
+    'Italy': 0.290,
+    'United Kingdom': 0.200,
+    'Canada': 0.120,
+    'United States of America': 0.400,
+}
+GLOBAL_CARBON_INTENSITY = 0.475
+
 class ROIMetricsCalculator:
     """
     Calculates metrics values after applying expected reductions based on tactics.
@@ -154,12 +166,28 @@ class ROIMetricsCalculator:
             total_new_cost = new_cost_per_inference * num_inferences + implementation_cost
             
             total_savings = total_baseline_cost - total_new_cost
+
+            # Calculate carbon emissions for Calculation Analyses
+            carbon_emissions = None
+            if hasattr(energy_metric_value.analysis, 'roianalysiscalculation'):
+                country = energy_metric_value.analysis.roianalysiscalculation.country
+                # Get carbon intensity for the country (default to global avg if not found)
+                carbon_intensity = COUNTRY_CARBON_INTENSITY.get(country, GLOBAL_CARBON_INTENSITY)
                 
-            return {
-                'baseline_energy_joules': baseline_energy_joules,
-                'new_energy_joules': new_energy_joules,
-                'energy_reduction_joules': baseline_energy_joules - new_energy_joules,
-                'energy_reduction_percentage': reduction_factor * 100,
+                # Calculate emissions
+                baseline_emissions = baseline_energy_kwh * carbon_intensity * num_inferences
+                new_emissions = new_energy_kwh * carbon_intensity * num_inferences
+                emissions_saved = baseline_emissions - new_emissions
+                
+                carbon_emissions = {
+                    "baseline_emissions_gCO2": baseline_emissions * 1000,
+                    "new_emissions_gCO2": new_emissions * 1000,
+                    "emissions_saved_gCO2": emissions_saved * 1000,
+                    "country_carbon_intensity_kgCO2Kwh": carbon_intensity,
+                    "emissions_country_used": country
+                }
+            
+            result = {
                 'baseline_cost_per_inference': baseline_cost_per_inference,
                 'new_cost_per_inference': new_cost_per_inference,
                 'total_baseline_cost': total_baseline_cost,
@@ -173,6 +201,11 @@ class ROIMetricsCalculator:
                 'num_inferences': num_inferences
             }
             
+            # Add carbon emissions to result if calculated
+            if carbon_emissions:
+                result['inferences_carbon_emissions'] = carbon_emissions
+
+            return result
         except Exception as e:
             return {
                 'error': f"Error calculating cost savings: {str(e)}"
