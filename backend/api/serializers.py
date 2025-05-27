@@ -11,7 +11,7 @@ from api.models import Model, Entrenament, Inferencia, Metrica, Qualificacio, In
     ResultatInferencia, InfoAddicional, ValorInfoEntrenament, ValorInfoInferencia, EinaCalcul, TransformacioMetrica, \
     TransformacioInformacio, Administrador, ModelArchitecture, TacticSource, MLTactic, TacticParameterOption, \
     ROIAnalysis, ROIAnalysisCalculation, ROIAnalysisResearch, ROIMetric, AnalysisMetricValue, EnergyAnalysisMetricValue, \
-    ExpectedMetricReduction, Configuracio, Administrador
+    ExpectedMetricReduction, Configuracio, Administrador, Country, CarbonIntensity
 
 from efficiency_calculators.roi_metrics_calculator import ROIMetricsCalculator
 
@@ -764,3 +764,17 @@ class LoginAdminSerializer(serializers.ModelSerializer):
         self.context['user'] = user
 
         return data
+
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = '__all__'
+
+class CarbonIntensitySerializer(serializers.ModelSerializer):
+    country_name = serializers.CharField(source='country.name', read_only=True)
+    country_code = serializers.CharField(source='country.country_code', read_only=True)
+    
+    class Meta:
+        model = CarbonIntensity
+        fields = ['id', 'country', 'country_name', 'country_code', 'carbon_intensity', 'data_source', 'data_year']
+        read_only_fields = ['country_name', 'country_code']

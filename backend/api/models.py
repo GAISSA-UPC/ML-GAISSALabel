@@ -397,3 +397,35 @@ class Configuracio(SingletonModel):
         
     def __str__(self):
         return "Configuration Settings"
+
+class Country(models.Model):
+    """
+    Model to store country information for carbon intensity data
+    """
+    name = models.CharField(max_length=100, unique=True, verbose_name=_('Country Name'))
+    country_code = models.CharField(max_length=2, unique=True, verbose_name=_('Country Code'))
+    
+    class Meta:
+        verbose_name = _('Country')
+        verbose_name_plural = _('Countries')
+        ordering = ['name']
+
+    def __str__(self):
+        return f"{self.name} ({self.country_code})"
+
+class CarbonIntensity(models.Model):
+    """
+    Stores carbon intensity data for countries (in kgCO2/kWh)
+    """
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='carbon_intensities', verbose_name=_('Country'))
+    carbon_intensity = models.FloatField(verbose_name=_('Carbon Intensity (kgCO2/kWh)'))
+    data_year = models.IntegerField(null=True, blank=True, verbose_name=_('Data Year'))
+
+    class Meta:
+        verbose_name = _('Country Carbon Intensity')
+        verbose_name_plural = _('Country Carbon Intensities')
+        ordering = ['country']
+        unique_together = ('country', 'data_year')
+
+    def __str__(self):
+        return f"{self.country.name}: {self.carbon_intensity} kgCO2/kWh ({self.data_year or 'N/A'})"

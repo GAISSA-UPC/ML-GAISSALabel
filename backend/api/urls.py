@@ -28,6 +28,8 @@ router.register(r'roi/analyses', views.ROIAnalysisViewSet, basename='roi_analyse
 router.register(r'roi/analysis-metric-values', views.AnalysisMetricValueView, basename='roi_analysis_metric_values')
 router.register(r'roi/energy-metric-values', views.EnergyAnalysisMetricValueView, basename='roi_energy_metric_values')
 router.register(r'roi/expected-reductions', views.ExpectedMetricReductionView, basename='roi_expected_reductions')
+router.register(r'roi/countries', views.CountryView, basename='countries')
+router.register(r'roi/carbon-intensities', views.CarbonIntensityView, basename='carbon_intensities')
 
 urlpatterns = [
     path('', include(router.urls)),

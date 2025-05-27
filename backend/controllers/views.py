@@ -12,14 +12,16 @@ from django_filters.rest_framework import DjangoFilterBackend
 from api.models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, Interval, EinaCalcul, \
     TransformacioMetrica, TransformacioInformacio, Administrador, Configuracio, \
     ModelArchitecture, TacticSource, MLTactic, TacticParameterOption, ROIAnalysis, ROIAnalysisCalculation, \
-    ROIAnalysisResearch, ROIMetric, AnalysisMetricValue, EnergyAnalysisMetricValue, ExpectedMetricReduction
+    ROIAnalysisResearch, ROIMetric, AnalysisMetricValue, EnergyAnalysisMetricValue, ExpectedMetricReduction, \
+    Country, CarbonIntensity
 from api.serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
     EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer, \
     IntervalBasicSerializer, MetricaSerializer, EinaCalculBasicSerializer, EinaCalculSerializer, \
     TransformacioMetricaSerializer, TransformacioInformacioSerializer, LoginAdminSerializer, \
     ModelArchitectureSerializer, TacticSourceSerializer, MLTacticSerializer, TacticParameterOptionSerializer, \
     ROIAnalysisSerializer, AnalysisListSerializer, ROIAnalysisCalculationSerializer, ROIAnalysisResearchSerializer, ROIMetricSerializer, \
-    AnalysisMetricValueSerializer, EnergyAnalysisMetricValueSerializer, ExpectedMetricReductionSerializer, ConfiguracioSerializer
+    AnalysisMetricValueSerializer, EnergyAnalysisMetricValueSerializer, ExpectedMetricReductionSerializer, ConfiguracioSerializer, \
+    CountrySerializer, CarbonIntensitySerializer
 
 from api import permissions
 from efficiency_calculators.rating_calculator import calculateRating
@@ -562,3 +564,27 @@ class ExpectedMetricReductionView(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['model_architecture', 'tactic_parameter_option', 'metric']
     ordering_fields = ['model_architecture', 'tactic_parameter_option', 'metric']
+
+
+class CountryView(viewsets.ModelViewSet):
+    """
+    API endpoint for countries list.
+    """
+    queryset = Country.objects.all().order_by('name')
+    serializer_class = CountrySerializer
+    permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSAROIAnalyzerEnabled]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name', 'country_code']
+    ordering_fields = ['name', 'country_code']
+
+
+class CarbonIntensityView(viewsets.ModelViewSet):
+    """
+    API endpoint for carbon intensity data.
+    """
+    queryset = CarbonIntensity.objects.all()
+    serializer_class = CarbonIntensitySerializer
+    permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSAROIAnalyzerEnabled]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['country', 'data_year']
+    ordering_fields = ['country', 'carbon_intensity', 'data_year']
