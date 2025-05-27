@@ -776,5 +776,5 @@ class CarbonIntensitySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = CarbonIntensity
-        fields = ['id', 'country', 'country_name', 'country_code', 'carbon_intensity', 'data_source', 'data_year']
+        fields = ['id', 'country', 'country_name', 'country_code', 'carbon_intensity', 'data_year']
         read_only_fields = ['country_name', 'country_code']

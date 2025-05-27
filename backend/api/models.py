@@ -403,7 +403,7 @@ class Country(models.Model):
     Model to store country information for carbon intensity data
     """
     name = models.CharField(max_length=100, unique=True, verbose_name=_('Country Name'))
-    country_code = models.CharField(max_length=2, unique=True, verbose_name=_('Country Code'))
+    country_code = models.CharField(max_length=5, unique=True, verbose_name=_('Country Code'))
     
     class Meta:
         verbose_name = _('Country')

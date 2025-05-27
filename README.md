@@ -89,6 +89,11 @@ To access the virtual machine, one needs to connect via SSH to the virtual machi
    python manage.py migrate
    ```
 
+   In case it is the first time you are running the project or if you have not yet imported the carbon intensity data, you can do so with the following command:
+      ```
+      python manage.py import_carbon_intensity
+      ```
+
 3. Install any new backend requirements:
    (assuming step 2 has been performed)
    ```
@@ -134,6 +139,7 @@ Would you like to download the repository locally and run it? Follow these steps
      pip install -r requirements.txt
      python manage.py migrate
      python manage.py runserver
+     python manage.py import_carbon_intensity
      ```
 
    - To run:
