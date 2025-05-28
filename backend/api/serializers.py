@@ -383,7 +383,12 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
     
     def get_country(self, obj):
         if hasattr(obj, 'roianalysiscalculation'):
-            return obj.roianalysiscalculation.country
+            country = obj.roianalysiscalculation.country
+            return {
+                'id': country.id,
+                'name': country.name,
+                'country_code': country.country_code
+            } if country else None
         return None
         
     def get_source(self, obj):
@@ -585,7 +590,12 @@ class AnalysisListSerializer(serializers.ModelSerializer):
     
     def get_country(self, obj):
         if hasattr(obj, 'roianalysiscalculation'):
-            return obj.roianalysiscalculation.country
+            country = obj.roianalysiscalculation.country
+            return {
+                'id': country.id,
+                'name': country.name,
+                'country_code': country.country_code
+            } if country else None
         return None
         
     def get_analysis_type(self, obj):
@@ -608,11 +618,16 @@ class AnalysisListSerializer(serializers.ModelSerializer):
         return None
 
 class ROIAnalysisCalculationSerializer(ROIAnalysisSerializer):
-    country = serializers.CharField(max_length=255, required=True)
+    country_name = serializers.CharField(source='country.name', read_only=True)
+    country_code = serializers.CharField(source='country.country_code', read_only=True)
+    country_id = serializers.PrimaryKeyRelatedField(
+        queryset=Country.objects.all(), write_only=True, source='country'
+    )
     
     class Meta(ROIAnalysisSerializer.Meta):
         model = ROIAnalysisCalculation
-        fields = ROIAnalysisSerializer.Meta.fields + ['dateRegistration', 'country']
+        fields = ROIAnalysisSerializer.Meta.fields + ['dateRegistration', 'country', 'country_id', 'country_name', 'country_code']
+        read_only_fields = ROIAnalysisSerializer.Meta.read_only_fields + ['country']
 
     def create(self, validated_data):
         metric_values_data = validated_data.pop('metric_values_data', [])

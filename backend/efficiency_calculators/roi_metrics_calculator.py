@@ -1,17 +1,5 @@
-from api.models import ROIAnalysis, AnalysisMetricValue, ExpectedMetricReduction, EnergyAnalysisMetricValue
+from api.models import ROIAnalysis, AnalysisMetricValue, ExpectedMetricReduction, EnergyAnalysisMetricValue, CarbonIntensity, Country
 from efficiency_calculators.roi_calculator import ROICalculator
-
-# Static mapping for average grid carbon intensity (kgCO2/kWh)
-COUNTRY_CARBON_INTENSITY = {
-    'Spain': 0.180,
-    'France': 0.050,
-    'Germany': 0.400,
-    'Italy': 0.290,
-    'United Kingdom': 0.200,
-    'Canada': 0.120,
-    'United States of America': 0.400,
-}
-GLOBAL_CARBON_INTENSITY = 0.475
 
 class ROIMetricsCalculator:
     """
@@ -170,9 +158,16 @@ class ROIMetricsCalculator:
             # Calculate carbon emissions for Calculation Analyses
             carbon_emissions = None
             if hasattr(energy_metric_value.analysis, 'roianalysiscalculation'):
-                country = energy_metric_value.analysis.roianalysiscalculation.country
-                # Get carbon intensity for the country (default to global avg if not found)
-                carbon_intensity = COUNTRY_CARBON_INTENSITY.get(country, GLOBAL_CARBON_INTENSITY)
+                country_obj = energy_metric_value.analysis.roianalysiscalculation.country
+                # Try to get the latest carbon intensity for the country
+                carbon_intensity = None
+                if country_obj:
+                    ci_qs = CarbonIntensity.objects.filter(country=country_obj).order_by('-data_year')
+                    if ci_qs.exists():
+                        carbon_intensity = ci_qs.first().carbon_intensity
+                # Fallback to global average if not found
+                if carbon_intensity is None:
+                    carbon_intensity = 0.475  # Global average (kgCO2/kWh)
                 
                 # Calculate emissions
                 baseline_emissions = baseline_energy_kwh * carbon_intensity * num_inferences
@@ -184,7 +179,7 @@ class ROIMetricsCalculator:
                     "new_emissions_gCO2": new_emissions * 1000,
                     "emissions_saved_gCO2": emissions_saved * 1000,
                     "country_carbon_intensity_kgCO2Kwh": carbon_intensity,
-                    "emissions_country_used": country
+                    "emissions_country_used": str(country_obj) if country_obj else None
                 }
             
             result = {

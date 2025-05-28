@@ -462,7 +462,8 @@ class ROIAnalysisViewSet(viewsets.ModelViewSet):
         'tactic_parameter_option': ['exact'],
         'tactic_parameter_option__tactic': ['exact'],
         'metric_values__metric': ['exact'],
-        'roianalysiscalculation__country': ['exact', 'icontains'],
+        'roianalysiscalculation__country': ['exact'],
+        'roianalysiscalculation__country__name': ['exact', 'icontains'],
         'roianalysiscalculation__dateRegistration': ['date__gte', 'date__lte'],
     }
     search_fields = [
@@ -470,7 +471,7 @@ class ROIAnalysisViewSet(viewsets.ModelViewSet):
         'tactic_parameter_option__tactic__name',
         'tactic_parameter_option__name',
         'tactic_parameter_option__value',
-        'roianalysiscalculation__country'
+        'roianalysiscalculation__country__name'
     ]
     ordering_fields = ['id', 'model_architecture__name', 'tactic_parameter_option__tactic__name', 
                       'roianalysiscalculation__dateRegistration']

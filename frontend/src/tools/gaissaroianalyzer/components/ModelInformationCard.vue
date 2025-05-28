@@ -19,7 +19,7 @@
                 {{ formatDate(modelData.dateRegistration) }}
             </el-descriptions-item>
             <el-descriptions-item v-if="modelData.country" :label="$t('Country deploy')">
-                {{ modelData.country }}
+                {{ modelData.country.name }} ({{ modelData.country.country_code }})
             </el-descriptions-item>
             <el-descriptions-item :label="$t('Analysis type')">
                 {{ isResearch ? $t('Research') : $t('Calculation') }}

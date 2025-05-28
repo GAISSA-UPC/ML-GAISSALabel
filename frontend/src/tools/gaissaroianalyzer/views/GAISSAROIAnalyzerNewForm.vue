@@ -149,10 +149,18 @@
         <p>{{ $t("Please specify the country or region where the model is being deployed.") }}</p><br>
 
         <el-form-item :label="$t('Country')" prop="country">
-            <el-input 
+            <el-select 
                 v-model="formData.country" 
-                placeholder="e.g., Italy, Canada"
-                class="model-select"></el-input>
+                filterable 
+                clearable 
+                placeholder="Select country"
+                class="model-select">
+                <el-option 
+                    v-for="country in countries" 
+                    :key="country.id" 
+                    :label="`${country.name} (${country.country_code})`" 
+                    :value="country.id" />
+            </el-select>
             <el-alert type="info" show-icon :closable="false" style="margin-top: 10px">
                 <p style="font-size: 14px">{{ $t('The region specified will not be used in the analysis calculus, but it might be useful to contextualize the results.') }}</p>
             </el-alert>
@@ -175,6 +183,7 @@ import mlTactics from "@/tools/gaissaroianalyzer/services/mlTactics";
 import roiMetrics from "@/tools/gaissaroianalyzer/services/roiMetrics";
 import tacticParameters from "@/tools/gaissaroianalyzer/services/tacticParameters";
 import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
+import countries from "@/tools/gaissaroianalyzer/services/countries";
 import { ElMessage } from 'element-plus';
 
 export default {
@@ -186,6 +195,7 @@ export default {
             tacticParameters: [],
             applicableMetrics: [],
             energyRelatedMetrics: [],
+            countries: [],
             formData: {
                 modelArchitecture: null,
                 mlTactic: null,
@@ -228,6 +238,17 @@ export default {
             } catch (error) {
                 console.error("Error fetching model architectures:", error);
                 this.error = "Failed to load model architectures. Please try again.";
+            }
+        },
+        async fetchCountries() {
+            try {
+                const response = await countries.list();
+                if (response && response.data) {
+                    this.countries = response.data;
+                }
+            } catch (error) {
+                console.error("Error fetching countries:", error);
+                this.error = "Failed to load countries. Please try again.";
             }
         },
         async fetchTacticsForModelArchitecture(architectureId) {
@@ -357,7 +378,7 @@ export default {
                     model_architecture_id: parseInt(this.formData.modelArchitecture),
                     tactic_parameter_option_id: parseInt(this.formData.tacticParameter),
                     metric_values_data: metricValuesData,
-                    country: this.formData.country,
+                    country_id: this.formData.country,
                     analysis_type: "calculation" // Explicitly set analysis type
                 };
                                 
@@ -398,6 +419,7 @@ export default {
     async mounted() {
         // Load initial data
         await this.fetchModelArchitectures();
+        await this.fetchCountries();
     }
 };
 </script>
