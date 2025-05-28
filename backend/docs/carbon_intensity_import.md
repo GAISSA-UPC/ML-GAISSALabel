@@ -4,7 +4,7 @@ This document describes how to use the carbon intensity import tool in the GAISS
 
 ## Overview
 
-The `import_carbon_intensity` management command allows you to import carbon intensity data (measured in kgCO2/kWh) for different countries from various sources. This data is essential for calculating the environmental impact of ML models when deployed in different regions.
+The `import_carbon_intensity` management command allows you to import carbon intensity data (measured in gCO2/kWh, which will be converted into kgCO2/kWh) for different countries from various sources. This data is essential for calculating the environmental impact of ML models when deployed in different regions.
 
 ## Quick Start
 To quickly start using the carbon intensity import feature, execute the following command in your terminal:
@@ -62,4 +62,4 @@ The CSV file should contain the following columns (case insensitive):
 | Entity | country (string) | Country name |
 | Code | code (string: max 5 chars) | ISO country code |
 | Year | year (int) | Year of the carbon intensity value |
-| co2_intensity__gco2_kwh (float) | carbon_intensity | Carbon intensity value in kgCO2/kWh |
+| co2_intensity__gco2_kwh (float) | carbon_intensity | Carbon intensity value in gCO2/kWh |

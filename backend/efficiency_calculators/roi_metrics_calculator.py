@@ -167,7 +167,7 @@ class ROIMetricsCalculator:
                         carbon_intensity = ci_qs.first().carbon_intensity
                 # Fallback to global average if not found
                 if carbon_intensity is None:
-                    carbon_intensity = 0.475  # Global average (kgCO2/kWh)
+                    carbon_intensity = 0.4730065  # World data for 2024 (kgCO2/kWh)
                 
                 # Calculate emissions
                 baseline_emissions = baseline_energy_kwh * carbon_intensity * num_inferences

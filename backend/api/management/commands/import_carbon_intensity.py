@@ -90,7 +90,7 @@ class Command(BaseCommand):
                 obj, created = CarbonIntensity.objects.update_or_create(
                     country=country,
                     data_year=int(year),
-                    defaults={"carbon_intensity": float(intensity)},
+                    defaults={"carbon_intensity": float(intensity) / 1000}, # Convert gCO2/kWh to kgCO2/kWh
                 )
                 stats[
                     (
