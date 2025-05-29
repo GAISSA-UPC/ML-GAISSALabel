@@ -155,32 +155,31 @@ class ROIMetricsCalculator:
             
             total_savings = total_baseline_cost - total_new_cost
 
-            # Calculate carbon emissions for Calculation Analyses
+            # Calculate carbon emissions for all analyses (both Calculation and Research)
             carbon_emissions = None
-            if hasattr(energy_metric_value.analysis, 'roianalysiscalculation'):
-                country_obj = energy_metric_value.analysis.roianalysiscalculation.country
-                # Try to get the latest carbon intensity for the country
-                carbon_intensity = None
-                if country_obj:
-                    ci_qs = CarbonIntensity.objects.filter(country=country_obj).order_by('-data_year')
-                    if ci_qs.exists():
-                        carbon_intensity = ci_qs.first().carbon_intensity
-                # Fallback to global average if not found
-                if carbon_intensity is None:
-                    carbon_intensity = 0.4730065  # World data for 2024 (kgCO2/kWh)
-                
-                # Calculate emissions
-                baseline_emissions = baseline_energy_kwh * carbon_intensity * num_inferences
-                new_emissions = new_energy_kwh * carbon_intensity * num_inferences
-                emissions_saved = baseline_emissions - new_emissions
-                
-                carbon_emissions = {
-                    "baseline_emissions_gCO2": baseline_emissions * 1000,
-                    "new_emissions_gCO2": new_emissions * 1000,
-                    "emissions_saved_gCO2": emissions_saved * 1000,
-                    "country_carbon_intensity_kgCO2Kwh": carbon_intensity,
-                    "emissions_country_used": str(country_obj) if country_obj else None
-                }
+            country_obj = energy_metric_value.analysis.country
+            # Try to get the latest carbon intensity for the country
+            carbon_intensity = None
+            if country_obj:
+                ci_qs = CarbonIntensity.objects.filter(country=country_obj).order_by('-data_year')
+                if ci_qs.exists():
+                    carbon_intensity = ci_qs.first().carbon_intensity
+            # Fallback to global average if not found
+            if carbon_intensity is None:
+                carbon_intensity = 0.4730065  # World data for 2024 (kgCO2/kWh)
+            
+            # Calculate emissions
+            baseline_emissions = baseline_energy_kwh * carbon_intensity * num_inferences
+            new_emissions = new_energy_kwh * carbon_intensity * num_inferences
+            emissions_saved = baseline_emissions - new_emissions
+            
+            carbon_emissions = {
+                "baseline_emissions_gCO2": baseline_emissions * 1000,
+                "new_emissions_gCO2": new_emissions * 1000,
+                "emissions_saved_gCO2": emissions_saved * 1000,
+                "country_carbon_intensity_kgCO2Kwh": carbon_intensity,
+                "emissions_country_used": str(country_obj) if country_obj else None
+            }
             
             result = {
                 'baseline_cost_per_inference': baseline_cost_per_inference,

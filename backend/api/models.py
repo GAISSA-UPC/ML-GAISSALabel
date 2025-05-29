@@ -193,10 +193,21 @@ class TacticParameterOption(models.Model):
     def __str__(self):
         return f"{self.tactic.name} - {self.name}: {self.value}"
 
+def get_default_country():
+    """
+    Get the default country for ROI analyses (World)
+    """
+    try:
+        return Country.objects.get(country_code='WRL').pk
+    except Country.DoesNotExist:
+        # Fallback to first country if World doesn't exist
+        return Country.objects.first().pk if Country.objects.exists() else None
+
 class ROIAnalysis(models.Model):
     id = models.AutoField(primary_key=True)
     model_architecture = models.ForeignKey(ModelArchitecture, related_name='roi_analyses', on_delete=models.PROTECT, verbose_name=_('Model Architecture'))
     tactic_parameter_option = models.ForeignKey(TacticParameterOption, related_name='roi_analyses', on_delete=models.PROTECT, verbose_name=_('Tactic Parameter Option'))
+    country = models.ForeignKey('Country', on_delete=models.PROTECT, related_name='roi_analyses', verbose_name=_('Country of Deployment'), default=get_default_country)
     # Implicit link to MLTactic via TacticParameterOption
 
     class Meta:
@@ -230,7 +241,6 @@ class ROIAnalysis(models.Model):
 # Inheritance for the analysis subtypes
 class ROIAnalysisCalculation(ROIAnalysis):
     dateRegistration = models.DateTimeField(auto_now_add=True, verbose_name=_('Registration Date'))
-    country = models.ForeignKey('Country', on_delete=models.PROTECT, related_name='roi_analysis_calculations', verbose_name=_('Country of Deployment'))
 
     class Meta:
         verbose_name = _('ROI Analysis Calculation')

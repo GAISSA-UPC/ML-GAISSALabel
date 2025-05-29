@@ -367,10 +367,10 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
     metric_values = AnalysisMetricValueSerializer(many=True, read_only=True)
     metrics_analysis = serializers.SerializerMethodField(read_only=True)
     analysis_type = serializers.SerializerMethodField(read_only=True)
+    country = serializers.SerializerMethodField(read_only=True)
     
     # Fields from subclasses
     dateRegistration = serializers.SerializerMethodField(read_only=True)
-    country = serializers.SerializerMethodField(read_only=True)
     source = serializers.SerializerMethodField(read_only=True)
 
     # Writeable fields for relations
@@ -379,6 +379,9 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
     )
     tactic_parameter_option_id = serializers.PrimaryKeyRelatedField(
         queryset=TacticParameterOption.objects.all(), write_only=True, source='tactic_parameter_option'
+    )
+    country_id = serializers.PrimaryKeyRelatedField(
+        queryset=Country.objects.all(), write_only=True, source='country', required=False
     )
     # For creating metric values alongside analysis
     metric_values_data = serializers.ListField(
@@ -391,9 +394,9 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
             'id', 'model_architecture', 'model_architecture_id', 'model_architecture_name',
             'tactic_parameter_option', 'tactic_parameter_option_id', 'tactic_parameter_option_details',
             'metric_values', 'metric_values_data', 'metrics_analysis', 'dateRegistration', 'country', 
-            'source', 'analysis_type'
+            'country_id', 'source', 'analysis_type'
         ]
-        read_only_fields = ['model_architecture', 'tactic_parameter_option']
+        read_only_fields = ['model_architecture', 'tactic_parameter_option', 'country']
     
     def get_metrics_analysis(self, obj):
         # Get the num_inferences from the context if available, otherwise use default
@@ -407,14 +410,12 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
         return None
     
     def get_country(self, obj):
-        if hasattr(obj, 'roianalysiscalculation'):
-            country = obj.roianalysiscalculation.country
-            return {
-                'id': country.id,
-                'name': country.name,
-                'country_code': country.country_code
-            } if country else None
-        return None
+        country = obj.country
+        return {
+            'id': country.id,
+            'name': country.name,
+            'country_code': country.country_code
+        } if country else None
         
     def get_source(self, obj):
         if hasattr(obj, 'roianalysisresearch'):
@@ -594,10 +595,10 @@ class AnalysisListSerializer(serializers.ModelSerializer):
     parameter_name = serializers.CharField(source='tactic_parameter_option.name', read_only=True)
     parameter_value = serializers.CharField(source='tactic_parameter_option.value', read_only=True)
     analysis_type = serializers.SerializerMethodField(read_only=True)
+    country = serializers.SerializerMethodField(read_only=True)
     
     # Fields from subclasses
     dateRegistration = serializers.SerializerMethodField(read_only=True)
-    country = serializers.SerializerMethodField(read_only=True)
     source = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -614,14 +615,12 @@ class AnalysisListSerializer(serializers.ModelSerializer):
         return None
     
     def get_country(self, obj):
-        if hasattr(obj, 'roianalysiscalculation'):
-            country = obj.roianalysiscalculation.country
-            return {
-                'id': country.id,
-                'name': country.name,
-                'country_code': country.country_code
-            } if country else None
-        return None
+        country = obj.country
+        return {
+            'id': country.id,
+            'name': country.name,
+            'country_code': country.country_code
+        } if country else None
         
     def get_analysis_type(self, obj):
         """
@@ -643,16 +642,10 @@ class AnalysisListSerializer(serializers.ModelSerializer):
         return None
 
 class ROIAnalysisCalculationSerializer(ROIAnalysisSerializer):
-    country_name = serializers.CharField(source='country.name', read_only=True)
-    country_code = serializers.CharField(source='country.country_code', read_only=True)
-    country_id = serializers.PrimaryKeyRelatedField(
-        queryset=Country.objects.all(), write_only=True, source='country'
-    )
     
     class Meta(ROIAnalysisSerializer.Meta):
         model = ROIAnalysisCalculation
-        fields = ROIAnalysisSerializer.Meta.fields + ['dateRegistration', 'country', 'country_id', 'country_name', 'country_code']
-        read_only_fields = ROIAnalysisSerializer.Meta.read_only_fields + ['country']
+        fields = ROIAnalysisSerializer.Meta.fields + ['dateRegistration']
 
     def create(self, validated_data):
         metric_values_data = validated_data.pop('metric_values_data', [])
