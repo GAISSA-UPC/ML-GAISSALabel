@@ -6,7 +6,7 @@ class ROIMetricsCalculator:
     Calculates metrics values after applying expected reductions based on tactics.
     """
 
-    def calculate_metrics_for_analysis(self, analysis_id, num_inferences=10000000):
+    def calculate_metrics_for_analysis(self, analysis_id, num_inferences=100000000):
         """
         Calculates metrics for a specific ROI analysis.
         

@@ -115,7 +115,7 @@ export default {
                 return this.$t('This emissions reduction is equivalent to avoiding') + ' ' + 
                        this.formatNumber(km) + ' ' + this.$t('km of car driving.');
             } else if (saved >= 50) {
-                // Mobile phone charging: ~8g CO₂ per full charge
+                // Mobile phone charging: ~45.8g CO₂ per full charge
                 const phoneCharges = saved / 45.8;
                 return this.$t('This emissions reduction is equivalent to approximately') + ' ' + 
                        this.formatNumber(phoneCharges) + ' ' + this.$t('mobile phone usage days.');

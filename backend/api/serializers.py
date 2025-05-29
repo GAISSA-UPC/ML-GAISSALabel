@@ -258,15 +258,45 @@ class TacticSourceSerializer(serializers.ModelSerializer):
         model = TacticSource
         fields = '__all__'
 
+class ROIMetricSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ROIMetric
+        fields = '__all__'
+
 class MLTacticSerializer(serializers.ModelSerializer):
     sources = TacticSourceSerializer(many=True, read_only=True)
     source_ids = serializers.PrimaryKeyRelatedField(
         many=True, queryset=TacticSource.objects.all(), write_only=True, source='sources', required=True
     )
+    applicable_metrics = ROIMetricSerializer(many=True, read_only=True)
+    applicable_metric_ids = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=ROIMetric.objects.all(), write_only=True, source='applicable_metrics', required=True
+    )
+    compatible_architectures = ModelArchitectureSerializer(many=True, read_only=True)
+    compatible_architecture_ids = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=ModelArchitecture.objects.all(), write_only=True, source='compatible_architectures', required=True
+    )
+
+    def validate_applicable_metric_ids(self, value):
+        """Ensure at least one ROI metric is provided"""
+        if not value or len(value) == 0:
+            raise serializers.ValidationError("At least one applicable ROI metric must be provided.")
+        return value
+    
+    def validate_compatible_architecture_ids(self, value):
+        """Ensure at least one compatible architecture is provided"""
+        if not value or len(value) == 0:
+            raise serializers.ValidationError("At least one compatible model architecture must be provided.")
+        return value
 
     class Meta:
         model = MLTactic
-        fields = ['id', 'name', 'information', 'sources', 'source_ids']
+        fields = [
+            'id', 'name', 'information', 
+            'sources', 'source_ids', 
+            'applicable_metrics', 'applicable_metric_ids',
+            'compatible_architectures', 'compatible_architecture_ids'
+        ]
 
 class TacticParameterOptionSerializer(serializers.ModelSerializer):
     tactic_name = serializers.CharField(source='tactic.name', read_only=True)
@@ -278,11 +308,6 @@ class TacticParameterOptionSerializer(serializers.ModelSerializer):
         model = TacticParameterOption
         fields = ['id', 'tactic', 'tactic_id', 'tactic_name', 'name', 'value']
         read_only_fields = ['tactic'] # tactic is set via tactic_id
-
-class ROIMetricSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ROIMetric
-        fields = '__all__'
 
 class AnalysisMetricValueSerializer(serializers.ModelSerializer):
     metric_name = serializers.CharField(source='metric.name', read_only=True)
@@ -314,8 +339,8 @@ class EnergyAnalysisMetricValueSerializer(serializers.ModelSerializer):
         return value
     
     def get_cost_savings(self, obj):
-        # Default calculation for 10 million inferences if not specified
-        num_inferences = self.context.get('num_inferences', 10000000)
+        # Default calculation for 100 million inferences if not specified
+        num_inferences = self.context.get('num_inferences', 100000000)
         
         try:
             expected_reduction = ExpectedMetricReduction.objects.get(
@@ -372,7 +397,7 @@ class ROIAnalysisSerializer(serializers.ModelSerializer):
     
     def get_metrics_analysis(self, obj):
         # Get the num_inferences from the context if available, otherwise use default
-        num_inferences = self.context.get('num_inferences', 10000000)
+        num_inferences = self.context.get('num_inferences', 100000000)
         calculator = ROIMetricsCalculator()
         return calculator.calculate_metrics_for_analysis(obj.id, num_inferences)
     

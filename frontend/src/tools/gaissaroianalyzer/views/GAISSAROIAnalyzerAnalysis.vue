@@ -75,7 +75,7 @@
                     <div class="inferences-control-container">
                         <p class="inferences-control-label">{{ $t("Number of inferences:") }}</p>
                         <div class="inferences-slider-container">
-                            <el-slider v-model="sliderInferenceCount" :min="10000" :max="100000000" :step="10000"
+                            <el-slider v-model="sliderInferenceCount" :min="10000" :max="1000000000" :step="10000"
                                 @change="updateInferencesFromSlider" class="inferences-slider" />
                         </div>
                         <div class="inferences-input-container">
@@ -174,13 +174,13 @@ export default {
             tacticSources: [],
             showVisualMetrics: true,
             pdfGenerating: false,
-            inferenceCount: 10000000
+            inferenceCount: 100000000
         };
     },
     computed: {
         sliderInferenceCount: {
             get() {
-                const max = 100000000;
+                const max = 1000000000;
                 return Math.min(this.inferenceCount, max);
             },
             set(value) {
