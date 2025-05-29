@@ -101,6 +101,22 @@
                         </ROIDetailsCard>
                     </div>
 
+                    <!-- Emissions Reduction Section -->
+                    <div v-if="emissionsData" class="emissions-section" style="margin-top: 30px;">
+                        <h3 class="section-title">{{ $t("Environmental Impact") }}</h3>
+                        <p class="results-description">
+                            {{ $t("This section shows the environmental impact analysis, including CO₂ emissions reduction achieved by applying the ML optimization tactic.") }}
+                        </p>
+                        <div class="emissions-card-container">
+                            <EmissionsReductionCard 
+                                :emissionsData="emissionsData"
+                                :numInferences="costMetricsResults[0]?.num_inferences || 0"
+                                :formatNumber="formatNumber"
+                                :showTitle="false"
+                                :columnCount="getDescriptionsColumnCount()" />
+                        </div>
+                    </div>
+
                     <p v-if="costMetricsResults.length === 0">{{ $t("No energy-related metrics found to calculate ROI.")
                     }}</p>
                 </el-card>
@@ -137,6 +153,7 @@ import MetricCard from '../components/MetricCard.vue';
 import ROIDetailsCard from '../components/ROIDetailsCard.vue';
 import ROIEvolutionChart from '../components/ROIEvolutionChart.vue';
 import IncomeCostsChart from '../components/IncomeCostsChart.vue';
+import EmissionsReductionCard from '../components/EmissionsReductionCard.vue';
 
 export default {
     name: "GAISSAROIAnalyzerAnalysis",
@@ -148,7 +165,8 @@ export default {
         MetricCard,
         ROIDetailsCard,
         ROIEvolutionChart,
-        IncomeCostsChart
+        IncomeCostsChart,
+        EmissionsReductionCard
     },
     data() {
         return {
@@ -204,7 +222,10 @@ export default {
                         costData.break_even_inferences : parseInt(costData.break_even_inferences).toLocaleString(),
                     roi_percentage: parseFloat(costData.roi) * 100,
                     infinite_roi_percentage: parseFloat(costData.infinite_roi) * 100,
-                    num_inferences: costData.num_inferences
+                    num_inferences: costData.num_inferences,
+                    
+                    // Include emissions data if available
+                    inferences_carbon_emissions: costData.inferences_carbon_emissions || null
                 };
             });
         },
@@ -364,6 +385,23 @@ export default {
                 ],
                 legendData: ['Baseline', 'Optimized']
             };
+        },
+        emissionsData() {
+            // Extract emissions data from the first cost metrics result that has emissions data
+            if (!this.costMetricsResults || this.costMetricsResults.length === 0) {
+                return null;
+            }
+
+            const metricWithEmissions = this.costMetricsResults.find(metric => 
+                metric.inferences_carbon_emissions && 
+                !metric.inferences_carbon_emissions.error
+            );
+
+            if (!metricWithEmissions) {
+                return null;
+            }
+
+            return metricWithEmissions.inferences_carbon_emissions;
         },
     },
     methods: {
@@ -561,6 +599,17 @@ export default {
 }
 
 .roi-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.emissions-section {
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.emissions-card-container {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
