@@ -1,5 +1,5 @@
 <template>
-    <GAISSAROIAnalyzerRepository 
+    <AnalysisSelector 
         analysis-type="research"
         :repository-title="$t('Research Analysis Repository')"
         :repository-description="$t('This page allows you to consult research-based Return on Investment (ROI) analyses created by administrators. These analyses are based on real data extracted from research papers and form the foundation for calculation-based estimations.')"
@@ -8,11 +8,11 @@
 </template>
 
 <script>
-import GAISSAROIAnalyzerRepository from "@/tools/gaissaroianalyzer/components/GAISSAROIAnalyzerRepository.vue";
+import AnalysisSelector from "@/tools/gaissaroianalyzer/components/AnalysisSelector.vue";
 
 export default {
     name: "GAISSAROIAnalyzerResearchRepository",
-    components: { GAISSAROIAnalyzerRepository }
+    components: { AnalysisSelector }
 }
 </script>
 

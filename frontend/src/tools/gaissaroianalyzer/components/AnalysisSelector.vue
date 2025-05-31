@@ -81,7 +81,7 @@ import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
 import { formatData } from "@/utils";
 
 export default {
-    name: "GAISSAROIAnalyzerRepository",
+    name: "AnalysisSelector",
     props: {
         analysisType: { 
             required: true, 
