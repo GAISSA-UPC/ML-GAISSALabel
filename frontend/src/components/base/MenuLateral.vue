@@ -56,6 +56,9 @@
             <el-menu-item index="GAISSA ROI Analyzer New Form" @click="$router.push({name: 'GAISSA ROI Analyzer New Form'})">
                 {{ $t('Calculate ROI') }}
             </el-menu-item>
+            <el-menu-item index="GAISSA ROI Analyzer Comparison" @click="$router.push({name: 'GAISSA ROI Analyzer Comparison'})">
+                {{ $t('Compare Analyses') }}
+            </el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="4" v-if="isLogged">
             <template #title>

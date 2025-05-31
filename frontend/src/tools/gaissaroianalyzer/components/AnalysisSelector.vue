@@ -15,7 +15,7 @@
                     filterable>
                     <el-option v-for="(modelArchitecture, i) in modelArchitectures" :key="i" :value="modelArchitecture.id" :label="modelArchitecture.name" />
                 </el-select>
-                <el-alert type="info" show-icon :closable="false" style="margin-top: 10px">
+                <el-alert v-if="!comparisonMode" type="info" show-icon :closable="false" style="margin-top: 10px">
                     <p style="font-size: 14px">{{ $t('Model architecture refers to the specific structure and framework of a machine learning or deep learning system (e.g., SVM, KNN, AlexNet, GoogLeNet). Different architectures have distinct design principles and computational requirements, which influence both their performance and their environmental impact.') }}</p>
                 </el-alert>
             </el-form-item>
@@ -30,7 +30,7 @@
                         <el-option v-for="(mlTactic, i) in mlTactics" :key="i" :value="mlTactic.id"
                             :label="mlTactic.name" />
                     </el-select>
-                    <el-alert type="info" show-icon :closable="false" style="margin-top: 10px">
+                    <el-alert v-if="!comparisonMode" type="info" show-icon :closable="false" style="margin-top: 10px">
                         <p style="font-size: 14px">{{ $t('ML tactics are optimization techniques applied to machine learning models to enhance efficiency (e.g., pruning). These tactics aim to reduce computational and energy costs while preserving or minimally impacting model performance.') }}</p>
                     </el-alert>
                 </el-form-item>
@@ -44,7 +44,7 @@
                         <el-option v-for="parameter in tacticParameters" :key="parameter.id"
                             :value="parameter.id" :label="`${parameter.name}: ${parameter.value}`" />
                     </el-select>
-                    <el-alert type="info" show-icon :closable="false" style="margin-top: 10px">
+                    <el-alert v-if="!comparisonMode" type="info" show-icon :closable="false" style="margin-top: 10px">
                         <p style="font-size: 14px">{{ $t('Tactic parameters define specific configurations or settings for the selected ML tactic. These parameters directly influence how aggressively the optimization is applied.') }}</p>
                     </el-alert>
                 </el-form-item>
@@ -66,7 +66,7 @@
             <el-form-item>
                 <el-button @click="loadAnalysis" class="action-button"
                     :disabled="!isFormValid">
-                    {{ $t("Load ROI Analysis") }}
+                    {{ comparisonMode ? $t("Select Analysis") : $t("Load ROI Analysis") }}
                 </el-button>
             </el-form-item>
         </el-form>
@@ -101,6 +101,10 @@ export default {
         analysisSelectionDescription: {
             required: true, 
             type: String
+        },
+        comparisonMode: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -191,6 +195,14 @@ export default {
             return `Analysis ${experiment.id}`;
         },
         async loadAnalysis() {
+            // Emit the selected analysis ID for parent components that might need it
+            this.$emit('analysisSelected', this.selectedExperiment);
+            
+            // If in comparison mode, don't navigate to the analysis page
+            if (this.comparisonMode) {
+                return;
+            }
+            
             this.$router.push({
                 name: "GAISSA ROI Analyzer Analysis",
                 params: {

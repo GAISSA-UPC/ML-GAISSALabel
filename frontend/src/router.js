@@ -23,6 +23,7 @@ const GAISSAROIAnalyzerAnalysis = () => import("@/tools/gaissaroianalyzer/views/
 const GAISSAROIAnalyzerNewForm = () => import("@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzerNewForm.vue")
 const GAISSAROIAnalyzerCalculationRepository = () => import("@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzerCalculationRepository.vue")
 const GAISSAROIAnalyzerResearchRepository = () => import("@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzerResearchRepository.vue")
+const GAISSAROIAnalyzerComparison = () => import("@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzerComparison.vue")
 
 // Admin routes
 const AdminMetriquesInfo = () => import('@/tools/gaissalabel/views/AdminMetriquesInfo.vue')
@@ -122,6 +123,12 @@ const router = createRouter({
       path: '/gaissa-roi-analyzer/new-form',
       name: 'GAISSA ROI Analyzer New Form',
       component: GAISSAROIAnalyzerNewForm,
+      meta: { tool: 'gaissaroianalyzer' }
+    },
+    {
+      path: '/gaissa-roi-analyzer/comparison',
+      name: 'GAISSA ROI Analyzer Comparison',
+      component: GAISSAROIAnalyzerComparison,
       meta: { tool: 'gaissaroianalyzer' }
     },
     {
