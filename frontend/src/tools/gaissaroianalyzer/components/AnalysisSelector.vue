@@ -66,7 +66,7 @@
             <el-form-item>
                 <el-button @click="loadAnalysis" class="action-button"
                     :disabled="!isFormValid">
-                    {{ comparisonMode ? $t("Select Analysis") : $t("Load ROI Analysis") }}
+                    {{ getButtonText() }}
                 </el-button>
             </el-form-item>
         </el-form>
@@ -117,6 +117,7 @@ export default {
             selectedExperiment: null,
             tacticParameters: [],
             selectedTacticParameter: null,
+            analysisSelected: false,
         };
     },
     computed: {
@@ -128,6 +129,12 @@ export default {
                 this.selectedExperiment !== null
             );
         },
+    },
+    watch: {
+        selectedExperiment() {
+            // Reset selection feedback when experiment changes
+            this.resetSelection();
+        }
     },
     methods: {
         async refreshModelArchitectures() {
@@ -154,18 +161,21 @@ export default {
             this.selectedTacticParameter = null;
             this.experiments = [];
             this.selectedExperiment = null;
+            this.resetSelection();
             await this.refreshMlTactics();
         },
         async onMlTacticChange() {
             this.selectedTacticParameter = null;
             this.experiments = [];
             this.selectedExperiment = null;
+            this.resetSelection();
 
             await this.refreshTacticParameters();
         },
         async onTacticParameterChange() {
             this.experiments = [];
             this.selectedExperiment = null;
+            this.resetSelection();
             await this.refreshExperiments();
         },
         async refreshExperiments() {
@@ -195,6 +205,8 @@ export default {
             return `Analysis ${experiment.id}`;
         },
         async loadAnalysis() {
+            this.analysisSelected = true;
+
             // Emit the selected analysis ID for parent components that might need it
             this.$emit('analysisSelected', this.selectedExperiment);
             
@@ -209,6 +221,15 @@ export default {
                     id_experiment: this.selectedExperiment,
                 },
             });
+        },
+        resetSelection() {
+            this.analysisSelected = false;
+        },
+        getButtonText() {
+            if (this.comparisonMode) {
+                return this.analysisSelected ? this.$t("Analysis Selected ✓") : this.$t("Select Analysis");
+            }
+            return this.$t("Load ROI Analysis");
         },
         formatData,
     },
@@ -259,15 +280,18 @@ h2 {
     color: white;
 }
 
-.action-button {
+.action-button,
+.action-button:focus {
     margin-top: 20px;
-    background-color: var(--gaissa_green);
-    color: white;
+    background-color: var(--gaissa_green) !important;
+    color: white !important;
     border: none;
 }
 
-.action-button:hover {
-    background-color: var(--gaissa_green);
+.action-button:hover,
+.action-button:active {
+    background-color: white !important;
+    color: var(--gaissa_green) !important;
     opacity: 0.9;
 }
 

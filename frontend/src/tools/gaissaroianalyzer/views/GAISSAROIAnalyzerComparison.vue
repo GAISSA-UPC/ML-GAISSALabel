@@ -211,7 +211,7 @@ h2 {
 }
 
 .comparison-results {
-    margin-top: 30px;
+    margin-top: 50px;
 }
 
 .divider-text {
@@ -221,7 +221,7 @@ h2 {
 }
 
 .analysis-comparison-row {
-    margin-top: 20px;
+    margin-top: 30px;
 }
 
 .card-header {
@@ -252,7 +252,7 @@ h2 {
     }
     
     .analysis-comparison-row .el-col {
-        margin-bottom: 20px;
+        margin-bottom: 30px;
     }
 }
 </style>
