@@ -198,7 +198,7 @@ export default {
         window.addEventListener('resize', this.resize);
         this.initChart();
     },
-    beforeDestroy() {
+    beforeUnmount() {
         window.removeEventListener('resize', this.resize);
         if (this.chart) {
             this.chart.dispose();
