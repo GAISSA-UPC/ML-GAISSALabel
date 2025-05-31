@@ -1,5 +1,5 @@
 <template>
-    <div class="roi-analysis-component" :id="containerId">
+    <div class="roi-analysis-component" :class="{ 'force-mobile': forceMobile }" :id="containerId">
         <!-- Export button at the top right (only shown when showExportButton is true) -->
         <div v-if="showExportButton" class="export-button-container">
             <el-button type="primary" class="action-button export-button" @click="generatePDFReport"
@@ -10,7 +10,7 @@
         </div>
 
         <el-row :gutter="20" type="flex" :justify="center" class="row-bg">
-            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mobile-card">
+            <el-col :xs="24" :sm="24" :md="forceMobile ? 24 : 12" :lg="forceMobile ? 24 : 12" :xl="forceMobile ? 24 : 12" class="mobile-card">
                 <ModelInformationCard :modelData="analysisData" :formatDate="formatData" />
 
                 <!-- Source Information card for research-type analyses -->
@@ -21,7 +21,7 @@
                 <TacticSourcesCard v-if="!isResearchAnalysis" :sources="tacticSources" />
             </el-col>
 
-            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mobile-card">
+            <el-col :xs="24" :sm="24" :md="forceMobile ? 24 : 12" :lg="forceMobile ? 24 : 12" :xl="forceMobile ? 24 : 12" class="mobile-card">
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
                     <MetricsRadialChart :metricsData="metricsRadialChartData" :formatNumber="formatNumber" />
                 </el-card>
@@ -120,13 +120,13 @@
                 </el-card>
             </el-col>
 
-            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mobile-card" style="margin-top: 20px;">
+            <el-col :xs="24" :sm="24" :md="forceMobile ? 24 : 12" :lg="forceMobile ? 24 : 12" :xl="forceMobile ? 24 : 12" class="mobile-card" style="margin-top: 20px;">
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
                     <ROIEvolutionChart :chartData="roiChartData" :formatNumber="formatNumber" />
                 </el-card>
             </el-col>
 
-            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" class="mobile-card" style="margin-top: 20px;">
+            <el-col :xs="24" :sm="24" :md="forceMobile ? 24 : 12" :lg="forceMobile ? 24 : 12" :xl="forceMobile ? 24 : 12" class="mobile-card" style="margin-top: 20px;">
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
                     <IncomeCostsChart :chartData="incomeCostsChartData" :formatNumber="formatNumber" />
                 </el-card>
@@ -178,6 +178,10 @@ export default {
         containerId: {
             type: String,
             default: 'roi-analysis-container'
+        },
+        forceMobile: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -682,5 +686,28 @@ export default {
     .inferences-input-container {
         width: 100%;
     }
+}
+
+/* Force mobile layout styles - apply mobile layout regardless of screen size */
+.roi-analysis-component.force-mobile .visual-metrics-container {
+    grid-template-columns: 1fr;
+}
+
+.roi-analysis-component.force-mobile .inferences-control-container {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.roi-analysis-component.force-mobile .inferences-control-label {
+    margin-bottom: 10px;
+}
+
+.roi-analysis-component.force-mobile .inferences-slider-container {
+    margin-right: 0;
+    margin-bottom: 10px;
+}
+
+.roi-analysis-component.force-mobile .inferences-input-container {
+    width: 100%;
 }
 </style>

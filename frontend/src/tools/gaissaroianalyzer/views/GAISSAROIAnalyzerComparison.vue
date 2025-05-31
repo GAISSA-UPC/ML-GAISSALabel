@@ -81,6 +81,7 @@
                         <ROIAnalysisComponent 
                             :analysisId="firstAnalysisId"
                             :showExportButton="false"
+                            :forceMobile="true"
                             containerId="first-analysis-container" 
                         />
                     </el-card>
@@ -96,6 +97,7 @@
                         <ROIAnalysisComponent 
                             :analysisId="secondAnalysisId"
                             :showExportButton="false"
+                            :forceMobile="true"
                             containerId="second-analysis-container" 
                         />
                     </el-card>
