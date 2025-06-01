@@ -2,16 +2,19 @@ import { createRouter, createWebHistory } from 'vue-router'
 import store from './store'
 
 // Core routes
-const HomeView = () => import('@/views/HomeView.vue')
+const GAISSAToolsHome = () => import('@/views/GAISSAToolsHome.vue')
 const AboutView = () => import('@/views/AboutView.vue')
 
-// Training routes
+// GAISSA Label routes
+const GAISSALabelHome = () => import('@/views/HomeView.vue')
+
+// GAISSA Label Training routes
 const TrainingForm = () => import('@/tools/gaissalabel/views/TrainingForm.vue')
 const TrainingPreSaved = () => import('@/tools/gaissalabel/views/TrainingPreSaved.vue')
 const TrainingFile = () => import('@/tools/gaissalabel/views/TrainingFile.vue')
 const TrainingLabelInfo = () => import('@/tools/gaissalabel/views/TrainingLabelInfo.vue')
 
-// Inference routes
+// GAISSA Label Inference routes
 const InferenceForm = () => import('@/tools/gaissalabel/views/InferenceForm.vue')
 const InferencePreSaved = () => import('@/tools/gaissalabel/views/InferencePreSaved.vue')
 const InferenceFile = () => import('@/tools/gaissalabel/views/InferenceFile.vue')
@@ -41,7 +44,13 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView
+      component: GAISSAToolsHome
+    },
+    {
+      path: '/gaissalabel',
+      name: 'gaissalabel-home',
+      component: GAISSALabelHome,
+      meta: { tool: 'gaissalabel' }
     },{
       path: '/about',
       name: 'about',

@@ -9,6 +9,10 @@
             <font-awesome-icon :icon="['fas', 'house']" class="icon"/>
             <template #title>{{ $t('Home') }}</template>
         </el-menu-item>
+        <el-menu-item index="gaissalabel-home" v-if="isGAISSALabelEnabled" @click="$router.push({name: 'gaissalabel-home'})">
+            <font-awesome-icon :icon="['fas', 'tag']" class="icon"/>
+            <template #title>{{ $t('GAISSALabel') }}</template>
+        </el-menu-item>
         <el-sub-menu index="1" v-if="isGAISSALabelEnabled">
             <template #title>
                 <font-awesome-icon :icon="['fas', 'dumbbell']" class="icon"/>
