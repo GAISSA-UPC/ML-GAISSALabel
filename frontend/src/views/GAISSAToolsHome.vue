@@ -65,6 +65,7 @@
                 </div>                
                 <!-- GAISSA ROI Analyzer Tool -->
                 <div class="tool-card roi-analyzer-card" v-if="isGAISSAROIAnalyzerEnabled">
+                    <div class="new-banner">NEW</div>
                     <div class="tool-icon">
                         <font-awesome-icon :icon="['fas', 'chart-line']" />
                     </div>
@@ -126,10 +127,10 @@
                 <h2>{{ $t('Ready to Get Started?') }}</h2>
                 <p>{{ $t('Join the journey towards more efficient and sustainable machine learning.') }}</p>
                 <div class="cta-buttons">
-                    <el-button type="primary" size="large" @click="navigateToGAISSALabel" v-if="isGAISSALabelEnabled">
+                    <el-button type="default" size="large" @click="navigateToGAISSALabel" v-if="isGAISSALabelEnabled">
                         {{ $t('Start with GAISSALabel') }}
                     </el-button>
-                    <el-button type="default" size="large" @click="navigateToROIAnalyzer" v-if="isGAISSAROIAnalyzerEnabled">
+                    <el-button type="primary" size="large" @click="navigateToROIAnalyzer" v-if="isGAISSAROIAnalyzerEnabled">
                         {{ $t('Explore ROI Analyzer') }}
                     </el-button>
                 </div>
@@ -190,7 +191,7 @@ export default {
 /* Hero Section */
 .hero-section {
     padding: 60px 0;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: #f8f9fa;
     border-radius: 20px;
     margin-bottom: 60px;
 }
@@ -289,7 +290,7 @@ export default {
 
 .tools-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
     gap: 40px;
     margin-top: 40px;
 }
@@ -301,6 +302,21 @@ export default {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.new-banner {
+    position: absolute;
+    top: 10px;
+    right: -30px;
+    background: #e74c3c;
+    color: white;
+    padding: 5px 40px;
+    font-weight: bold;
+    transform: rotate(45deg);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    letter-spacing: 1px;
 }
 
 .tool-card:hover {

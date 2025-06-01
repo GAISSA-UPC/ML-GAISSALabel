@@ -135,7 +135,7 @@ export default {
 }
 
 .el-menu-vertical {
-    min-height: 95%;
+    min-height: 98%;
 }
 
 .el-menu-vertical.mobile {
