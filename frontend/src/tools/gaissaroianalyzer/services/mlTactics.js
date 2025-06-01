@@ -19,9 +19,9 @@ export default {
             return null;
         }
     },
-    async getCompatibleTacticsWithArchitecture(architectureId) {
+    async getCompatibleTacticsWithArchitecture(architectureId, filters = {}) {
         try {
-            const response = await axios.get(`/api/roi/model-architectures/${architectureId}/compatible-tactics/`);
+            const response = await axios.get(`/api/roi/model-architectures/${architectureId}/compatible-tactics/`, { params: filters });
             return response;
         } catch (error) {
             console.error(`Error fetching tactics compatible with architecture ${architectureId}:`, error);

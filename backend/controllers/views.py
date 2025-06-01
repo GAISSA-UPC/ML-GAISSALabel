@@ -349,12 +349,42 @@ class ModelArchitectureView(viewsets.ModelViewSet):
     search_fields = ['name', 'information']
     ordering_fields = ['name']
 
+    def get_queryset(self):
+        """
+        Filter model architectures by analysis type if analysis_type parameter is provided.
+        """
+        queryset = super().get_queryset()
+        
+        analysis_type = self.request.query_params.get('analysis_type')
+        if analysis_type:
+            if analysis_type == 'calculation':
+                queryset = queryset.filter(roi_analyses__roianalysiscalculation__isnull=False).distinct()
+            elif analysis_type == 'research':
+                queryset = queryset.filter(roi_analyses__roianalysisresearch__isnull=False).distinct()
+                
+        return queryset
     
     # Define new endpoint to get compatible tactics for a specific architecture
     @action(detail=True, methods=['get'], url_path='compatible-tactics')
     def get_compatible_tactics(self, request, pk=None):
         architecture = self.get_object()
         compatible_tactics = architecture.compatible_tactics.all()
+                
+        # Filter by analysis type if analysis_type parameter is provided
+        analysis_type = self.request.query_params.get('analysis_type')
+        if analysis_type:
+            if analysis_type == 'calculation':
+                # Filter to include only tactics that have calculation analyses with this architecture
+                compatible_tactics = compatible_tactics.filter(
+                    parameter_options__roi_analyses__model_architecture=architecture,
+                    parameter_options__roi_analyses__roianalysiscalculation__isnull=False
+                ).distinct()
+            elif analysis_type == 'research':
+                # Filter to include only tactics that have research analyses with this architecture
+                compatible_tactics = compatible_tactics.filter(
+                    parameter_options__roi_analyses__model_architecture=architecture,
+                    parameter_options__roi_analyses__roianalysisresearch__isnull=False
+                ).distinct()
         
         # Serialize the tactics and return them
         serializer = MLTacticSerializer(compatible_tactics, many=True)
@@ -416,6 +446,15 @@ class TacticParameterOptionView(viewsets.ModelViewSet):
             
             queryset = queryset.filter(id__in=parameter_options_with_reductions)
         
+        # Filter by analysis type if analysis_type parameter is provided
+        analysis_type = self.request.query_params.get('analysis_type')
+        if analysis_type:
+            if analysis_type == 'calculation':
+                # Filter to include only parameter options that have calculation analyses with this tactic
+                queryset = queryset.filter(roi_analyses__roianalysiscalculation__isnull=False).distinct()
+            elif analysis_type == 'research':
+                # Filter to include only parameter options that have research analyses with this tactic
+                queryset = queryset.filter(roi_analyses__roianalysisresearch__isnull=False).distinct()
         return queryset
 
 class ROIMetricView(viewsets.ModelViewSet):

@@ -138,19 +138,35 @@ export default {
     },
     methods: {
         async refreshModelArchitectures() {
-            const response = await modelArchitectures.list();
+            const params = {
+                analysis_type: this.analysisType
+            };
+            const response = await modelArchitectures.list(params);
             if (response && response.data) {
                 this.modelArchitectures = response.data;
             }
         },
         async refreshMlTactics() {
-            const response = await mlTactics.getCompatibleTacticsWithArchitecture(this.selectedModelArchitecture);
+            const params = {
+                analysis_type: this.analysisType
+            };
+            const response = await mlTactics.getCompatibleTacticsWithArchitecture(this.selectedModelArchitecture, params);
             if (response && response.data) {
                 this.mlTactics = response.data;
             }
         },
         async refreshTacticParameters() {
-            const response = await tacticParameters.list(this.selectedMlTactic);
+            if (!this.selectedMlTactic) {
+                this.tacticParameters = [];
+                return;
+            }
+
+            const filter = {
+                model_architecture: this.selectedModelArchitecture,
+                analysis_type: this.analysisType,
+            };
+
+            const response = await tacticParameters.list(this.selectedMlTactic, filter);
             if (response && response.data) {
                 this.tacticParameters = response.data;
             }
@@ -158,6 +174,7 @@ export default {
         async onModelArchitectureChange() {
             this.selectedMlTactic = null;
             this.tacticParameters = [];
+            this.mlTactics = [];
             this.selectedTacticParameter = null;
             this.experiments = [];
             this.selectedExperiment = null;
@@ -167,6 +184,7 @@ export default {
         async onMlTacticChange() {
             this.selectedTacticParameter = null;
             this.experiments = [];
+            this.tacticParameters = [];
             this.selectedExperiment = null;
             this.resetSelection();
 

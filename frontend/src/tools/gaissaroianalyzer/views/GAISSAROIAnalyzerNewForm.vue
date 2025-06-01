@@ -324,6 +324,7 @@ export default {
             this.applicableMetrics = [];
             this.energyRelatedMetrics = [];
             this.tacticParameters = [];
+            this.tactics = [];
             
             // Fetch tactics compatible with the selected model architecture
             if (this.formData.modelArchitecture) {
@@ -338,6 +339,8 @@ export default {
             this.metricValues = {};
             this.energyCostRates = {};
             this.implementationCosts = {};
+            this.tacticParameters = [];
+            this.applicableMetrics = [];
             
             // Fetch parameters and metrics for the selected tactic
             this.fetchTacticParameters();
