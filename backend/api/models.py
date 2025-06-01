@@ -207,7 +207,7 @@ class ROIAnalysis(models.Model):
     id = models.AutoField(primary_key=True)
     model_architecture = models.ForeignKey(ModelArchitecture, related_name='roi_analyses', on_delete=models.PROTECT, verbose_name=_('Model Architecture'))
     tactic_parameter_option = models.ForeignKey(TacticParameterOption, related_name='roi_analyses', on_delete=models.PROTECT, verbose_name=_('Tactic Parameter Option'))
-    country = models.ForeignKey('Country', on_delete=models.PROTECT, related_name='roi_analyses', verbose_name=_('Country of Deployment'), default=get_default_country)
+    country = models.ForeignKey('Country', on_delete=models.PROTECT, related_name='roi_analyses', verbose_name=_('Country of Deployment'), null=True)
     # Implicit link to MLTactic via TacticParameterOption
 
     class Meta:

@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='roianalysis',
             name='country',
-            field=models.ForeignKey(default=api.models.get_default_country, on_delete=django.db.models.deletion.PROTECT, related_name='roi_analyses', to='api.country', verbose_name='Country of Deployment'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='roi_analyses', to='api.country', verbose_name='Country of Deployment'),
         ),
     ]
