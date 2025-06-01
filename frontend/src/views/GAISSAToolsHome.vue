@@ -421,6 +421,7 @@ export default {
     font-size: 1.1rem;
     font-weight: 600;
     border-radius: 10px;
+    margin-left: 0;
 }
 
 .tool-button {

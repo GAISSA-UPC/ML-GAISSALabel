@@ -6,7 +6,7 @@ const GAISSAToolsHome = () => import('@/views/GAISSAToolsHome.vue')
 const AboutView = () => import('@/views/AboutView.vue')
 
 // GAISSA Label routes
-const GAISSALabelHome = () => import('@/views/HomeView.vue')
+const GAISSALabelHome = () => import('@/tools/gaissalabel/views/HomeView.vue')
 
 // GAISSA Label Training routes
 const TrainingForm = () => import('@/tools/gaissalabel/views/TrainingForm.vue')

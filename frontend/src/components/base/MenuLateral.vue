@@ -9,44 +9,49 @@
             <font-awesome-icon :icon="['fas', 'house']" class="icon"/>
             <template #title>{{ $t('Home') }}</template>
         </el-menu-item>
-        <el-menu-item index="gaissalabel-home" v-if="isGAISSALabelEnabled" @click="$router.push({name: 'gaissalabel-home'})">
-            <font-awesome-icon :icon="['fas', 'tag']" class="icon"/>
-            <template #title>{{ $t('GAISSALabel') }}</template>
-        </el-menu-item>
         <el-sub-menu index="1" v-if="isGAISSALabelEnabled">
             <template #title>
-                <font-awesome-icon :icon="['fas', 'dumbbell']" class="icon"/>
-                <span>{{ $t('Training') }}</span>
+                <font-awesome-icon :icon="['fas', 'tag']" class="icon"/>
+                <span>{{ $t('GAISSALabel') }}</span>
             </template>
-            <el-menu-item index="training form" @click="$router.push({name: 'training form'})">
-                {{ $t('New from Form') }}
+            <el-menu-item index="gaissalabel-home" @click="$router.push({name: 'gaissalabel-home'})">
+                {{ $t('Home') }}
             </el-menu-item>
-            <el-menu-item index="training file" @click="$router.push({name: 'training file'})">
-                {{ $t('New from File') }}
-            </el-menu-item>
-            <el-menu-item index="training pre saved" @click="$router.push({name: 'training pre saved'})">
-                {{ $t('Consult') }}
-            </el-menu-item>
+            <el-sub-menu index="1-1">
+                <template #title>
+                    <font-awesome-icon :icon="['fas', 'dumbbell']" class="icon"/>
+                    <span>{{ $t('Training') }}</span>
+                </template>
+                <el-menu-item index="training form" @click="$router.push({name: 'training form'})">
+                    {{ $t('New from Form') }}
+                </el-menu-item>
+                <el-menu-item index="training file" @click="$router.push({name: 'training file'})">
+                    {{ $t('New from File') }}
+                </el-menu-item>
+                <el-menu-item index="training pre saved" @click="$router.push({name: 'training pre saved'})">
+                    {{ $t('Consult') }}
+                </el-menu-item>
+            </el-sub-menu>
+            <el-sub-menu index="1-2">
+                <template #title>
+                    <font-awesome-icon :icon="['fas', 'bullseye']" class="icon"/>
+                    <span>{{ $t('Inference') }}</span>
+                </template>
+                <el-menu-item index="inference form" @click="$router.push({name: 'inference form'})">
+                    {{ $t('New from Form') }}
+                </el-menu-item>
+                <el-menu-item index="inference file" @click="$router.push({name: 'inference file'})">
+                    {{ $t('New from File') }}
+                </el-menu-item>
+                <el-menu-item index="inference deploy" @click="$router.push({name: 'inference deploy'})">
+                    {{ $t('New from Deployment') }}
+                </el-menu-item>
+                <el-menu-item index="inference pre saved" @click="$router.push({name: 'inference pre saved'})">
+                    {{ $t('Consult') }}
+                </el-menu-item>
+            </el-sub-menu>
         </el-sub-menu>
-        <el-sub-menu index="2" v-if="isGAISSALabelEnabled">
-            <template #title>
-                <font-awesome-icon :icon="['fas', 'bullseye']" class="icon"/>
-                <span>{{ $t('Inference') }}</span>
-            </template>
-            <el-menu-item index="inference form" @click="$router.push({name: 'inference form'})">
-                {{ $t('New from Form') }}
-            </el-menu-item>
-            <el-menu-item index="inference file" @click="$router.push({name: 'inference file'})">
-                {{ $t('New from File') }}
-            </el-menu-item>
-            <el-menu-item index="inference deploy" @click="$router.push({name: 'inference deploy'})">
-                {{ $t('New from Deployment') }}
-            </el-menu-item>
-            <el-menu-item index="inference pre saved" @click="$router.push({name: 'inference pre saved'})">
-                {{ $t('Consult') }}
-            </el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu index="3" v-if="isGAISSAROIAnalyzerEnabled">
+        <el-sub-menu index="2" v-if="isGAISSAROIAnalyzerEnabled">
             <template #title>
                 <font-awesome-icon :icon="['fas', 'chart-line']" class="icon"/>
                 <span class="wrap-title">{{ $t('GAISSA ROI Analyzer') }}</span>
@@ -64,7 +69,7 @@
                 {{ $t('Compare Analyses') }}
             </el-menu-item>
         </el-sub-menu>
-        <el-sub-menu index="4" v-if="isLogged">
+        <el-sub-menu index="3" v-if="isLogged">
             <template #title>
                 <font-awesome-icon :icon="['fas', 'screwdriver-wrench']" class="icon"/>
                 <span>{{ $t('Administration') }}</span>
