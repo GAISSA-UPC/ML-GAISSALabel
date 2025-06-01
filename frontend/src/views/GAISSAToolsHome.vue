@@ -62,9 +62,8 @@
                             {{ $t('Get Started') }}
                         </el-button>
                     </div>
-                </div>
-
-                <!-- GAISSAROIAnalyzer Tool -->
+                </div>                
+                <!-- GAISSA ROI Analyzer Tool -->
                 <div class="tool-card roi-analyzer-card" v-if="isGAISSAROIAnalyzerEnabled">
                     <div class="tool-icon">
                         <font-awesome-icon :icon="['fas', 'chart-line']" />

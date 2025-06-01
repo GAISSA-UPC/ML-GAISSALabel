@@ -47,7 +47,7 @@ class LoginAdminView(mixins.CreateModelMixin, viewsets.GenericViewSet):
     models = Administrador
 
 
-# GAISSA Label Views
+# GAISSALabel Views
 class ModelsView(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Model.objects.all()
     serializer_class = ModelSerializer

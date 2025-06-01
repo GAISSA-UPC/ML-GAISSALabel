@@ -148,6 +148,12 @@ export default {
     color: var(--gaissa_green)
 }
 
+.el-menu-item {
+    white-space: normal !important;
+    word-wrap: break-word;
+    line-height: 1.4 !important;
+}
+
 .icon {
     width: 20px;
     margin-right: 10px;
@@ -174,10 +180,12 @@ export default {
         text-align: center;
         padding: 0 20px;
     }
+    
     .el-menu-vertical .el-menu-item .icon,
     .el-menu-vertical .el-sub-menu__title .icon {
         margin-right: 5px;
     }
+    
     .el-menu-vertical .el-menu--popup {
         min-width: 60px;
     }

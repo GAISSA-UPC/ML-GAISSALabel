@@ -1,6 +1,10 @@
 from django.contrib import admin
 from api import models
 
+# GAISSA Tools models
+admin.site.register(models.Administrador)
+admin.site.register(models.Configuracio)
+
 # GAISSALabel models
 admin.site.register(models.Model)
 admin.site.register(models.Entrenament)
@@ -16,8 +20,6 @@ admin.site.register(models.ValorInfoInferencia)
 admin.site.register(models.EinaCalcul)
 admin.site.register(models.TransformacioMetrica)
 admin.site.register(models.TransformacioInformacio)
-admin.site.register(models.Administrador)
-admin.site.register(models.Configuracio)
 
 # GAISSA ROI Analyzer models
 admin.site.register(models.ModelArchitecture)

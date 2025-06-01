@@ -1,6 +1,6 @@
 # Carbon Intensity Data Import Tool
 
-This document describes how to use the carbon intensity import tool in the GAISSALabel platform.
+This document describes how to use the carbon intensity import tool in the GAISSA Tools platform.
 
 ## Overview
 

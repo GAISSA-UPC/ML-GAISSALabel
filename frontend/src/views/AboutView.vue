@@ -1,7 +1,8 @@
 <template>
     <h1>{{ $t('About') }}</h1><br>
 
-    <h3>{{ $t('GAISSALabel is a tool that can assist you in evaluating both the training and inference phases of any machine learning model. \
+    <h3>{{ $t('GAISSA Tools is an open-source platform that provides comprehensible cutting-edge solutions for machine learning model efficiency assessment and analysis. \
+    This platform includes GAISSALabel for evaluating training and inference phases, and GAISSA ROI Analyzer for return on investment analysis. \
     This application has been developed as part of the') }} <a href="https://gaissa.upc.edu/en" target="_blank">{{ $t('GAISSA') }}</a>
         {{ $t('project, at the') }} <a href="https://gessi.upc.edu/en" target="_blank">{{ $t('GESSI') }}</a> {{ $t('research group.') }}</h3><br>
     <h3>{{ $t('By using our platform, you are joining a community of researchers and developers committed to addressing the environmental impact of AI. \

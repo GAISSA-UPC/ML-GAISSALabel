@@ -5,16 +5,16 @@ import store from './store'
 const GAISSAToolsHome = () => import('@/views/GAISSAToolsHome.vue')
 const AboutView = () => import('@/views/AboutView.vue')
 
-// GAISSA Label routes
+// GAISSALabel tool routes
 const GAISSALabelHome = () => import('@/tools/gaissalabel/views/HomeView.vue')
 
-// GAISSA Label Training routes
+// GAISSALabel Training routes
 const TrainingForm = () => import('@/tools/gaissalabel/views/TrainingForm.vue')
 const TrainingPreSaved = () => import('@/tools/gaissalabel/views/TrainingPreSaved.vue')
 const TrainingFile = () => import('@/tools/gaissalabel/views/TrainingFile.vue')
 const TrainingLabelInfo = () => import('@/tools/gaissalabel/views/TrainingLabelInfo.vue')
 
-// GAISSA Label Inference routes
+// GAISSALabel Inference routes
 const InferenceForm = () => import('@/tools/gaissalabel/views/InferenceForm.vue')
 const InferencePreSaved = () => import('@/tools/gaissalabel/views/InferencePreSaved.vue')
 const InferenceFile = () => import('@/tools/gaissalabel/views/InferenceFile.vue')

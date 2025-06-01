@@ -1,10 +1,13 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10532066.svg)](https://doi.org/10.5281/zenodo.10532066)
 
-# GAISSALabel
+# GAISSA Tools
 
-GAISSALabel allows data scientists, software engineers, and end-users of AI models to analyze, understand, and contribute to improving the energy efficiency of artificial intelligence models during both training and inference stages.
+GAISSA Tools is an open-source platform that provides comprehensible cutting-edge solutions for machine learning model efficiency assessment and ROI analysis. The platform includes two main tools:
 
-## Main Features
+- **GAISSALabel**: Allows data scientists, software engineers, and end-users of AI models to analyze, understand, and contribute to improving the energy efficiency of artificial intelligence models during both training and inference stages.
+- **GAISSA ROI Analyzer**: Provides return on investment analysis capabilities for machine learning projects. Calculates the ROI of machine learning tactics, used to optimize a certain model, by analyzing the costs and benefits associated with them, helping organizations make technically and environmentally informed decisions about their AI investments.
+
+## GAISSALabel Features
 
 ### Training
 During the training phase, data scientists can record a series of results for various metrics, such as CO2 emissions or model size, which the tool uses to generate energy efficiency results. These results include an energy efficiency label and a breakdown of the label to explain implications and potential improvements. With these results, data scientists can make decisions for future training phases, whether to retrain the same model or explore other models.
