@@ -9,9 +9,14 @@
             </el-button>
         </div>
 
-        <el-row :gutter="20" type="flex" :justify="center" class="row-bg">
+        <el-row :gutter="20" type="flex" justify="center" class="row-bg">
             <el-col :xs="24" :sm="24" :md="forceMobile ? 24 : 12" :lg="forceMobile ? 24 : 12" :xl="forceMobile ? 24 : 12" class="mobile-card">
-                <ModelInformationCard :modelData="analysisData" :formatDate="formatData" />
+                <ModelInformationCard v-if="analysisData" :modelData="analysisData" :formatDate="formatData" />
+                <el-card v-else shadow="always" :body-style="{ padding: '20px' }">
+                    <div class="loading-placeholder">
+                        <p>{{ $t("Loading analysis data...") }}</p>
+                    </div>
+                </el-card>
 
                 <!-- Source Information card for research-type analyses -->
                 <SourceInformationCard v-if="isResearchAnalysis && analysisData?.source"
@@ -23,7 +28,10 @@
 
             <el-col :xs="24" :sm="24" :md="forceMobile ? 24 : 12" :lg="forceMobile ? 24 : 12" :xl="forceMobile ? 24 : 12" class="mobile-card">
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
-                    <MetricsRadialChart :metricsData="metricsRadialChartData" :formatNumber="formatNumber" />
+                    <MetricsRadialChart v-if="metricsRadialChartData" :metricsData="metricsRadialChartData" :formatNumber="formatNumber" />
+                    <div v-else class="loading-placeholder">
+                        <p>{{ $t("Loading metrics data...") }}</p>
+                    </div>
                 </el-card>
             </el-col>
 
@@ -122,13 +130,19 @@
 
             <el-col :xs="24" :sm="24" :md="forceMobile ? 24 : 12" :lg="forceMobile ? 24 : 12" :xl="forceMobile ? 24 : 12" class="mobile-card" style="margin-top: 20px;">
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
-                    <ROIEvolutionChart :chartData="roiChartData" :formatNumber="formatNumber" />
+                    <ROIEvolutionChart v-if="roiChartData" :chartData="roiChartData" :formatNumber="formatNumber" />
+                    <div v-else class="loading-placeholder">
+                        <p>{{ $t("Loading ROI evolution data...") }}</p>
+                    </div>
                 </el-card>
             </el-col>
 
             <el-col :xs="24" :sm="24" :md="forceMobile ? 24 : 12" :lg="forceMobile ? 24 : 12" :xl="forceMobile ? 24 : 12" class="mobile-card" style="margin-top: 20px;">
                 <el-card shadow="always" :body-style="{ padding: '20px' }">
-                    <IncomeCostsChart :chartData="incomeCostsChartData" :formatNumber="formatNumber" />
+                    <IncomeCostsChart v-if="incomeCostsChartData" :chartData="incomeCostsChartData" :formatNumber="formatNumber" />
+                    <div v-else class="loading-placeholder">
+                        <p>{{ $t("Loading income costs data...") }}</p>
+                    </div>
                 </el-card>
             </el-col>
         </el-row>
@@ -510,9 +524,18 @@ export default {
 
                     // For calculation-type analyses, fetch the sources for the tactic
                     if (!this.isResearchAnalysis) {
-                        const tacticId = this.analysisData.tactic_parameter_option;
-                        const resultTactic = await mlTactics.getById(tacticId);
-                        this.tacticSources = resultTactic.sources;
+                        try {
+                            const tacticId = this.analysisData.tactic_parameter_option_details?.tactic;
+                            if (tacticId) {
+                                const resultTactic = await mlTactics.getById(tacticId);
+                                this.tacticSources = resultTactic?.sources || [];
+                            } else {
+                                this.tacticSources = [];
+                            }
+                        } catch (tacticError) {
+                            console.error("Error loading tactic sources:", tacticError);
+                            this.tacticSources = [];
+                        }
                     }
                 }
             } catch (error) {
@@ -709,5 +732,14 @@ export default {
 
 .roi-analysis-component.force-mobile .inferences-input-container {
     width: 100%;
+}
+
+.loading-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    color: #666;
+    font-style: italic;
 }
 </style>
