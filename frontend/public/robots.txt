@@ -1,5 +1,12 @@
 User-agent: *
 Allow: /
 
-# Disallow potential sensitive paths
+# Sitemap location
+Sitemap: https://gaissalabel.essi.upc.edu/sitemap.xml
+
+# Disallow sensitive and private paths
 Disallow: /admin/
+Disallow: /api/
+
+# Crawl delay to be respectful to server resources
+Crawl-delay: 1

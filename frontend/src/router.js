@@ -47,69 +47,74 @@ const router = createRouter({
       component: GAISSAToolsHome
     },
     {
-      path: '/gaissalabel',
-      name: 'gaissalabel-home',
-      component: GAISSALabelHome,
-      meta: { tool: 'gaissalabel' }
-    },{
       path: '/about',
       name: 'about',
       component: AboutView
     },
+
+    // GAISSALabel routes
     {
-      path: '/trainingForm',
+      path: '/gaissalabel',
+      name: 'gaissalabel-home',
+      component: GAISSALabelHome,
+      meta: { tool: 'gaissalabel' }
+    },
+    {
+      path: '/gaissalabel/trainingForm',
       name: 'training form',
       component: TrainingForm,
       meta: { tool: 'gaissalabel' }
     },
     {
-      path: '/trainingPre',
+      path: '/gaissalabel/trainingPre',
       name: 'training pre saved',
       component: TrainingPreSaved,
       meta: { tool: 'gaissalabel' }
     },
     {
-      path: '/trainingFile',
+      path: '/gaissalabel/trainingFile',
       name: 'training file',
       component: TrainingFile,
       meta: { tool: 'gaissalabel' }
     },
     {
-      path: '/inferenceForm',
+      path: '/gaissalabel/inferenceForm',
       name: 'inference form',
       component: InferenceForm,
       meta: { tool: 'gaissalabel' }
     },
     {
-      path: '/InferencePre',
+      path: '/gaissalabel/inferencePre',
       name: 'inference pre saved',
       component: InferencePreSaved,
       meta: { tool: 'gaissalabel' }
     },
     {
-      path: '/InferenceFile',
+      path: '/gaissalabel/inferenceFile',
       name: 'inference file',
       component: InferenceFile,
       meta: { tool: 'gaissalabel' }
     },
     {
-      path: '/InferenceDeploy',
+      path: '/gaissalabel/inferenceDeploy',
       name: 'inference deploy',
       component: InferenceDeploy,
       meta: { tool: 'gaissalabel' }
     },
     {
-      path: '/models/:id_model/trainings/:id_training',
+      path: '/gaissalabel/models/:id_model/trainings/:id_training',
       name: 'Label info for training',
       component: TrainingLabelInfo,
       meta: { tool: 'gaissalabel' }
     },
     {
-      path: '/models/:id_model/inferences/:id_inference',
+      path: '/gaissalabel/models/:id_model/inferences/:id_inference',
       name: 'Label info for inference',
       component: InferenceLabelInfo,
       meta: { tool: 'gaissalabel' }
     },
+
+    // GAISSA ROI Analyzer routes
     {
       path: '/gaissa-roi-analyzer/calculation-repository',
       name: 'GAISSA ROI Analyzer Calculation Repository',
@@ -140,6 +145,8 @@ const router = createRouter({
       component: GAISSAROIAnalyzerComparison,
       meta: { tool: 'gaissaroianalyzer' }
     },
+
+    // Admin routes
     {
       path: '/admin/metriquesinfo',
       name: 'Admin mètriques i informacions',
