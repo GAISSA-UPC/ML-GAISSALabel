@@ -17,7 +17,21 @@
 </template>
 
 <script>
-import * as echarts from 'echarts';
+import * as echarts from 'echarts/core';
+import { LineChart } from 'echarts/charts';
+import {
+    GridComponent,
+    TooltipComponent,
+    LegendComponent
+} from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+echarts.use([
+    GridComponent,
+    TooltipComponent,
+    LegendComponent,
+    LineChart,
+    CanvasRenderer
+]);
 
 export default {
     name: "ROIEvolutionChart",

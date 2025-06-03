@@ -15,7 +15,21 @@
 </template>
 
 <script>
-import * as echarts from 'echarts';
+import * as echarts from 'echarts/core';
+import { RadarChart } from 'echarts/charts';
+import {
+    LegendComponent,
+    TooltipComponent,
+    RadarComponent,
+} from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+echarts.use([
+    LegendComponent,
+    TooltipComponent,
+    RadarComponent,
+    RadarChart,
+    CanvasRenderer
+]);
 
 export default {
     name: "MetricsRadialChart",
