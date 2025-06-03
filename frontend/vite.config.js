@@ -46,8 +46,7 @@ export default defineConfig({
     modulePreload: {
       polyfill: true,
       resolveDependencies: (filename, deps, { hostId, hostType }) => {
-        // Filter out pdf-export chunk, vuetify.css and element-plus.css from being preloaded
-        // These should only be loaded when actually needed (on-demand)
+        // Filter out pdf-export chunk from being preloaded
         return deps.filter(dep => 
           !dep.includes('pdf-export') && 
           !dep.includes('element-plus')

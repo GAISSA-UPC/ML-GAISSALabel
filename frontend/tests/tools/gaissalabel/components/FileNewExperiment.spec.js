@@ -122,7 +122,7 @@ describe('FileNewExperiment.vue', () => {
             }    
         });
 
-        const result = wrapper.vm.parseExcelJSON(fakeContent);
+        const result = await wrapper.vm.parseExcelJSON(fakeContent);
         expect(result).toEqual(parsedData);
     });
 });

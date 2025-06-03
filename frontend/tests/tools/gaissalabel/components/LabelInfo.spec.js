@@ -59,7 +59,7 @@ vi.mock('@/tools/gaissalabel/components/EnergyLabel.vue', () => ({
   }));
 
 // Mocks to return a specific response structure
-import { mockTrainingResponse, mockModelResponse, mockMetriquesResponse } from '@tests/components/LabelInfo.mock';
+import { mockTrainingResponse, mockModelResponse, mockMetriquesResponse } from '@tests/tools/gaissalabel/components/LabelInfo.mock';
 
 describe('LabelInfo.vue', () => {
     let wrapper;

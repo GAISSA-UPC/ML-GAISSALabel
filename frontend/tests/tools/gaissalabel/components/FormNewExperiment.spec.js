@@ -23,7 +23,7 @@ library.add(faPlus);
 window.scrollTo = vi.fn();
 
 // Mocks to return a specific response structure
-import { mockModelsData, mockMetriquesData, mockInformacionsData } from '@tests/components/FormNewExperiment.mock'; 
+import { mockModelsData, mockMetriquesData, mockInformacionsData } from '@tests/tools/gaissalabel/components/FormNewExperiment.mock'; 
 
 describe('FormNewExperiment.vue', () => {
     let wrapper;
