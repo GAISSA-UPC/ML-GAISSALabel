@@ -153,7 +153,6 @@
 import { formatData } from "@/utils";
 import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
 import mlTactics from "@/tools/gaissaroianalyzer/services/mlTactics";
-import pdfReportService from "@/tools/gaissaroianalyzer/services/pdfReportService";
 
 // Import components
 import ModelInformationCard from './ModelInformationCard.vue';
@@ -552,6 +551,9 @@ export default {
             try {
                 // Give charts time to fully render before capturing
                 await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Dynamically import PDF service only when needed
+                const { default: pdfReportService } = await import("@/tools/gaissaroianalyzer/services/pdfReportService");
 
                 // Generate file name based on analysis data
                 const fileName = `roi-analysis-${this.analysisData.id}-${this.analysisData.model_architecture_name}-${this.analysisData.tactic_parameter_option_details.tactic_name}.pdf`.replace(/\s+/g, '-').toLowerCase();

@@ -43,6 +43,17 @@ export default defineConfig({
   build: {
     manifest: true,
     chunkSizeWarningLimit: 2000,
+    modulePreload: {
+      polyfill: true,
+      resolveDependencies: (filename, deps, { hostId, hostType }) => {
+        // Filter out pdf-export chunk, vuetify.css and element-plus.css from being preloaded
+        // These should only be loaded when actually needed (on-demand)
+        return deps.filter(dep => 
+          !dep.includes('pdf-export') && 
+          !dep.includes('element-plus')
+        );
+      }
+    },
     rollupOptions: {
       output: {
         manualChunks(id) {
