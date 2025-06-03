@@ -1,5 +1,3 @@
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 export default {
     /**
@@ -7,6 +5,10 @@ export default {
      */
     async generatePDFReport(analysisData, elementId, fileName = 'roi-analysis-report.pdf') {
         try {
+            // Dynamically import jsPDF and html2canvas to avoid bundling them unnecessarily
+            const { default: jsPDF } = await import('jspdf');
+            const { default: html2canvas } = await import('html2canvas');
+
             // Get the container element with all the analysis data
             const element = document.getElementById(elementId);
             

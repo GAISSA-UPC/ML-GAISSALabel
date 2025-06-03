@@ -87,7 +87,6 @@
 </template>
 
 <script>
-import * as XLSX from "xlsx";
 import eines from "@/tools/gaissalabel/services/eines";
 export default {
     name: "FileNewExperiment",
@@ -120,11 +119,12 @@ export default {
             const promises = Array.from(this.fileList).map((file) => {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
-                    reader.onload = (event) => {
+                    reader.onload = async (event) => {
                         const contingut = event.target.result;
                         console.log(file.tool)
                         console.log(file.name)
-                        const contingutFormatted = this.transformarContingut(this.parseExcelJSON(contingut), file.tool);
+                        const parsedContent = await this.parseExcelJSON(contingut);
+                        const contingutFormatted = this.transformarContingut(parsedContent, file.tool);
                         resolve(contingutFormatted);
                     };
                     reader.onerror = reject;
@@ -139,7 +139,9 @@ export default {
                 console.error("Error carregant els fitxers:", error);
             }
         },
-        parseExcelJSON(contingut) {
+        async parseExcelJSON(contingut) {
+            const XLSX = await import('xlsx'); 
+            
             const workbook = XLSX.read(contingut, { type: 'binary' });
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];

@@ -47,12 +47,14 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('echarts')) return 'echarts';
+            if (id.includes('echarts') || id.includes('zrender')) return 'echarts';
             if (id.includes('xlsx')) return 'xlsx';
             if (id.includes('html2canvas') || id.includes('jspdf')) return 'pdf-export';
             if (id.includes('@fortawesome')) return 'fontawesome';
             if (id.includes('element-plus')) return 'element-plus';
             if (id.includes('vuetify')) return 'vuetify';
+            if (id.includes('lodash-es')) return 'lodash';
+            if (id.includes('core-js')) return 'corejs';
             return 'vendor';
           }
         },
