@@ -56,6 +56,18 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
+          if (
+            id.includes('vite/modulepreload-polyfill.js') ||
+            id.includes('vite/preload-helper.js') ||
+            id.endsWith('plugin-vue:export-helper') || // Vue SFC compiler helper
+            id.includes('vite/dist/client/client.mjs') || // Vite client (might contain DIH)
+            id.includes('vite/dist/client/env.mjs') ||
+            id.startsWith('\0vite/dynamic-import-helper') // Vite internal namespace for helpers
+          ) {
+            // console.log('>>> Forcing Vite internal to vendor:', id);
+            return 'vendor';
+          }
+
           if (id.includes('node_modules')) {
             if (id.includes('echarts') || id.includes('zrender')) return 'echarts';
             if (id.includes('xlsx')) return 'xlsx';
