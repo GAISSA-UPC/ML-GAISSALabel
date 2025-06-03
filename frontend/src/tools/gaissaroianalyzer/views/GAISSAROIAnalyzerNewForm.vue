@@ -184,7 +184,6 @@ import roiMetrics from "@/tools/gaissaroianalyzer/services/roiMetrics";
 import tacticParameters from "@/tools/gaissaroianalyzer/services/tacticParameters";
 import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
 import countries from "@/tools/gaissaroianalyzer/services/countries";
-import { ElMessage } from 'element-plus';
 
 export default {
     name: "GAISSAROIAnalyzerNewForm",

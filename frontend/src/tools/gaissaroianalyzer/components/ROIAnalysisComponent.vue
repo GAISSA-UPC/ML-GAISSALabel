@@ -154,7 +154,6 @@ import { formatData } from "@/utils";
 import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
 import mlTactics from "@/tools/gaissaroianalyzer/services/mlTactics";
 import pdfReportService from "@/tools/gaissaroianalyzer/services/pdfReportService";
-import { ElMessage } from 'element-plus';
 
 // Import components
 import ModelInformationCard from './ModelInformationCard.vue';

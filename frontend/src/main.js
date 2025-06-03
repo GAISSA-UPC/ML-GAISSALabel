@@ -11,58 +11,6 @@ import router from './router'
 import store from './store'
 import {i18n} from './i18n.js'
 
-// ElementPlus Components 
-import {
-    // Layout
-    ElContainer,
-    ElHeader,
-    ElAside,
-    ElMain,
-    
-    // Form
-    ElInput,
-    ElFormItem,
-    ElButton,
-    ElUpload,
-    ElSelect,
-    ElOption,
-    ElInputNumber,
-    
-    // Data
-    ElDescriptions,
-    ElDescriptionsItem,
-    
-    // Navigation
-    ElMenu,
-    ElMenuItem,
-    ElSubMenu,
-    
-    // Feedback
-    ElAlert,
-    ElDialog,
-    
-    // Basic
-    ElRow,
-    ElCol,
-    ElCard,
-    ElImage,
-    ElIcon,
-    ElSlider,
-    
-    // Config Provider
-    ElConfigProvider
-} from 'element-plus'
-  
-const elcomponents = [
-    ElContainer, ElHeader, ElAside, ElMain,
-    ElInput, ElFormItem, ElButton, ElUpload, ElSelect, ElOption, ElInputNumber,
-    ElDescriptions, ElDescriptionsItem,
-    ElMenu, ElMenuItem, ElSubMenu,
-    ElAlert, ElDialog,
-    ElRow, ElCol, ElCard, ElImage, ElIcon, ElSlider,
-    ElConfigProvider
-]  
-
 // Font Awesome: Llibreria d'icones, importem els tipus de icones que farem servir
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faBars, faHome, faTag, faDumbbell, faBullseye, faChartLine, faPeopleGroup, faCloudArrowUp, faPlus,
@@ -79,11 +27,6 @@ library.add(
 );
 
 const app = createApp(App)
-
-// Register Element Plus components
-elcomponents.forEach(component => {
-    app.component(component.name, component)
-})  
 
 const vuetify = createVuetify({
 

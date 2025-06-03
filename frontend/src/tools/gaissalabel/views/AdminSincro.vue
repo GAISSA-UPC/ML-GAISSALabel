@@ -44,7 +44,6 @@
 
 <script>
 import sincronitzacions from "@/tools/gaissalabel/services/sincronitzacions";
-import { ElLoading } from 'element-plus'
 
 export default {
     name: "AdminSincro",
