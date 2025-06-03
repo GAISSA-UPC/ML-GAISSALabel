@@ -20,7 +20,7 @@ export default defineConfig({
     viteCompression({
       algorithm: 'gzip',
       ext: '.gz',
-      deleteOriginFile: false // Keep original uncompressed files
+      deleteOriginFile: false, // Keep original uncompressed files
     }),
     viteCompression({
       algorithm: 'brotliCompress',
@@ -43,13 +43,16 @@ export default defineConfig({
     chunkSizeWarningLimit: 2000,
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['vue', 'vue-router', 'vuex', 'axios'],
-          fontawesome: [
-            '@fortawesome/fontawesome-svg-core',
-            '@fortawesome/free-solid-svg-icons',
-          ],
-          vuetify: ['vuetify'],
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('echarts')) return 'echarts';
+            if (id.includes('xlsx')) return 'xlsx';
+            if (id.includes('html2canvas') || id.includes('jspdf')) return 'pdf-export';
+            if (id.includes('@fortawesome')) return 'fontawesome';
+            if (id.includes('element-plus')) return 'element-plus';
+            if (id.includes('vuetify')) return 'vuetify';
+            return 'vendor';
+          }
         },
         entryFileNames: 'assets/[name].js',
         chunkFileNames: 'assets/[name].js',
@@ -57,5 +60,7 @@ export default defineConfig({
       },
     },
     minify: 'terser',
+    // Tree shaking optimization
+    sourcemap: false
   },
 });
