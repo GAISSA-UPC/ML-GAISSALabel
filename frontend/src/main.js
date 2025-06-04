@@ -2,7 +2,7 @@ import '@/assets/base.css'
 import '@/assets/common.scss'
 
 import { createApp } from 'vue'
-// import 'vuetify/styles' // asynchronous loaded in index.html
+// import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 
 
