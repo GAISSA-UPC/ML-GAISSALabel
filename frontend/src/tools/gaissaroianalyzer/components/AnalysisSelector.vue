@@ -134,6 +134,20 @@ export default {
         selectedExperiment() {
             // Reset selection feedback when experiment changes
             this.resetSelection();
+        },
+        async analysisType() {
+            // Reset all selections when analysis type changes
+            this.selectedModelArchitecture = null;
+            this.selectedMlTactic = null;
+            this.selectedTacticParameter = null;
+            this.selectedExperiment = null;
+            this.mlTactics = [];
+            this.tacticParameters = [];
+            this.experiments = [];
+            this.resetSelection();
+            
+            // Refresh model architectures for the new analysis type
+            await this.refreshModelArchitectures();
         }
     },
     methods: {
