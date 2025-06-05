@@ -1,5 +1,5 @@
 <template>
-    <div class="metric-card">
+    <div class="metric-card" :class="{ 'force-mobile': forceMobile }" >
 
         <!-- Percentage Change -->
         <div class="change-indicator">
@@ -59,7 +59,11 @@ export default {
         formatNumber: {
             type: Function,
             required: true
-        }
+        },
+        forceMobile: {
+            type: Boolean,
+            default: false
+        },
     },
     computed: {
         calculateReductionPercent() {
@@ -232,4 +236,21 @@ export default {
         align-items: center;
     }
 }
+
+.metric-card.force-mobile {
+    flex-direction: column;
+    align-items: center;
+}
+
+.metric-card.force-mobile .values-comparison {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+    margin-left: 0;
+}
+
+.metric-card.force-mobile .value-container {
+    align-items: center;
+}
+
 </style>

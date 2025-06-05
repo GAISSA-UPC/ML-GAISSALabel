@@ -1,5 +1,5 @@
 <template>
-    <div class="emissions-card">
+    <div class="emissions-card" :class="{ 'force-mobile': forceMobile, 'force-partial-mobile': forcePartialMobile }">
         <h3 v-if="showTitle">{{ $t('Environmental Impact') }}</h3>
         
         <div class="emissions-details-container">
@@ -80,6 +80,14 @@ export default {
         columnCount: {
             type: Number,
             default: 2
+        },
+        forceMobile: {
+            type: Boolean,
+            default: false
+        },
+        forcePartialMobile: {
+            type: Boolean,
+            default: false
         }
     },
     methods: {
@@ -258,12 +266,14 @@ export default {
 }
 
 /* Responsive design */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     .emissions-details-container {
         flex-direction: column;
         gap: 15px;
     }
-    
+}
+
+@media (max-width: 768px) {
     .emissions-details-left,
     .emissions-details-right {
         flex: 1;
@@ -290,4 +300,39 @@ export default {
         gap: 8px;
     }
 }
+
+.emissions-card.force-partial-mobile .emissions-details-container {
+    flex-direction: column;
+}
+
+.emissions-card.force-mobile .emissions-details-container {
+    flex-direction: column;
+}
+
+.emissions-card.force-mobile .emissions-details-left,
+.emissions-card.force-mobile .emissions-details-right {
+    flex: 1;
+    min-width: 100%;
+}
+
+.emissions-card.force-mobile .impact-comparison {
+    flex-direction: column;
+    gap: 15px;
+}
+
+.emissions-card.force-mobile .arrow-icon {
+    transform: rotate(90deg);
+}
+
+.emissions-card.force-mobile .environmental-impact-visual {
+    padding: 15px;
+    margin: 0;
+}
+
+.emissions-card.force-mobile .savings-highlight {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+}
+
 </style>

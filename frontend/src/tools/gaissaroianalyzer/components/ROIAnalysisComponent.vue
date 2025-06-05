@@ -64,11 +64,32 @@
                     <!-- Visual View -->
                     <div v-if="showVisualMetrics && analysisData?.metrics_analysis?.length"
                         class="visual-metrics-container">
-                        <MetricCard v-for="(metric, index) in analysisData.metrics_analysis" :key="index"
-                            :metric="metric" :formatNumber="formatNumber" />
+                        <MetricCard v-for="(metric, index) in analysisData.metrics_analysis" 
+                            :key="index"
+                            :metric="metric" 
+                            :formatNumber="formatNumber"
+                            :forceMobile="forceMobile" />
                     </div>
 
                     <p v-if="!analysisData?.metrics_analysis?.length && !analysisData">{{ $t("Loading tactic results...") }}</p>
+                </el-card>
+            </el-col>
+
+            <el-col :xs="24" :sm="24" :md="forceMobile ? 24 : 12" :lg="forceMobile ? 24 : 12" :xl="forceMobile ? 24 : 12" class="mobile-card" style="margin-top: 20px;">
+                <el-card shadow="always" :body-style="{ padding: '20px' }">
+                    <ROIEvolutionChart v-if="roiChartData" :chartData="roiChartData" :formatNumber="formatNumber" />
+                    <div v-else class="loading-placeholder">
+                        <p>{{ $t("Loading ROI evolution data...") }}</p>
+                    </div>
+                </el-card>
+            </el-col>
+
+            <el-col :xs="24" :sm="24" :md="forceMobile ? 24 : 12" :lg="forceMobile ? 24 : 12" :xl="forceMobile ? 24 : 12" class="mobile-card" style="margin-top: 20px;">
+                <el-card shadow="always" :body-style="{ padding: '20px' }">
+                    <IncomeCostsChart v-if="incomeCostsChartData" :chartData="incomeCostsChartData" :formatNumber="formatNumber" />
+                    <div v-else class="loading-placeholder">
+                        <p>{{ $t("Loading income costs data...") }}</p>
+                    </div>
                 </el-card>
             </el-col>
 
@@ -102,7 +123,10 @@
                             :tacticName="analysisData?.tactic_parameter_option_details?.tactic_name"
                             :showTitle="costMetricsResults.length > 1" :columnCount="getDescriptionsColumnCount()">
                             <template v-slot:costMetricCard>
-                                <MetricCard :metric="metric" :formatNumber="formatNumber" />
+                                <MetricCard 
+                                    :metric="metric" 
+                                    :formatNumber="formatNumber"
+                                    :forceMobile="forceMobile" />
                             </template>
                         </ROIDetailsCard>
                     </div>
@@ -119,30 +143,13 @@
                                 :numInferences="costMetricsResults[0]?.num_inferences || 0"
                                 :formatNumber="formatNumber"
                                 :showTitle="false"
-                                :columnCount="getDescriptionsColumnCount()" />
+                                :columnCount="getDescriptionsColumnCount()"
+                                :forcePartialMobile="forceMobile" />
                         </div>
                     </div>
 
                     <p v-if="costMetricsResults.length === 0">{{ $t("No energy-related metrics found to calculate ROI.")
                     }}</p>
-                </el-card>
-            </el-col>
-
-            <el-col :xs="24" :sm="24" :md="forceMobile ? 24 : 12" :lg="forceMobile ? 24 : 12" :xl="forceMobile ? 24 : 12" class="mobile-card" style="margin-top: 20px;">
-                <el-card shadow="always" :body-style="{ padding: '20px' }">
-                    <ROIEvolutionChart v-if="roiChartData" :chartData="roiChartData" :formatNumber="formatNumber" />
-                    <div v-else class="loading-placeholder">
-                        <p>{{ $t("Loading ROI evolution data...") }}</p>
-                    </div>
-                </el-card>
-            </el-col>
-
-            <el-col :xs="24" :sm="24" :md="forceMobile ? 24 : 12" :lg="forceMobile ? 24 : 12" :xl="forceMobile ? 24 : 12" class="mobile-card" style="margin-top: 20px;">
-                <el-card shadow="always" :body-style="{ padding: '20px' }">
-                    <IncomeCostsChart v-if="incomeCostsChartData" :chartData="incomeCostsChartData" :formatNumber="formatNumber" />
-                    <div v-else class="loading-placeholder">
-                        <p>{{ $t("Loading income costs data...") }}</p>
-                    </div>
                 </el-card>
             </el-col>
         </el-row>
