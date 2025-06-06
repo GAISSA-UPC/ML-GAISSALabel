@@ -16,12 +16,13 @@
 
                 <!-- Environmental Context -->
                 <div class="environmental-context">
-                    <el-alert type="info" :closable="false" show-icon>
-                        <template #title>
-                            {{ $t('Environmental Context') }}
-                        </template>
-                        <p>{{ getEnvironmentalContext() }}</p>
-                    </el-alert>
+                    <div class="context-card">
+                        <font-awesome-icon :icon="environmentalIcon" class="context-icon" />
+                        <div class="context-text">
+                            <div class="context-title">{{ $t('Environmental Context') }}</div>
+                            <div class="context-description">{{ getEnvironmentalContext() }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -88,6 +89,18 @@ export default {
         forcePartialMobile: {
             type: Boolean,
             default: false
+        }
+    },
+    computed: {
+        environmentalIcon() {
+            const saved = parseFloat(this.emissionsData.emissions_saved_gCO2);
+            const savedKg = saved / 1000;
+
+            if (savedKg >= 100) return ['fas', 'gas-pump'];
+            if (savedKg >= 10) return ['fas', 'tree'];
+            if (savedKg >= 1) return ['fas', 'car'];
+            if (saved >= 50) return ['fas', 'mobile-alt'];
+            return ['fas', 'globe'];
         }
     },
     methods: {
@@ -251,17 +264,36 @@ export default {
     margin-top: 2px;
 }
 
-.environmental-context {
+/* Environmental context styles */
+.context-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border: 2px solid var(--gaissa_green);
+    padding: 16px;
+    border-radius: 10px;
     margin-top: 20px;
 }
 
-.environmental-context .el-alert {
-    border-left: 4px solid #2e7d32;
+.context-icon {
+    font-size: 2.5rem;
+    color: var(--gaissa_green);
 }
 
-.environmental-context p {
-    margin: 0;
-    font-size: 0.9rem;
+.context-text {
+    flex: 1;
+}
+
+.context-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: var(--gaissa_green);
+    margin-bottom: 4px;
+}
+
+.context-description {
+    font-size: 0.95rem;
+    color: #606266;
     line-height: 1.4;
 }
 
@@ -299,6 +331,11 @@ export default {
         text-align: center;
         gap: 8px;
     }
+
+    .context-card {
+        flex-direction: column;
+        text-align: center;
+    }
 }
 
 .emissions-card.force-partial-mobile .emissions-details-container {
@@ -334,5 +371,4 @@ export default {
     text-align: center;
     gap: 8px;
 }
-
 </style>

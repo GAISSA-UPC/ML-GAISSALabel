@@ -16,7 +16,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faBars, faHome, faTag, faDumbbell, faBullseye, faChartLine, faPeopleGroup, faCloudArrowUp, faPlus,
     faIdCardClip, faUser, faCircleInfo, faCalendarDays, faPenToSquare, faTrash, faCloud, faArrowRight,
     faLeaf, faSeedling, faDownLong, faEquals, faUpLong, faFilePdf, faLightbulb, faBrain, faRocket, 
-    faScrewdriverWrench, faChartBar,
+    faScrewdriverWrench, faChartBar, faGasPump, faTree, faCar, faMobileAlt
  } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -25,7 +25,7 @@ library.add(
     faBars, faHome, faTag, faDumbbell, faBullseye, faChartLine, faPeopleGroup, faCloudArrowUp, faPlus,
     faIdCardClip, faUser, faCircleInfo, faCalendarDays, faPenToSquare, faTrash, faCloud, faArrowRight,
     faLeaf, faSeedling, faDownLong, faEquals, faUpLong, faFilePdf, faLightbulb, faBrain, faRocket, 
-    faScrewdriverWrench, faChartBar
+    faScrewdriverWrench, faChartBar, faGasPump, faTree, faCar, faMobileAlt
 );
 
 const app = createApp(App)

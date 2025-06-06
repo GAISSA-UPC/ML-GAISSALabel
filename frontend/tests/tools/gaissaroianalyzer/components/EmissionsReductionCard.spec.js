@@ -3,12 +3,22 @@ import EmissionsReductionCard from '@/tools/gaissaroianalyzer/components/Emissio
 import ElementPlus from 'element-plus';
 import { i18n } from '@/i18n';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCloud, faLeaf, faArrowRight, faSeedling } from '@fortawesome/free-solid-svg-icons';
+import { 
+    faCloud, 
+    faLeaf, 
+    faArrowRight, 
+    faSeedling, 
+    faGasPump, 
+    faTree, 
+    faCar, 
+    faMobileAlt, 
+    faGlobe 
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import flushPromises from 'flush-promises';
 
 // Add required FontAwesome icons
-library.add(faCloud, faLeaf, faArrowRight, faSeedling);
+library.add(faCloud, faLeaf, faArrowRight, faSeedling, faGasPump, faTree, faCar, faMobileAlt, faGlobe);
 
 describe('EmissionsReductionCard.vue', () => {
     let wrapper;
@@ -119,7 +129,7 @@ describe('EmissionsReductionCard.vue', () => {
             }
         });
         
-        const context = wrapper.find('.environmental-context p');
+        const context = wrapper.find('.context-card');
         expect(context.text()).toContain('Every gram');
         expect(context.text()).toContain('sustainability');
     });
@@ -132,7 +142,7 @@ describe('EmissionsReductionCard.vue', () => {
             }
         });
         
-        const context = wrapper.find('.environmental-context p');
+        const context = wrapper.find('.environmental-context .context-card');
         expect(context.text()).toContain('phone');
         expect(context.text()).toContain('usage days');
     });
@@ -145,7 +155,7 @@ describe('EmissionsReductionCard.vue', () => {
             }
         });
         
-        const context = wrapper.find('.environmental-context p');
+        const context = wrapper.find('.environmental-context .context-card');
         expect(context.text()).toContain('car driving');
         expect(context.text()).toContain('km');
     });
@@ -158,7 +168,7 @@ describe('EmissionsReductionCard.vue', () => {
             }
         });
         
-        const context = wrapper.find('.environmental-context p');
+        const context = wrapper.find('.environmental-context .context-card');
         expect(context.text()).toContain('tree');
         expect(context.text()).toContain('year');
     });
@@ -171,7 +181,7 @@ describe('EmissionsReductionCard.vue', () => {
             }
         });
         
-        const context = wrapper.find('.environmental-context p');
+        const context = wrapper.find('.environmental-context .context-card');
         expect(context.text()).toContain('gasoline');
         expect(context.text()).toContain('liters');
     });
