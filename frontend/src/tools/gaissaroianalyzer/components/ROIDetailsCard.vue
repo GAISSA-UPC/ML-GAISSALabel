@@ -26,7 +26,7 @@
             <el-descriptions-item :label="$t('Break-Even Point (inferences)')">
                 {{ costMetric.break_even_inferences }}
             </el-descriptions-item>
-            <el-descriptions-item :label="$t(`ROI (for ${costMetric.num_inferences.toLocaleString()} inferences)`)">
+            <el-descriptions-item :label="$t(`ROI (for ${costMetric.num_inferences.toLocaleString('en-US')} inferences)`)">
                 {{ formatNumber(costMetric.roi_percentage) }}%
             </el-descriptions-item>
             <el-descriptions-item :label="$t('ROI (for infinite inferences)')">

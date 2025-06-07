@@ -254,7 +254,7 @@ export default {
                     energy_cost_rate: parseFloat(costData.energy_cost_rate || 0),
                     total_savings: parseFloat(costData.total_savings),
                     break_even_inferences: costData.break_even_inferences === 'Infinity' ?
-                        costData.break_even_inferences : parseInt(costData.break_even_inferences).toLocaleString(),
+                        costData.break_even_inferences : parseInt(costData.break_even_inferences).toLocaleString('en-US'),
                     roi_percentage: parseFloat(costData.roi) * 100,
                     infinite_roi_percentage: parseFloat(costData.infinite_roi) * 100,
                     num_inferences: costData.num_inferences,
