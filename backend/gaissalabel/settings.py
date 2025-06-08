@@ -47,6 +47,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
     'api',
+    'apps.core',
+    'apps.gaissa_roi_analyzer',
+    'apps.gaissalabel', 
 ]
 
 MIDDLEWARE = [
