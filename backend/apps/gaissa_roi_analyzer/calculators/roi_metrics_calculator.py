@@ -1,6 +1,6 @@
-from apps.gaissa_roi_analyzer.models import ROIAnalysis, AnalysisMetricValue, ExpectedMetricReduction, EnergyAnalysisMetricValue
+from ..models import ROIAnalysis, AnalysisMetricValue, ExpectedMetricReduction, EnergyAnalysisMetricValue
 from apps.core.models import CarbonIntensity, Country
-from efficiency_calculators.roi_calculator import ROICalculator
+from .roi_calculator import ROICalculator
 
 class ROIMetricsCalculator:
     """

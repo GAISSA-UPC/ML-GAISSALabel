@@ -1,5 +1,5 @@
 from .calculator_codecarbon_adapter import get_efficiency_results
-from apps.gaissalabel.models import TransformacioMetrica
+from ..models import TransformacioMetrica
 
 
 def calculateEfficiency(endpoint, data):

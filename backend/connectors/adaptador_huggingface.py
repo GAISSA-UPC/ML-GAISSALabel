@@ -16,7 +16,9 @@ from huggingface_hub import HfApi
 from huggingface_hub import ModelCard
 from huggingface_hub import hf_hub_url, get_hf_file_metadata
 
-from api.models import Model, Entrenament, Metrica, InfoAddicional, ResultatEntrenament, ValorInfoEntrenament, Configuracio
+# Import from new modular apps
+from apps.gaissalabel.models import Model, Entrenament, Metrica, InfoAddicional, ResultatEntrenament, ValorInfoEntrenament
+from apps.core.models import Configuracio
 
 
 ########## PRIMERA PART: EXTRACTION FROM HUGGING FACE

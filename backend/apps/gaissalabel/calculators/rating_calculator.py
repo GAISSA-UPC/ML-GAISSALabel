@@ -1,5 +1,5 @@
-from apps.gaissalabel.models import Interval, Qualificacio
-from apps.gaissalabel.serializers import MetricaAmbLimitsSerializer, IntervalSerializer, QualificacioSerializer
+from ..models import Interval, Qualificacio
+from ..serializers import MetricaAmbLimitsSerializer, IntervalSerializer, QualificacioSerializer
 from .rating_calculator_strategy import calculate_ratings
 
 

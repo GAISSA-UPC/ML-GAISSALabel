@@ -34,6 +34,11 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),
+    # Legacy API (for backward compatibility during migration)
+    #path('api/', include('api.urls')),
+    # New modular apps
+    path('api/core/', include('apps.core.urls')),
+    path('api/gaissalabel/', include('apps.gaissalabel.urls')),
+    path('api/roi/', include('apps.gaissa_roi_analyzer.urls')),
     path('doc/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]

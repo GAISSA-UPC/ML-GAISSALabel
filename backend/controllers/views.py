@@ -9,21 +9,40 @@ from django.shortcuts import get_object_or_404
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from api.models import Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, Interval, EinaCalcul, \
-    TransformacioMetrica, TransformacioInformacio, Administrador, Configuracio, \
-    ModelArchitecture, TacticSource, MLTactic, TacticParameterOption, ROIAnalysis, ROIAnalysisCalculation, \
-    ROIAnalysisResearch, ROIMetric, AnalysisMetricValue, EnergyAnalysisMetricValue, ExpectedMetricReduction, \
-    Country, CarbonIntensity
-from api.serializers import ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer, \
-    EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, QualificacioSerializer, \
-    IntervalBasicSerializer, MetricaSerializer, EinaCalculBasicSerializer, EinaCalculSerializer, \
-    TransformacioMetricaSerializer, TransformacioInformacioSerializer, LoginAdminSerializer, \
-    ModelArchitectureSerializer, TacticSourceSerializer, MLTacticSerializer, TacticParameterOptionSerializer, \
-    ROIAnalysisSerializer, AnalysisListSerializer, ROIAnalysisCalculationSerializer, ROIAnalysisResearchSerializer, ROIMetricSerializer, \
-    AnalysisMetricValueSerializer, EnergyAnalysisMetricValueSerializer, ExpectedMetricReductionSerializer, ConfiguracioSerializer, \
-    CountrySerializer, CarbonIntensitySerializer
+# Core models imports
+from apps.core.models import Administrador, Configuracio, Country, CarbonIntensity
 
-from api import permissions
+# GAISSALabel models imports  
+from apps.gaissalabel.models import (
+    Model, Entrenament, Inferencia, Metrica, InfoAddicional, Qualificacio, 
+    Interval, EinaCalcul, TransformacioMetrica, TransformacioInformacio
+)
+
+# ROI Analyzer models imports
+from apps.gaissa_roi_analyzer.models import (
+    ModelArchitecture, TacticSource, MLTactic, TacticParameterOption, 
+    ROIAnalysis, ROIAnalysisCalculation, ROIAnalysisResearch, ROIMetric, 
+    AnalysisMetricValue, EnergyAnalysisMetricValue, ExpectedMetricReduction
+)
+# Core serializers imports
+from apps.core.serializers import LoginAdminSerializer, ConfiguracioSerializer, CountrySerializer, CarbonIntensitySerializer
+
+# GAISSALabel serializers imports
+from apps.gaissalabel.serializers import (
+    ModelSerializer, EntrenamentSerializer, InferenciaSerializer, MetricaAmbLimitsSerializer,
+    EntrenamentAmbResultatSerializer, InferenciaAmbResultatSerializer, InfoAddicionalSerializer, 
+    QualificacioSerializer, IntervalBasicSerializer, MetricaSerializer, EinaCalculBasicSerializer, 
+    EinaCalculSerializer, TransformacioMetricaSerializer, TransformacioInformacioSerializer
+)
+
+# ROI Analyzer serializers imports
+from apps.gaissa_roi_analyzer.serializers import (
+    ModelArchitectureSerializer, TacticSourceSerializer, MLTacticSerializer, TacticParameterOptionSerializer,
+    ROIAnalysisSerializer, AnalysisListSerializer, ROIAnalysisCalculationSerializer, ROIAnalysisResearchSerializer, 
+    ROIMetricSerializer, AnalysisMetricValueSerializer, EnergyAnalysisMetricValueSerializer, ExpectedMetricReductionSerializer
+)
+
+from apps.core import permissions
 from efficiency_calculators.rating_calculator import calculateRating
 from efficiency_calculators.label_generator import generateLabel
 from efficiency_calculators.efficiency_calculator import calculateEfficiency
