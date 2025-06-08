@@ -23,7 +23,7 @@ from .calculators.rating_calculator import calculateRating
 from .calculators.label_generator import generateLabel
 from .calculators.efficiency_calculator import calculateEfficiency
 from apps.core.models import Configuracio
-from api import permissions
+from apps.core import permissions
 from connectors import adaptador_huggingface
 
 

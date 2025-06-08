@@ -6,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Administrador, Configuracio, Country, CarbonIntensity
 from .serializers import LoginAdminSerializer, ConfiguracioSerializer, CountrySerializer, CarbonIntensitySerializer
-from api import permissions
+from . import permissions
 
 
 class LoginAdminView(mixins.CreateModelMixin, viewsets.GenericViewSet):

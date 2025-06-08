@@ -17,7 +17,7 @@ from .serializers import (
 )
 from apps.core.models import Country, CarbonIntensity
 from apps.core.serializers import CountrySerializer, CarbonIntensitySerializer
-from api import permissions
+from apps.core import permissions
 
 
 class ModelArchitectureView(viewsets.ModelViewSet):
