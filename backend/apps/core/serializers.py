@@ -1,4 +1,8 @@
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
+from rest_framework.exceptions import NotFound, ValidationError
+from django.contrib.auth.models import User
+from django.contrib.auth.hashers import check_password
 from .models import Administrador, Configuracio, Country, CarbonIntensity
 
 
@@ -12,18 +16,44 @@ class LoginAdminSerializer(serializers.ModelSerializer):
         model = Administrador
         fields = ('username', 'password', 'token')
 
-    def create(self, data):
+    def create(self, validated_data):
         user = self.context['user']
-        # Import the function from the original location temporarily
-        from api.serializers import creacioLogin
-        data = creacioLogin(data, user)
-        data['user'] = user
-        return data
+        # Create or get token for the user
+        token, created = Token.objects.get_or_create(user=user)
+        
+        # Return the response data
+        return {
+            'username': validated_data['username'],
+            'token': token.key,
+            'user': user
+        }
 
     def validate(self, data):
-        # Import the validation function from the original location temporarily
-        from api.serializers import validacioLogin
-        return validacioLogin(data)
+        username = data.get("username", None)
+        password = data.get("password", None)
+
+        # Check if user exists
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise NotFound("No existeix un usuari amb aquest username.")
+
+        # Check password
+        pwd_valid = check_password(password, user.password)
+        if not pwd_valid:
+            raise ValidationError("Contrasenya incorrecta.")
+        
+        # Check if user is an administrator
+        try:
+            _ = user.administrador
+        except:
+            raise NotFound("No existeix un admininstrador amb aquest username.")
+        
+        # Store user in context for create method
+        self.context['user'] = user
+        
+        # Return the original data (not the user object)
+        return data
 
 
 class ConfiguracioSerializer(serializers.ModelSerializer):
