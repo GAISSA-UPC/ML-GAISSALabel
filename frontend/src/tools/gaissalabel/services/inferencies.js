@@ -2,11 +2,11 @@ import axios from "@/controllers/backend"
 
 export default {
     async listByModel(model_id) {
-        const responseInference = await axios.get(`/api/models/${model_id}/inferencies.json`)
+        const responseInference = await axios.get(`/api/gaissalabel/models/${model_id}/inferencies.json`)
         return responseInference
     },
     async retrieve(model_id, inference_id) {
-        const responseInference = await axios.get(`/api/models/${model_id}/inferencies/${inference_id}.json`)
+        const responseInference = await axios.get(`/api/gaissalabel/models/${model_id}/inferencies/${inference_id}.json`)
         return responseInference
     },
     async create(model_id, results, informacions) {
@@ -24,7 +24,7 @@ export default {
             'infoAddicional_valors': informacions_adapted,
         }
 
-        const responseInference = await axios.post(`/api/models/${model_id}/inferencies.json`, inference)
+        const responseInference = await axios.post(`/api/gaissalabel/models/${model_id}/inferencies.json`, inference)
         return responseInference
     },
 }

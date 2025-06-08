@@ -3,7 +3,7 @@ import axios from "@/controllers/backend"
 export default {
     async getConfiguration() {
         try {
-            const response = await axios.get(`/api/configuracio/`);
+            const response = await axios.get(`/api/core/configuracio/`);
             return response;
         } catch (error) {
             console.error("Error fetching configuration:", error);
@@ -13,7 +13,7 @@ export default {
     
     async updateConfiguration(data) {
         try {
-            const response = await axios.patch(`/api/configuracio/`, data);
+            const response = await axios.patch(`/api/core/configuracio/`, data);
             return response;
         } catch (error) {
             console.error("Error updating configuration:", error);

@@ -7,7 +7,7 @@ export default {
             'input': input,
         }
         let responseCalculador = null
-        await axios.post(`/api/calculadors/inferencia/`, data)
+        await axios.post(`/api/gaissalabel/calculadors/inferencia/`, data)
             .then(response => responseCalculador = response)
             .catch(error => responseCalculador = error)
         return responseCalculador
