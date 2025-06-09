@@ -1,5 +1,5 @@
 """
-WSGI config for gaissa_tools project.
+WSGI config for gaissalabel project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gaissa_tools.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gaissalabel.settings')
 
 application = get_wsgi_application()

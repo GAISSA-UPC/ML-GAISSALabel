@@ -24,9 +24,9 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
     openapi.Info(
-       title="GAISSA Tools",
+       title="GAISSALabel",
        default_version='v1',
-       description="Comprehensive platform for ML model efficiency assessment and ROI analysis",
+       description="Generation of training and inference energy labels for ML models",
     ),
     public=True,
     permission_classes=[permissions.AllowAny],
