@@ -11,7 +11,7 @@ class IsAuthenticated(permissions.IsAuthenticated):
 class IsAdmin(IsAuthenticated):
     def has_permission(self, request, view=None):
         try:
-            return super().has_permission(request, view) and request.user.administrador
+            return super().has_permission(request, view) and request.user.core_administrador
         except (ObjectDoesNotExist, AttributeError):
             return False
 
@@ -21,7 +21,7 @@ class IsAdminEditOthersRead(IsAuthenticated):
         try:
             return (
                 request.method in permissions.SAFE_METHODS or
-                getattr(request.user, 'administrador', False)
+                getattr(request.user, 'core_administrador', False)
             )
         except (ObjectDoesNotExist, AttributeError):
             return False

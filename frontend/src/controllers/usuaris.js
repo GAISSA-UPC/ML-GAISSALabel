@@ -8,7 +8,7 @@ export default {
         }
 
         let responseLogin = null
-        await axios.post(`/api/core/login/admins.json`, data)
+        await axios.post(`/api/core/login/admins/`, data)
             .then(response => responseLogin = response)
             .catch(error => responseLogin = error)
 
