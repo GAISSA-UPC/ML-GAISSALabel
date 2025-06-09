@@ -1,6 +1,6 @@
 import base64
 import os
-from gaissa_tools.settings import URL_FRONTEND
+from gaissalabel.settings import URL_FRONTEND
 from ..models import Qualificacio, Metrica, Interval
 from ..serializers import QualificacioSerializer
 from .label_generator_strategy import generate_efficency_label
