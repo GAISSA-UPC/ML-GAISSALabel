@@ -45,7 +45,7 @@ class LoginAdminSerializer(serializers.ModelSerializer):
         
         # Check if user is an administrator
         try:
-            _ = user.administrador
+            _ = user.core_administrador
         except:
             raise NotFound("No existeix un admininstrador amb aquest username.")
         
