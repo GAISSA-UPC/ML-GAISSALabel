@@ -298,7 +298,10 @@ def migrate_gaissalabel_models():
         )
         from apps.gaissalabel.models import Model, Metrica, Qualificacio
         
-        # Migrate Model
+        # Temporarily disable auto_now_add for Model.dataCreacio
+        Model._meta.get_field('dataCreacio').auto_now_add = False
+        
+        # Migrate Model with preserved timestamps
         legacy_models = LegacyModel.objects.all()
         for legacy_model in legacy_models:
             model, created = Model.objects.get_or_create(
@@ -312,7 +315,11 @@ def migrate_gaissalabel_models():
             )
             if created:
                 migrated_count += 1
-        print(f"    ✅ Migrated {Model.objects.count()} Model records")
+        
+        # Re-enable auto_now_add for Model.dataCreacio
+        Model._meta.get_field('dataCreacio').auto_now_add = True
+        
+        print(f"    ✅ Migrated {Model.objects.count()} Model records with preserved timestamps")
         
         # Migrate Metrica
         legacy_metriques = LegacyMetrica.objects.all()
@@ -358,7 +365,10 @@ def migrate_gaissalabel_models():
         from api.models import Entrenament as LegacyEntrenament, Inferencia as LegacyInferencia
         from apps.gaissalabel.models import Entrenament, Inferencia, Model
         
-        # Migrate Entrenament
+        # Temporarily disable auto_now_add for Entrenament.dataRegistre
+        Entrenament._meta.get_field('dataRegistre').auto_now_add = False
+        
+        # Migrate Entrenament with preserved timestamps
         legacy_entrenaments = LegacyEntrenament.objects.all()
         for legacy_entrenament in legacy_entrenaments:
             try:
@@ -374,9 +384,16 @@ def migrate_gaissalabel_models():
                     migrated_count += 1
             except Model.DoesNotExist:
                 pass
-        print(f"    ✅ Migrated {Entrenament.objects.count()} Entrenament records")
         
-        # Migrate Inferencia
+        # Re-enable auto_now_add for Entrenament.dataRegistre
+        Entrenament._meta.get_field('dataRegistre').auto_now_add = True
+        
+        print(f"    ✅ Migrated {Entrenament.objects.count()} Entrenament records with preserved timestamps")
+        
+        # Temporarily disable auto_now_add for Inferencia.dataRegistre
+        Inferencia._meta.get_field('dataRegistre').auto_now_add = False
+        
+        # Migrate Inferencia with preserved timestamps
         legacy_inferencies = LegacyInferencia.objects.all()
         for legacy_inferencia in legacy_inferencies:
             try:
@@ -392,7 +409,11 @@ def migrate_gaissalabel_models():
                     migrated_count += 1
             except Model.DoesNotExist:
                 pass
-        print(f"    ✅ Migrated {Inferencia.objects.count()} Inferencia records")
+        
+        # Re-enable auto_now_add for Inferencia.dataRegistre
+        Inferencia._meta.get_field('dataRegistre').auto_now_add = True
+        
+        print(f"    ✅ Migrated {Inferencia.objects.count()} Inferencia records with preserved timestamps")
         
     except Exception as e:
         print(f"    ❌ Error migrating Entrenament/Inferencia: {e}")
@@ -884,6 +905,12 @@ def migrate_roi_analyzer_models():
         print(f"    ✅ Migrated {ROIAnalysis.objects.count()} ROIAnalysis records")
         
         # Migrate ROIAnalysisCalculation
+        print("  Temporarily disabling auto_now_add for ROIAnalysisCalculation.dateRegistration...")
+        # Temporarily disable auto_now_add to allow preserving original timestamps during migration
+        date_registration_field = ROIAnalysisCalculation._meta.get_field('dateRegistration')
+        original_auto_now_add = date_registration_field.auto_now_add
+        date_registration_field.auto_now_add = False
+        
         legacy_calculations = LegacyROIAnalysisCalculation.objects.all()
         for legacy_calc in legacy_calculations:
             try:
@@ -900,7 +927,9 @@ def migrate_roi_analyzer_models():
             except Exception as e:
                 print(f"    ⚠️ Error migrating ROIAnalysisCalculation {legacy_calc.roianalysis_ptr_id}: {e}")
         
-        print(f"    ✅ Migrated {ROIAnalysisCalculation.objects.count()} ROIAnalysisCalculation records")
+        # Restore original auto_now_add behavior
+        date_registration_field.auto_now_add = original_auto_now_add
+        print(f"    ✅ Migrated {ROIAnalysisCalculation.objects.count()} ROIAnalysisCalculation records with preserved timestamps")
         
         # Migrate ROIAnalysisResearch
         legacy_researches = LegacyROIAnalysisResearch.objects.all()
