@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'django_filters',
     'corsheaders',
     'drf_yasg',
-    'api',
     'apps.core',
     'apps.gaissa_roi_analyzer',
     'apps.gaissalabel', 
