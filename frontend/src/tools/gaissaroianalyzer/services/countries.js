@@ -3,7 +3,7 @@ import axios from "@/controllers/backend"
 export default {
     async list(filters = {}) {
         try {
-            const response = await axios.get('/api/roi/countries/', { params: filters });
+            const response = await axios.get('/api/core/countries/', { params: filters });
             return response;
         } catch (error) {
             console.error("Error fetching countries:", error);
@@ -12,7 +12,7 @@ export default {
     },
     async getById(id) {
         try {
-            const response = await axios.get(`/api/roi/countries/${id}/`);
+            const response = await axios.get(`/api/core/countries/${id}/`);
             return response.data;
         } catch (error) {
             console.error("Error fetching country:", error);

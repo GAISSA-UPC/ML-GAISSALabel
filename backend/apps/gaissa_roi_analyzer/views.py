@@ -15,8 +15,6 @@ from .serializers import (
     AnalysisMetricValueSerializer, EnergyAnalysisMetricValueSerializer, 
     ExpectedMetricReductionSerializer
 )
-from apps.core.models import Country, CarbonIntensity
-from apps.core.serializers import CountrySerializer, CarbonIntensitySerializer
 from apps.core import permissions
 
 
@@ -28,7 +26,8 @@ class ModelArchitectureView(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['id', 'name']
     search_fields = ['name', 'information']
-    ordering_fields = ['name']
+    ordering_fields = ['id', 'name']
+    ordering = ['id']
 
     def get_queryset(self):
         """Filter model architectures by analysis type if analysis_type parameter is provided."""
@@ -297,23 +296,3 @@ class ExpectedMetricReductionView(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['model_architecture', 'tactic_parameter_option', 'metric']
     ordering_fields = ['model_architecture', 'tactic_parameter_option', 'metric']
-
-
-class CountryView(viewsets.ModelViewSet):
-    """API endpoint for countries list (ROI analyzer context)."""
-    queryset = Country.objects.all().order_by('name')
-    serializer_class = CountrySerializer
-    permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSAROIAnalyzerEnabled]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['name', 'country_code']
-    ordering_fields = ['name', 'country_code']
-
-
-class CarbonIntensityView(viewsets.ModelViewSet):
-    """API endpoint for carbon intensity data (ROI analyzer context)."""
-    queryset = CarbonIntensity.objects.all()
-    serializer_class = CarbonIntensitySerializer
-    permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSAROIAnalyzerEnabled]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ['country', 'data_year']
-    ordering_fields = ['country', 'carbon_intensity', 'data_year']
