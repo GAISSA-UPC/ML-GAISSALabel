@@ -70,7 +70,7 @@ REST_FRAMEWORK = {
     ]
 }
 
-ROOT_URLCONF = 'gaissalabel.urls'
+ROOT_URLCONF = 'gaissa_tools.urls'
 
 TEMPLATES = [
     {
