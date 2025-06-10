@@ -169,6 +169,30 @@ Would you like to download the repository locally and run it? Follow these steps
      npm run dev
      ```
 
+## Testing
+
+To ensure the functionality of the GAISSA tools, we have implemented a series of tests. These tests are designed to verify the correct operation of both the frontend and backend components of the application.
+To run the tests, follow these steps:
+
+## Frontend Tests
+Navigate to the frontend directory and run the tests using the following commands:
+
+```bash
+cd frontend
+npm install
+npm run test:unit
+```
+
+## Backend Tests
+To run the backend tests, navigate to the backend directory and execute the following commands:
+
+```bash
+cd backend
+python manage.py test apps.gaissa_roi_analyzer.tests.unit_tests.test_models
+python manage.py test apps.gaissa_roi_analyzer.tests.unit_tests.test_views
+python manage.py test apps.gaissa_roi_analyzer.tests.unit_tests.test_serializers
+```
+
 ## Acknowledgements
 
 We acknowledge the raphischer/strep [repository](https://github.com/raphischer/strep) for its closely related work, particularly in the design of our energy efficiency labels. For transparency, the MIT license has been applied in line with this collaboration on the affected files. Explore [raphischer/strep](https://github.com/raphischer/strep) on GitHub for further details. Our approach to indexing and classification also draws upon industry standards, streamlining comparisons within our tool. We're thankful for these contributions that have shaped our project.
