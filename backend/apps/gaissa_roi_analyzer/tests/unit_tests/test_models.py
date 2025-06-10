@@ -1443,3 +1443,610 @@ class ROIAnalysisResearchTest(TestCase):
         self.assertEqual(source_field.remote_field.on_delete, models.PROTECT)
         self.assertEqual(source_field.remote_field.related_name, 'roi_analysis_researches')
         self.assertFalse(source_field.null)
+
+
+
+
+
+class AnalysisMetricValueTest(TestCase):
+    """Unit tests for AnalysisMetricValue model"""
+    
+    def setUp(self):
+        """Set up test data including all related objects"""
+        # Create related objects
+        self.country = Country.objects.create(name="Spain", country_code="ES")
+        
+        self.model_arch = ModelArchitecture.objects.create(
+            name="ResNet50",
+            information="Deep residual network"
+        )
+        
+        self.tactic_source = TacticSource.objects.create(
+            title="Pruning Research Paper",
+            url="https://arxiv.org/abs/1234.5678"
+        )
+        
+        self.ml_tactic = MLTactic.objects.create(
+            name="Weight Pruning",
+            information="Neural network pruning technique"
+        )
+        self.ml_tactic.sources.add(self.tactic_source)
+        self.ml_tactic.compatible_architectures.add(self.model_arch)
+        
+        self.param_option = TacticParameterOption.objects.create(
+            tactic=self.ml_tactic,
+            name="sparsity_level",
+            value="0.5"
+        )
+        
+        # Create non-energy metric
+        self.roi_metric = ROIMetric.objects.create(
+            name="Inference Time",
+            description="Time to process input",
+            unit="ms",
+            is_energy_related=False,
+            higher_is_better=False,
+            min_value=0.0,
+            max_value=1000.0
+        )
+        
+        # Make metric applicable to tactic
+        self.ml_tactic.applicable_metrics.add(self.roi_metric)
+        
+        # Create ExpectedMetricReduction (required for validation)
+        self.expected_reduction = ExpectedMetricReduction.objects.create(
+            model_architecture=self.model_arch,
+            tactic_parameter_option=self.param_option,
+            metric=self.roi_metric,
+            expectedReductionValue=0.25
+        )
+        
+        # Create ROIAnalysis
+        self.roi_analysis = ROIAnalysis.objects.create(
+            model_architecture=self.model_arch,
+            tactic_parameter_option=self.param_option,
+            country=self.country
+        )
+        
+        # Create AnalysisMetricValue
+        self.analysis_metric_value = AnalysisMetricValue.objects.create(
+            analysis=self.roi_analysis,
+            metric=self.roi_metric,
+            baselineValue=100.5
+        )
+
+    def test_analysis_metric_value_creation_with_setup(self):
+        """Test that AnalysisMetricValue from setUp was created correctly"""
+        self.assertEqual(self.analysis_metric_value.analysis, self.roi_analysis)
+        self.assertEqual(self.analysis_metric_value.metric, self.roi_metric)
+        self.assertEqual(self.analysis_metric_value.baselineValue, 100.5)
+        self.assertTrue(isinstance(self.analysis_metric_value, AnalysisMetricValue))
+        self.assertTrue(self.analysis_metric_value.id)
+
+    def test_foreignkey_relationships(self):
+        """Test ForeignKey relationships"""
+        # Test forward relationships
+        self.assertEqual(self.analysis_metric_value.analysis.id, self.roi_analysis.id)
+        self.assertEqual(self.analysis_metric_value.metric.name, "Inference Time")
+        
+        # Test reverse relationships
+        analysis_values = list(self.roi_analysis.metric_values.all())
+        self.assertIn(self.analysis_metric_value, analysis_values)
+        
+        metric_values = list(self.roi_metric.analysis_values.all())
+        self.assertIn(self.analysis_metric_value, metric_values)
+
+    def test_unique_together_constraint(self):
+        """Test unique_together constraint (analysis, metric)"""
+        from django.db import transaction
+        
+        # This should fail - exact same combination
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                AnalysisMetricValue.objects.create(
+                    analysis=self.roi_analysis,  # Same
+                    metric=self.roi_metric,      # Same
+                    baselineValue=200.0          # Different value doesn't matter
+                )
+        
+        # This should work - different analysis
+        new_analysis = ROIAnalysis.objects.create(
+            model_architecture=self.model_arch,
+            tactic_parameter_option=self.param_option
+        )
+        
+        metric_value2 = AnalysisMetricValue.objects.create(
+            analysis=new_analysis,           # Different
+            metric=self.roi_metric,          # Same
+            baselineValue=150.0
+        )
+        self.assertEqual(metric_value2.baselineValue, 150.0)
+        
+        # This should work - different metric
+        new_metric = ROIMetric.objects.create(
+            name="Model Size", 
+            unit="MB",
+            is_energy_related=False
+        )
+        self.ml_tactic.applicable_metrics.add(new_metric)
+        
+        # Create corresponding ExpectedMetricReduction
+        ExpectedMetricReduction.objects.create(
+            model_architecture=self.model_arch,
+            tactic_parameter_option=self.param_option,
+            metric=new_metric,
+            expectedReductionValue=0.3
+        )
+        
+        metric_value3 = AnalysisMetricValue.objects.create(
+            analysis=self.roi_analysis,      # Same
+            metric=new_metric,               # Different
+            baselineValue=75.0
+        )
+        self.assertEqual(metric_value3.baselineValue, 75.0)
+
+    def test_validation_metric_applicable_to_tactic_success(self):
+        """Test successful validation when metric is applicable to tactic"""
+        # Create a new analysis to avoid unique constraint conflict
+        new_analysis = ROIAnalysis.objects.create(
+            model_architecture=self.model_arch,
+            tactic_parameter_option=self.param_option    
+        )
+
+        # This should work - metric is in tactic's applicable_metrics
+        metric_value = AnalysisMetricValue(
+            analysis=new_analysis,
+            metric=self.roi_metric,
+            baselineValue=200.0
+        )
+        # Should not raise ValidationError
+        metric_value.full_clean()
+
+    def test_validation_metric_not_applicable_to_tactic_failure(self):
+        """Test validation failure when metric is not applicable to tactic"""
+        # Create metric not applicable to tactic
+        non_applicable_metric = ROIMetric.objects.create(
+            name="Non Applicable Metric",
+            unit="units",
+            is_energy_related=False
+        )
+        # Note: We don't add this to ml_tactic.applicable_metrics
+        
+        metric_value = AnalysisMetricValue(
+            analysis=self.roi_analysis,
+            metric=non_applicable_metric,
+            baselineValue=100.0
+        )
+        
+        with self.assertRaises(ValidationError) as context:
+            metric_value.full_clean()
+        
+        error_message = str(context.exception)
+        self.assertIn("not applicable", error_message)
+        self.assertIn("Weight Pruning", error_message)
+        self.assertIn("Non Applicable Metric", error_message)
+
+    def test_validation_expected_metric_reduction_exists_success(self):
+        """Test successful validation when ExpectedMetricReduction exists"""
+        # Create a new analysis to avoid unique constraint conflict
+        new_analysis = ROIAnalysis.objects.create(
+            model_architecture=self.model_arch,
+            tactic_parameter_option=self.param_option
+        )
+
+        # ExpectedMetricReduction already exists from setUp
+        metric_value = AnalysisMetricValue(
+            analysis=new_analysis,
+            metric=self.roi_metric,
+            baselineValue=300.0
+        )
+        # Should not raise ValidationError
+        metric_value.full_clean()
+
+    def test_validation_expected_metric_reduction_missing_failure(self):
+        """Test validation failure when ExpectedMetricReduction doesn't exist"""
+        # Create metric without corresponding ExpectedMetricReduction
+        metric_without_reduction = ROIMetric.objects.create(
+            name="Metric Without Reduction",
+            unit="units",
+            is_energy_related=False
+        )
+        self.ml_tactic.applicable_metrics.add(metric_without_reduction)
+        # Note: We don't create ExpectedMetricReduction for this metric
+        
+        metric_value = AnalysisMetricValue(
+            analysis=self.roi_analysis,
+            metric=metric_without_reduction,
+            baselineValue=100.0
+        )
+        
+        with self.assertRaises(ValidationError) as context:
+            metric_value.full_clean()
+        
+        error_message = str(context.exception)
+        self.assertIn("No matching ExpectedMetricReduction", error_message)
+        self.assertIn("ResNet50", error_message)
+        self.assertIn("Metric Without Reduction", error_message)
+
+    def test_validation_energy_metric_restriction_failure(self):
+        """Test validation failure when energy metric is used with base class"""
+        # Create energy-related metric
+        energy_metric = ROIMetric.objects.create(
+            name="Energy Consumption",
+            unit="W",
+            is_energy_related=True
+        )
+        self.ml_tactic.applicable_metrics.add(energy_metric)
+        
+        # Create corresponding ExpectedMetricReduction
+        ExpectedMetricReduction.objects.create(
+            model_architecture=self.model_arch,
+            tactic_parameter_option=self.param_option,
+            metric=energy_metric,
+            expectedReductionValue=0.4
+        )
+        
+        metric_value = AnalysisMetricValue(
+            analysis=self.roi_analysis,
+            metric=energy_metric,
+            baselineValue=500.0
+        )
+        
+        with self.assertRaises(ValidationError) as context:
+            metric_value.full_clean()
+        
+        error_message = str(context.exception)
+        self.assertIn("Energy-related metrics must use EnergyAnalysisMetricValue", error_message)
+
+    def test_validation_baseline_value_within_range_success(self):
+        """Test successful validation when baseline value is within metric range"""
+        # Create a new analysis to avoid unique constraint conflict
+        new_analysis = ROIAnalysis.objects.create(
+            model_architecture=self.model_arch,
+            tactic_parameter_option=self.param_option
+        )
+        
+        # roi_metric has min_value=0.0, max_value=1000.0
+        metric_value = AnalysisMetricValue(
+            analysis=new_analysis, 
+            metric=self.roi_metric,
+            baselineValue=500.0  # Within range
+        )
+        # Should not raise ValidationError
+        metric_value.full_clean()
+    def test_validation_baseline_value_below_minimum_failure(self):
+        """Test validation failure when baseline value is below minimum"""
+        metric_value = AnalysisMetricValue(
+            analysis=self.roi_analysis,
+            metric=self.roi_metric,
+            baselineValue=-10.0  # Below min_value=0.0
+        )
+        
+        with self.assertRaises(ValidationError) as context:
+            metric_value.full_clean()
+        
+        error_message = str(context.exception)
+        self.assertIn("below the minimum allowed value", error_message)
+        self.assertIn("-10.0", error_message)
+        self.assertIn("0.0", error_message)
+
+    def test_validation_baseline_value_above_maximum_failure(self):
+        """Test validation failure when baseline value is above maximum"""
+        metric_value = AnalysisMetricValue(
+            analysis=self.roi_analysis,
+            metric=self.roi_metric,
+            baselineValue=1500.0  # Above max_value=1000.0
+        )
+        
+        with self.assertRaises(ValidationError) as context:
+            metric_value.full_clean()
+        
+        error_message = str(context.exception)
+        self.assertIn("exceeds the maximum allowed value", error_message)
+        self.assertIn("1500.0", error_message)
+        self.assertIn("1000.0", error_message)
+
+    def test_cascade_delete_behavior_analysis(self):
+        """Test CASCADE delete when analysis is deleted"""
+        metric_value_id = self.analysis_metric_value.id
+        analysis_id = self.roi_analysis.id
+        
+        # Delete the analysis
+        self.roi_analysis.delete()
+        
+        # Verify analysis is deleted
+        with self.assertRaises(ROIAnalysis.DoesNotExist):
+            ROIAnalysis.objects.get(id=analysis_id)
+        
+        # Verify metric value is also deleted (CASCADE)
+        with self.assertRaises(AnalysisMetricValue.DoesNotExist):
+            AnalysisMetricValue.objects.get(id=metric_value_id)
+
+    def test_protect_delete_behavior_metric(self):
+        """Test PROTECT behavior when metric is deleted"""
+        # Try to delete metric - should fail
+        with self.assertRaises(models.ProtectedError):
+            self.roi_metric.delete()
+
+    def test_update_analysis_metric_value_fields(self):
+        """Test updating AnalysisMetricValue fields"""
+        # Create new valid objects
+        new_metric = ROIMetric.objects.create(
+            name="Updated Metric",
+            unit="units",
+            is_energy_related=False,
+            min_value=0.0,
+            max_value=500.0
+        )
+        self.ml_tactic.applicable_metrics.add(new_metric)
+        
+        ExpectedMetricReduction.objects.create(
+            model_architecture=self.model_arch,
+            tactic_parameter_option=self.param_option,
+            metric=new_metric,
+            expectedReductionValue=0.15
+        )
+        
+        new_analysis = ROIAnalysis.objects.create(
+            model_architecture=self.model_arch,
+            tactic_parameter_option=self.param_option
+        )
+        
+        # Update the metric value
+        self.analysis_metric_value.analysis = new_analysis
+        self.analysis_metric_value.metric = new_metric
+        self.analysis_metric_value.baselineValue = 250.0
+        self.analysis_metric_value.save()
+        
+        # Refresh from database
+        self.analysis_metric_value.refresh_from_db()
+        
+        self.assertEqual(self.analysis_metric_value.analysis, new_analysis)
+        self.assertEqual(self.analysis_metric_value.metric, new_metric)
+        self.assertEqual(self.analysis_metric_value.baselineValue, 250.0)
+
+    def test_delete_analysis_metric_value(self):
+        """Test deleting AnalysisMetricValue"""
+        metric_value_id = self.analysis_metric_value.id
+        
+        # Delete the metric value
+        self.analysis_metric_value.delete()
+        
+        # Verify it's deleted
+        with self.assertRaises(AnalysisMetricValue.DoesNotExist):
+            AnalysisMetricValue.objects.get(id=metric_value_id)
+        
+        # Verify related objects still exist
+        self.assertTrue(ROIAnalysis.objects.filter(id=self.roi_analysis.id).exists())
+        self.assertTrue(ROIMetric.objects.filter(id=self.roi_metric.id).exists())
+
+    def test_field_properties_and_types(self):
+        """Test model field properties"""
+        analysis_field = AnalysisMetricValue._meta.get_field('analysis')
+        metric_field = AnalysisMetricValue._meta.get_field('metric')
+        baseline_field = AnalysisMetricValue._meta.get_field('baselineValue')
+        
+        # ForeignKey field tests
+        self.assertEqual(analysis_field.related_model, ROIAnalysis)
+        self.assertEqual(analysis_field.remote_field.on_delete, models.CASCADE)
+        self.assertEqual(analysis_field.remote_field.related_name, 'metric_values')
+        
+        self.assertEqual(metric_field.related_model, ROIMetric)
+        self.assertEqual(metric_field.remote_field.on_delete, models.PROTECT)
+        self.assertEqual(metric_field.remote_field.related_name, 'analysis_values')
+        
+        # FloatField tests
+        self.assertFalse(baseline_field.null)
+        
+        # Test unique_together constraint
+        unique_together = AnalysisMetricValue._meta.unique_together
+        self.assertIn(('analysis', 'metric'), unique_together)
+
+
+
+
+
+class EnergyAnalysisMetricValueTest(TestCase):
+    """Unit tests for EnergyAnalysisMetricValue model (inherits from AnalysisMetricValue)"""
+    
+    def setUp(self):
+        """Set up test data including all related objects"""
+        # Create related objects
+        self.country = Country.objects.create(name="Germany", country_code="DE")
+        
+        self.model_arch = ModelArchitecture.objects.create(
+            name="VGG16",
+            information="VGG architecture"
+        )
+        
+        self.tactic_source = TacticSource.objects.create(
+            title="Energy Optimization Research",
+            url="https://arxiv.org/abs/3333.4444"
+        )
+        
+        self.ml_tactic = MLTactic.objects.create(
+            name="Dynamic Quantization",
+            information="Energy-efficient quantization"
+        )
+        self.ml_tactic.sources.add(self.tactic_source)
+        self.ml_tactic.compatible_architectures.add(self.model_arch)
+        
+        self.param_option = TacticParameterOption.objects.create(
+            tactic=self.ml_tactic,
+            name="precision_bits",
+            value="8"
+        )
+        
+        # Create energy-related metric
+        self.energy_metric = ROIMetric.objects.create(
+            name="Power Consumption",
+            description="Energy usage measurement",
+            unit="W",
+            is_energy_related=True,
+            higher_is_better=False,
+            min_value=0.0,
+            max_value=2000.0
+        )
+        
+        # Make metric applicable to tactic
+        self.ml_tactic.applicable_metrics.add(self.energy_metric)
+        
+        # Create ExpectedMetricReduction (required for validation)
+        self.expected_reduction = ExpectedMetricReduction.objects.create(
+            model_architecture=self.model_arch,
+            tactic_parameter_option=self.param_option,
+            metric=self.energy_metric,
+            expectedReductionValue=0.35
+        )
+        
+        # Create ROIAnalysis
+        self.roi_analysis = ROIAnalysis.objects.create(
+            model_architecture=self.model_arch,
+            tactic_parameter_option=self.param_option,
+            country=self.country
+        )
+        
+        # Create EnergyAnalysisMetricValue
+        self.energy_metric_value = EnergyAnalysisMetricValue.objects.create(
+            analysis=self.roi_analysis,
+            metric=self.energy_metric,
+            baselineValue=750.0,
+            energy_cost_rate=0.2150,
+            implementation_cost=1500.00
+        )
+
+    def test_energy_analysis_metric_value_creation_with_setup(self):
+        """Test that EnergyAnalysisMetricValue from setUp was created correctly"""
+        self.assertEqual(self.energy_metric_value.analysis, self.roi_analysis)
+        self.assertEqual(self.energy_metric_value.metric, self.energy_metric)
+        self.assertEqual(self.energy_metric_value.baselineValue, 750.0)
+        self.assertEqual(self.energy_metric_value.energy_cost_rate, 0.2150)
+        self.assertEqual(self.energy_metric_value.implementation_cost, 1500.00)
+        self.assertTrue(isinstance(self.energy_metric_value, EnergyAnalysisMetricValue))
+        self.assertTrue(isinstance(self.energy_metric_value, AnalysisMetricValue))  # Inheritance
+        self.assertTrue(self.energy_metric_value.id)
+
+    def test_inheritance_from_analysis_metric_value(self):
+        """Test that EnergyAnalysisMetricValue inherits AnalysisMetricValue functionality"""
+        # Test inherited validation - metric applicable to tactic
+        non_applicable_metric = ROIMetric.objects.create(
+            name="Non Applicable Energy Metric",
+            unit="W",
+            is_energy_related=True
+        )
+        
+        energy_value = EnergyAnalysisMetricValue(
+            analysis=self.roi_analysis,
+            metric=non_applicable_metric,
+            baselineValue=100.0,
+            energy_cost_rate=0.15,
+            implementation_cost=1000.0
+        )
+        
+        with self.assertRaises(ValidationError) as context:
+            energy_value.full_clean()
+        
+        error_message = str(context.exception)
+        self.assertIn("not applicable", error_message)
+
+    def test_validation_non_energy_metric_failure(self):
+        """Test validation failure when used with non-energy metric"""
+        # Create non-energy metric
+        non_energy_metric = ROIMetric.objects.create(
+            name="Inference Time",
+            unit="ms",
+            is_energy_related=False
+        )
+        self.ml_tactic.applicable_metrics.add(non_energy_metric)
+        
+        ExpectedMetricReduction.objects.create(
+            model_architecture=self.model_arch,
+            tactic_parameter_option=self.param_option,
+            metric=non_energy_metric,
+            expectedReductionValue=0.2
+        )
+        
+        energy_value = EnergyAnalysisMetricValue(
+            analysis=self.roi_analysis,
+            metric=non_energy_metric,
+            baselineValue=100.0,
+            energy_cost_rate=0.20,
+            implementation_cost=1000.0
+        )
+        
+        with self.assertRaises(ValidationError) as context:
+            energy_value.full_clean()
+        
+        error_message = str(context.exception)
+        self.assertIn("can only be used with energy-related metrics", error_message)
+
+    def test_update_energy_analysis_metric_value_fields(self):
+        """Test updating EnergyAnalysisMetricValue fields"""
+        # Create new energy metric
+        new_energy_metric = ROIMetric.objects.create(
+            name="Updated Energy Metric",
+            unit="kWh",
+            is_energy_related=True,
+            min_value=0.0,
+            max_value=100.0
+        )
+        self.ml_tactic.applicable_metrics.add(new_energy_metric)
+        
+        ExpectedMetricReduction.objects.create(
+            model_architecture=self.model_arch,
+            tactic_parameter_option=self.param_option,
+            metric=new_energy_metric,
+            expectedReductionValue=0.4
+        )
+        
+        new_analysis = ROIAnalysis.objects.create(
+            model_architecture=self.model_arch,
+            tactic_parameter_option=self.param_option
+        )
+        
+        # Update the energy metric value
+        self.energy_metric_value.analysis = new_analysis
+        self.energy_metric_value.metric = new_energy_metric
+        self.energy_metric_value.baselineValue = 50.0
+        self.energy_metric_value.energy_cost_rate = 0.30
+        self.energy_metric_value.implementation_cost = 2500.0
+        self.energy_metric_value.save()
+        
+        # Refresh from database
+        self.energy_metric_value.refresh_from_db()
+        
+        self.assertEqual(self.energy_metric_value.analysis, new_analysis)
+        self.assertEqual(self.energy_metric_value.metric, new_energy_metric)
+        self.assertEqual(self.energy_metric_value.baselineValue, 50.0)
+        self.assertEqual(float(self.energy_metric_value.energy_cost_rate), 0.30)
+        self.assertEqual(float(self.energy_metric_value.implementation_cost), 2500.0)
+
+    def test_cascade_delete_behavior_inherited(self):
+        """Test inherited CASCADE delete behavior when analysis is deleted"""
+        energy_value_id = self.energy_metric_value.id
+        analysis_id = self.roi_analysis.id
+        
+        # Delete the analysis
+        self.roi_analysis.delete()
+        
+        # Verify analysis is deleted
+        with self.assertRaises(ROIAnalysis.DoesNotExist):
+            ROIAnalysis.objects.get(id=analysis_id)
+        
+        # Verify energy metric value is also deleted (inherited CASCADE)
+        with self.assertRaises(EnergyAnalysisMetricValue.DoesNotExist):
+            EnergyAnalysisMetricValue.objects.get(id=energy_value_id)
+
+    def test_field_properties_and_types(self):
+        """Test model field properties specific to EnergyAnalysisMetricValue"""
+        cost_rate_field = EnergyAnalysisMetricValue._meta.get_field('energy_cost_rate')
+        impl_cost_field = EnergyAnalysisMetricValue._meta.get_field('implementation_cost')
+        
+        # DecimalField tests
+        self.assertEqual(cost_rate_field.max_digits, 10)
+        self.assertEqual(cost_rate_field.decimal_places, 4)
+        self.assertFalse(cost_rate_field.null)
+        
+        self.assertEqual(impl_cost_field.max_digits, 10)
+        self.assertEqual(impl_cost_field.decimal_places, 2)
+        self.assertFalse(impl_cost_field.null)
