@@ -36,9 +36,12 @@ export default {
         BarraSuperior,
     },
     data() {
+        const isMobileScreen = typeof window !== 'undefined' && window.innerWidth < 1360;
+        const shouldCollapse = typeof window !== 'undefined' && window.innerWidth < 768;
+        
         return {
-            collapse: false,
-            isMobile: false
+            collapse: shouldCollapse,
+            isMobile: isMobileScreen,
         }
     },
     mounted() {
