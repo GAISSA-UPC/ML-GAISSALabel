@@ -66,6 +66,15 @@ class ROIMetric(models.Model):
         verbose_name = _('ROI Metric')
         verbose_name_plural = _('ROI Metrics')
 
+    def clean(self):
+        super().clean()
+        if not self.name or self.name.strip() == '':
+            raise ValidationError(_('Name field cannot be empty.'))
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.name
 
@@ -82,6 +91,15 @@ class MLTactic(models.Model):
     class Meta:
         verbose_name = _('ML Tactic')
         verbose_name_plural = _('ML Tactics')
+
+    def clean(self):
+        super().clean()
+        if not self.name or self.name.strip() == '':
+            raise ValidationError(_('Name field cannot be empty.'))
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
