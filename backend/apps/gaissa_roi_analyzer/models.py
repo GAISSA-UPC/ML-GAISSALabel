@@ -13,6 +13,15 @@ class ModelArchitecture(models.Model):
         verbose_name = _('Model Architecture')
         verbose_name_plural = _('Model Architectures')
 
+    def clean(self):
+        super().clean()
+        if not self.name or self.name.strip() == '':
+            raise ValidationError(_('Name field cannot be empty.'))
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.name
 
@@ -26,6 +35,17 @@ class TacticSource(models.Model):
     class Meta:
         verbose_name = _('Tactic Source')
         verbose_name_plural = _('Tactic Sources')
+
+    def clean(self):
+        super().clean()
+        if not self.title or self.title.strip() == '':
+            raise ValidationError(_('Title field cannot be empty.'))
+        if not self.url or self.url.strip() == '':
+            raise ValidationError(_('URL field cannot be empty.'))
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
