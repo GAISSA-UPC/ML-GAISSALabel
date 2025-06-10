@@ -121,6 +121,25 @@ class TacticParameterOption(models.Model):
         return f"{self.tactic.name} - {self.name}: {self.value}"
 
 
+
+class ExpectedMetricReduction(models.Model):
+    """Expected metric reduction values for tactic-architecture-metric combinations"""
+    id = models.AutoField(primary_key=True)
+    model_architecture = models.ForeignKey(ModelArchitecture, on_delete=models.CASCADE, verbose_name=_('Model Architecture'))
+    tactic_parameter_option = models.ForeignKey(TacticParameterOption, on_delete=models.CASCADE, verbose_name=_('Tactic Parameter Option'))
+    metric = models.ForeignKey(ROIMetric, on_delete=models.CASCADE, verbose_name=_('ROI Metric'))
+    expectedReductionValue = models.FloatField(verbose_name=_('Expected Reduction Value'))
+
+    class Meta:
+        verbose_name = _('Expected Metric Reduction')
+        verbose_name_plural = _('Expected Metric Reductions')
+        unique_together = ('model_architecture', 'tactic_parameter_option', 'metric')
+
+    def __str__(self):
+        return f"Reduction for {self.metric.name} on {self.model_architecture.name} with {self.tactic_parameter_option}"
+
+
+
 class ROIAnalysis(models.Model):
     """Base class for ROI analyses"""
     id = models.AutoField(primary_key=True)
@@ -173,6 +192,7 @@ class ROIAnalysisResearch(ROIAnalysis):
     class Meta:
         verbose_name = _('ROI Analysis Research')
         verbose_name_plural = _('ROI Analysis Researches')
+
 
 
 class AnalysisMetricValue(models.Model):
@@ -281,19 +301,3 @@ class EnergyAnalysisMetricValue(AnalysisMetricValue):
         self.clean()
         super().save(*args, **kwargs)
 
-
-class ExpectedMetricReduction(models.Model):
-    """Expected metric reduction values for tactic-architecture-metric combinations"""
-    id = models.AutoField(primary_key=True)
-    model_architecture = models.ForeignKey(ModelArchitecture, on_delete=models.CASCADE, verbose_name=_('Model Architecture'))
-    tactic_parameter_option = models.ForeignKey(TacticParameterOption, on_delete=models.CASCADE, verbose_name=_('Tactic Parameter Option'))
-    metric = models.ForeignKey(ROIMetric, on_delete=models.CASCADE, verbose_name=_('ROI Metric'))
-    expectedReductionValue = models.FloatField(verbose_name=_('Expected Reduction Value'))
-
-    class Meta:
-        verbose_name = _('Expected Metric Reduction')
-        verbose_name_plural = _('Expected Metric Reductions')
-        unique_together = ('model_architecture', 'tactic_parameter_option', 'metric')
-
-    def __str__(self):
-        return f"Reduction for {self.metric.name} on {self.model_architecture.name} with {self.tactic_parameter_option}"
