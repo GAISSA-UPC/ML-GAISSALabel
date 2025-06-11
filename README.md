@@ -188,9 +188,11 @@ To run the backend tests, navigate to the backend directory and execute the foll
 
 ```bash
 cd backend
+
 python manage.py test apps.gaissa_roi_analyzer.tests.unit_tests.test_models
-python manage.py test apps.gaissa_roi_analyzer.tests.unit_tests.test_views
 python manage.py test apps.gaissa_roi_analyzer.tests.unit_tests.test_serializers
+
+python manage.py test apps.gaissa_roi_analyzer.tests.integration_tests.test_api
 ```
 
 ## Acknowledgements
