@@ -8,7 +8,7 @@ from apps.gaissa_roi_analyzer.serializers import *
 from apps.core.models import Country
 
 # NOTE: Simple CRUD serializers are not tested here as they contain only basic field  
-# validation that is adequately covered by view tests.
+# validation that is adequately covered by other tests.
 
 
 
