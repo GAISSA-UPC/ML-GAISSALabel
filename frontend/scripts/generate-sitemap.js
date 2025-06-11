@@ -25,37 +25,83 @@ const routes = [
         lastmod: new Date().toISOString().split('T')[0]
     },
     {
-        path: '/gaissalabel',
-        changefreq: 'monthly',
-        priority: '0.9',
-        lastmod: new Date().toISOString().split('T')[0]
-    },
-    {
         path: '/about',
         changefreq: 'monthly',
         priority: '0.8',
         lastmod: new Date().toISOString().split('T')[0]
     },
+    // GAISSALabel main routes
+    {
+        path: '/gaissalabel',
+        changefreq: 'weekly',
+        priority: '0.9',
+        lastmod: new Date().toISOString().split('T')[0]
+    },
+    // GAISSALabel Training routes
     {
         path: '/gaissalabel/trainingForm',
         changefreq: 'monthly',
-        priority: '0.7',
+        priority: '0.8',
         lastmod: new Date().toISOString().split('T')[0]
     },
     {
         path: '/gaissalabel/trainingPre',
         changefreq: 'monthly',
-        priority: '0.7',
+        priority: '0.8',
         lastmod: new Date().toISOString().split('T')[0]
     },
     {
+        path: '/gaissalabel/trainingFile',
+        changefreq: 'monthly',
+        priority: '0.7',
+        lastmod: new Date().toISOString().split('T')[0]
+    },
+    // GAISSALabel Inference routes
+    {
         path: '/gaissalabel/inferenceForm',
+        changefreq: 'monthly',
+        priority: '0.8',
+        lastmod: new Date().toISOString().split('T')[0]
+    },
+    {
+        path: '/gaissalabel/inferencePre',
+        changefreq: 'monthly',
+        priority: '0.8',
+        lastmod: new Date().toISOString().split('T')[0]
+    },
+    {
+        path: '/gaissalabel/inferenceFile',
         changefreq: 'monthly',
         priority: '0.7',
         lastmod: new Date().toISOString().split('T')[0]
     },
     {
-        path: '/gaissalabel/inferencePre',
+        path: '/gaissalabel/inferenceDeploy',
+        changefreq: 'monthly',
+        priority: '0.7',
+        lastmod: new Date().toISOString().split('T')[0]
+    },
+    // GAISSA ROI Analyzer routes
+    {
+        path: '/gaissa-roi-analyzer/calculation-repository',
+        changefreq: 'weekly',
+        priority: '0.8',
+        lastmod: new Date().toISOString().split('T')[0]
+    },
+    {
+        path: '/gaissa-roi-analyzer/research-repository',
+        changefreq: 'weekly',
+        priority: '0.8',
+        lastmod: new Date().toISOString().split('T')[0]
+    },
+    {
+        path: '/gaissa-roi-analyzer/new-form',
+        changefreq: 'monthly',
+        priority: '0.7',
+        lastmod: new Date().toISOString().split('T')[0]
+    },
+    {
+        path: '/gaissa-roi-analyzer/comparison',
         changefreq: 'monthly',
         priority: '0.7',
         lastmod: new Date().toISOString().split('T')[0]
