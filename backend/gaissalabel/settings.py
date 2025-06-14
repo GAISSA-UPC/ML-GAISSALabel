@@ -150,13 +150,28 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS
 
-URL_FRONTEND = os.environ.get('URL_FRONTEND', 'http://localhost:5173')
+# Determine the appropriate frontend URL based on environment
+# Check if we're in production by looking for common production indicators
+is_production = (
+    os.environ.get('DJANGO_ENV') == 'production' or
+    os.environ.get('ENV') == 'production' or
+    not DEBUG or
+    'gunicorn' in os.environ.get('SERVER_SOFTWARE', '') or
+    os.environ.get('DEPLOYMENT_ENV') == 'production'
+)
+
+if is_production:
+    # Production environment
+    URL_FRONTEND = os.environ.get('URL_FRONTEND', 'https://gaissalabel.essi.upc.edu')
+else:
+    # Development environment
+    URL_FRONTEND = os.environ.get('URL_FRONTEND', 'http://localhost:5173')
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://gaissalabel.essi.upc.edu",
     "https://gaissalabel.essi.upc.edu",
-    os.environ.get('URL_FRONTEND', 'http://localhost:5173'),
+    URL_FRONTEND,
 ]
 
 # LOGS

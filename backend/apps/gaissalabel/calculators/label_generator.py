@@ -82,7 +82,7 @@ def generateLabel(qualifFinal, qualifMetriques, resultats, model, experiment_id,
     ]
 
     # Enllaç a la pàgina d'info de l'etiqueta
-    url = URL_FRONTEND + '/models/' + str(model.id) + '/' + fase.lower() + 's/' + str(experiment_id)
+    url = URL_FRONTEND + '/gaissalabel/models/' + str(model.id) + '/' + fase.lower() + 's/' + str(experiment_id)
 
     # Generació de l'etiqueta a partir del label_generator
     label = generate_efficency_label(resultats_formatted, qualificacions_valor, qualifFinal, model.nom, fase, url)
