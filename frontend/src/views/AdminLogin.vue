@@ -227,7 +227,7 @@ export default {
 }
 
 
-@media (max-width: 1359px) {
+@media (max-width: 1339px) {
     .admin-login-page {
         padding: 15px;
     }

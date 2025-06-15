@@ -166,7 +166,7 @@ export default {
     white-space: normal;
 }
 
-@media (max-width: 1359px) {
+@media (max-width: 1339px) {
     .el-menu-vertical {
         display: flex;
         flex-wrap: wrap;
@@ -196,7 +196,7 @@ export default {
     }
 }
 
-@media (min-width: 1360px) {
+@media (min-width: 1340px) {
     .el-menu-vertical {
         display: block;
     }

@@ -36,7 +36,7 @@ export default {
         BarraSuperior,
     },
     data() {
-        const isMobileScreen = typeof window !== 'undefined' && window.innerWidth < 1360;
+        const isMobileScreen = typeof window !== 'undefined' && window.innerWidth < 1340;
         const shouldCollapse = typeof window !== 'undefined' && window.innerWidth < 768;
         
         return {
@@ -56,7 +56,7 @@ export default {
     },
     methods: {
         checkScreenSize() {
-            this.isMobile = window.innerWidth < 1360
+            this.isMobile = window.innerWidth < 1340
             this.collapse = window.innerWidth < 768
         }
     }
