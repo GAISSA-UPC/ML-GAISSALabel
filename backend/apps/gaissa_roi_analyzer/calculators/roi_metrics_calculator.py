@@ -31,63 +31,71 @@ class ROIMetricsCalculator:
                 analysis=analysis
             ).select_related('metric')
             
+            # Fetch all expected reductions for this analysis in a single query to avoid N+1
+            expected_reductions = ExpectedMetricReduction.objects.filter(
+                model_architecture=analysis.model_architecture,
+                tactic_parameter_option=analysis.tactic_parameter_option,
+                metric__in=[mv.metric for mv in metric_values]
+            ).select_related('metric')
+            
+            # Create a lookup dictionary for expected reductions by metric ID
+            expected_reductions_lookup = {
+                er.metric.id: er for er in expected_reductions
+            }
+            
             results = []
             
             for metric_value in metric_values:
-                try:
-                    # Get the necessary data
-                    expected_reduction = ExpectedMetricReduction.objects.get(
-                        model_architecture=analysis.model_architecture,
-                        tactic_parameter_option=analysis.tactic_parameter_option,
-                        metric=metric_value.metric
-                    )
-                    
-                    reduction_percent = expected_reduction.expectedReductionValue * 100
-                    
-                    # Calculate the new value 
-                    baseline_value = metric_value.baselineValue
-                    new_expected_value = baseline_value * (1 - (reduction_percent / 100))
-                    
-                    # Create a result dictionary
-                    result = {
-                        'metric_id': metric_value.metric.id,
-                        'metric_name': metric_value.metric.name,
-                        'description': metric_value.metric.description,
-                        'unit': metric_value.metric.unit,
-                        'baseline_value': baseline_value,
-                        'expected_reduction_percent': reduction_percent,
-                        'new_expected_value': new_expected_value,
-                        'higher_is_better': metric_value.metric.higher_is_better,
-                    }
-                    
-                    # If this is an energy metric with cost data, calculate cost savings
-                    if metric_value.metric.is_energy_related:
-                        try:
-                            energy_metric_value = EnergyAnalysisMetricValue.objects.get(id=metric_value.id)
-                            # Calculate cost savings with default 10M inferences
-                            cost_savings = self.calculate_cost_savings(
-                                energy_metric_value, 
-                                expected_reduction.expectedReductionValue, 
-                                num_inferences
-                            )
-                            result['cost_savings'] = cost_savings
-                            
-                            # Calculate ROI evolution data points (useful for chart display)
-                            roi_evolution_data = self.calculate_roi_evolution_data(
-                                energy_metric_value, 
-                                expected_reduction.expectedReductionValue
-                            )
-                            result['roi_evolution_chart_data'] = roi_evolution_data
-                            
-                        except EnergyAnalysisMetricValue.DoesNotExist:
-                            # This is an energy-related metric but without the cost data
-                            print(f"Energy metric {metric_value.metric.id} does not have cost data.")
-                            pass
-                    
-                    results.append(result)
-                    
-                except ExpectedMetricReduction.DoesNotExist:
+                # Look up the expected reduction from our pre-fetched data
+                expected_reduction = expected_reductions_lookup.get(metric_value.metric.id)
+                
+                if expected_reduction is None:
                     print(f"No expected reduction found for metric {metric_value.metric.id} in analysis {analysis_id}. It will be skipped.")
+                    continue
+                
+                reduction_percent = expected_reduction.expectedReductionValue * 100
+                
+                # Calculate the new value 
+                baseline_value = metric_value.baselineValue
+                new_expected_value = baseline_value * (1 - (reduction_percent / 100))
+                
+                # Create a result dictionary
+                result = {
+                    'metric_id': metric_value.metric.id,
+                    'metric_name': metric_value.metric.name,
+                    'description': metric_value.metric.description,
+                    'unit': metric_value.metric.unit,
+                    'baseline_value': baseline_value,
+                    'expected_reduction_percent': reduction_percent,
+                    'new_expected_value': new_expected_value,
+                    'higher_is_better': metric_value.metric.higher_is_better,
+                }
+                
+                # If this is an energy metric with cost data, calculate cost savings
+                if metric_value.metric.is_energy_related:
+                    try:
+                        energy_metric_value = EnergyAnalysisMetricValue.objects.get(id=metric_value.id)
+                        # Calculate cost savings with default 10M inferences
+                        cost_savings = self.calculate_cost_savings(
+                            energy_metric_value, 
+                            expected_reduction.expectedReductionValue, 
+                            num_inferences
+                        )
+                        result['cost_savings'] = cost_savings
+                        
+                        # Calculate ROI evolution data points (useful for chart display)
+                        roi_evolution_data = self.calculate_roi_evolution_data(
+                            energy_metric_value, 
+                            expected_reduction.expectedReductionValue
+                        )
+                        result['roi_evolution_chart_data'] = roi_evolution_data
+                        
+                    except EnergyAnalysisMetricValue.DoesNotExist:
+                        # This is an energy-related metric but without the cost data
+                        print(f"Energy metric {metric_value.metric.id} does not have cost data.")
+                        pass
+                
+                results.append(result)
             
             return results
             
