@@ -162,7 +162,7 @@
                     :value="country.id" />
             </el-select>
             <el-alert type="info" show-icon :closable="false" style="margin-top: 10px">
-                <p style="font-size: 14px">{{ $t('The region specified will not be used in the analysis calculus, but it might be useful to contextualize the results.') }}</p>
+                <p style="font-size: 14px">{{ $t('The country or region specified will be used to determine the carbon intensity of the electricity supply.') }}</p>
             </el-alert>
         </el-form-item>
         <br>
