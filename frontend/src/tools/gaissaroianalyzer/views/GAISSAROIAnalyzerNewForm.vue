@@ -73,7 +73,7 @@
 
         <div>
             <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Tactic Metrics") }}</h3>
-            <p>{{ $t("Next, introduce the values for each of the metric described.") }}</p><br>
+            <p>{{ $t("Next, introduce the values for each of the metrics described.") }}</p><br>
 
             <p v-if="!formData.mlTactic" style="color: grey;">
                 {{ $t("Please select a model architecture and a machine learning tactic to see the applicable metrics.") }}

@@ -77,7 +77,8 @@ class TacticSourceView(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['id', 'title', 'url']
     search_fields = ['title', 'url']
-    ordering_fields = ['title']
+    ordering_fields = ['id', 'title']
+    ordering = ['id']
 
 
 class MLTacticView(viewsets.ModelViewSet):
@@ -88,13 +89,14 @@ class MLTacticView(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['id', 'name', 'sources']
     search_fields = ['name', 'information']
-    ordering_fields = ['name']
+    ordering_fields = ['id', 'name']
+    ordering = ['id']
 
     @action(detail=True, methods=['get'], url_path='applicable-metrics')
     def get_applicable_metrics(self, request, pk=None):
         """Get applicable metrics for a specific tactic."""
         tactic = self.get_object()
-        applicable_metrics = tactic.applicable_metrics.all()
+        applicable_metrics = tactic.applicable_metrics.all().order_by('id')
         
         # Serialize the metrics and return them
         serializer = ROIMetricSerializer(applicable_metrics, many=True)
@@ -109,7 +111,8 @@ class TacticParameterOptionView(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['id', 'tactic', 'name', 'value']
     search_fields = ['name', 'value', 'tactic__name']
-    ordering_fields = ['tactic__name', 'name', 'value']
+    ordering_fields = ['id', 'tactic__name', 'name', 'value']
+    ordering = ['id']
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -150,7 +153,8 @@ class ROIMetricView(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['id', 'name', 'unit']
     search_fields = ['name', 'description']
-    ordering_fields = ['name']
+    ordering_fields = ['id', 'name']
+    ordering = ['id']
 
 
 class ROIAnalysisViewSet(viewsets.ModelViewSet):
@@ -262,7 +266,8 @@ class AnalysisMetricValueView(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSAROIAnalyzerEnabled]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['analysis', 'metric']
-    ordering_fields = ['analysis', 'metric']
+    ordering_fields = ['id', 'analysis', 'metric']
+    ordering = ['id']
 
 
 class EnergyAnalysisMetricValueView(viewsets.ModelViewSet):
@@ -272,7 +277,8 @@ class EnergyAnalysisMetricValueView(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSAROIAnalyzerEnabled]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['analysis', 'metric']
-    ordering_fields = ['analysis', 'metric']
+    ordering_fields = ['id', 'analysis', 'metric']
+    ordering = ['id']
     
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -295,4 +301,5 @@ class ExpectedMetricReductionView(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSAROIAnalyzerEnabled]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['model_architecture', 'tactic_parameter_option', 'metric']
-    ordering_fields = ['model_architecture', 'tactic_parameter_option', 'metric']
+    ordering_fields = ['id', 'model_architecture', 'tactic_parameter_option', 'metric']
+    ordering = ['id']
