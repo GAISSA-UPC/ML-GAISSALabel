@@ -95,12 +95,22 @@ class EnergyAnalysisMetricValueSerializer(serializers.ModelSerializer):
         queryset=ROIMetric.objects.all(), write_only=True, source='metric'
     )
     cost_savings = serializers.SerializerMethodField(read_only=True)
+    implementation_cost = serializers.SerializerMethodField(read_only=True)
+    energy_cost_rate = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = EnergyAnalysisMetricValue
         fields = ['id', 'analysis', 'metric', 'metric_id', 'metric_name', 'baselineValue', 
                  'energy_cost_rate', 'implementation_cost', 'cost_savings']
         read_only_fields = ['metric'] # metric is set via metric_id
+
+    def get_implementation_cost(self, obj):
+        """Format implementation_cost to remove trailing zeros"""
+        return obj.implementation_cost.normalize()
+    
+    def get_energy_cost_rate(self, obj):
+        """Format energy_cost_rate to remove trailing zeros"""
+        return obj.energy_cost_rate.normalize()
 
     def get_cost_savings(self, obj):
         # Default calculation for 100 million inferences if not specified

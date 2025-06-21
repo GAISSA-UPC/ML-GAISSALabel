@@ -496,23 +496,26 @@ export default {
                 return 'N/A';
             }
 
-            // Scientific notation for very small values
-            if (Math.abs(value) < 0.00001 && value !== 0) {
-                return value.toExponential(4);
+            // Convert to number to ensure we're working with numeric values
+            const numValue = Number(value);
+
+            // Scientific notation for very small values (smaller than 0.0001)
+            if (Math.abs(numValue) < 0.0001 && numValue !== 0) {
+                return numValue.toExponential(4);
             }
 
-            if (Math.abs(value) >= 1000000000) {
-                return (value / 1000000000).toLocaleString('en-US', { maximumFractionDigits: 1 }) + 'B';
-            } else if (Math.abs(value) >= 1000000) {
-                return (value / 1000000).toLocaleString('en-US', { maximumFractionDigits: 1 }) + 'M';
-            } else if (Math.abs(value) >= 1000) {
-                return (value / 1000).toLocaleString('en-US', { maximumFractionDigits: 1 }) + 'K';
-            } else if (Math.abs(value) >= 1) {
-                return value.toLocaleString('en-US', { maximumFractionDigits: 2 });
-            } else if (Math.abs(value) >= 0.01) {
-                return value.toLocaleString('en-US', { maximumFractionDigits: 4 });
+            if (Math.abs(numValue) >= 1000000000) {
+                return (numValue / 1000000000).toLocaleString('en-US', { maximumFractionDigits: 1 }) + 'B';
+            } else if (Math.abs(numValue) >= 1000000) {
+                return (numValue / 1000000).toLocaleString('en-US', { maximumFractionDigits: 1 }) + 'M';
+            } else if (Math.abs(numValue) >= 1000) {
+                return (numValue / 1000).toLocaleString('en-US', { maximumFractionDigits: 1 }) + 'K';
+            } else if (Math.abs(numValue) >= 1) {
+                return numValue.toLocaleString('en-US', { maximumFractionDigits: 2 });
+            } else if (Math.abs(numValue) >= 0.01) {
+                return numValue.toLocaleString('en-US', { maximumFractionDigits: 4 });
             } else {
-                return value.toLocaleString('en-US', { maximumFractionDigits: 6 });
+                return numValue.toLocaleString('en-US', { maximumFractionDigits: 6 });
             }
         },
         getDescriptionsColumnCount() {

@@ -85,7 +85,7 @@
                 :label="metric.name">
                 <el-input-number 
                     v-model="metricValues[metric.id]" 
-                    :precision="4" 
+                    :precision="8" 
                     :step="0.01"
                     :min="metric.min_value !== null ? metric.min_value : 0"
                     :max="metric.max_value !== null ? metric.max_value : undefined"
@@ -121,7 +121,7 @@
                 <el-form-item :label="$t('Energy Cost Rate (€/kWh)')">
                     <el-input-number 
                         v-model="energyCostRates[metric.id]" 
-                        :precision="4" 
+                        :precision="6" 
                         :step="0.001"
                         :min="0"
                         style="width: 200px"></el-input-number>
@@ -133,8 +133,8 @@
                 <el-form-item :label="$t('Implementation Cost (€)')">
                     <el-input-number 
                         v-model="implementationCosts[metric.id]" 
-                        :precision="2" 
-                        :step="1"
+                        :precision="8"
+                        :step="0.01"
                         :min="0"
                         style="width: 200px"></el-input-number>
                     <el-alert type="info" show-icon :closable="false" style="margin-top: 10px">

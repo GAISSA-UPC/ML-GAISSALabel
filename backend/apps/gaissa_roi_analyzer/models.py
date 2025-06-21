@@ -284,8 +284,8 @@ class AnalysisMetricValue(models.Model):
 
 class EnergyAnalysisMetricValue(AnalysisMetricValue):
     """Specialized metric values for energy-related metrics"""
-    energy_cost_rate = models.DecimalField(max_digits=10, decimal_places=4, verbose_name=_('Energy Cost Rate (€/kWh)'), help_text=_('The cost per kilowatt-hour of energy in €'))
-    implementation_cost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('Implementation Costs (€)'), help_text=_('Additional costs for implementing this energy optimization tactic in €'))
+    energy_cost_rate = models.DecimalField(max_digits=10, decimal_places=6, verbose_name=_('Energy Cost Rate (€/kWh)'), help_text=_('The cost per kilowatt-hour of energy in €'))
+    implementation_cost = models.DecimalField(max_digits=14, decimal_places=10, verbose_name=_('Implementation Costs (€)'), help_text=_('Additional costs for implementing this energy optimization tactic in €'))
 
     class Meta:
         verbose_name = _('Energy Metric Analysis Value')
