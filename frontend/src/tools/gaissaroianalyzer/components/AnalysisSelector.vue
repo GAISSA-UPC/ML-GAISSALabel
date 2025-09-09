@@ -9,44 +9,47 @@
 
         <el-form label-position="top" class="form-container">
             <h3 class="section-title">{{ $t("Model Architecture") }}</h3>
-            <p class="field-description">{{ $t("Please, indicate the model architecture you are interested in.") }}</p>
+            <p class="field-description">
+                {{ $t("Please, indicate the model architecture you are interested in.") }}
+                <el-tooltip v-if="!comparisonMode" placement="top" :content="$t('Model architecture refers to the specific structure and framework of a machine learning or deep learning system (e.g., SVM, KNN, AlexNet, GoogLeNet). Different architectures have distinct design principles and computational requirements, which influence both their performance and their environmental impact.')">
+                    <el-icon class="info-icon"><InfoFilled /></el-icon>
+                </el-tooltip>
+            </p>
             <el-form-item>
                 <el-select v-model="selectedModelArchitecture" @change="onModelArchitectureChange" placeholder="Select"
                     filterable>
                     <el-option v-for="(modelArchitecture, i) in modelArchitectures" :key="i" :value="modelArchitecture.id" :label="modelArchitecture.name" />
                 </el-select>
-                <el-alert v-if="!comparisonMode" type="info" show-icon :closable="false" style="margin-top: 10px">
-                    <p style="font-size: 14px">{{ $t('Model architecture refers to the specific structure and framework of a machine learning or deep learning system (e.g., SVM, KNN, AlexNet, GoogLeNet). Different architectures have distinct design principles and computational requirements, which influence both their performance and their environmental impact.') }}</p>
-                </el-alert>
             </el-form-item>
 
             <div v-if="selectedModelArchitecture !== null">
                 <h3 class="section-title">{{ $t("ML Tactic") }}</h3>
-                <p class="field-description">{{ $t("Please, indicate the ML tactic you are interested in.")
-                    }}</p>
+                <p class="field-description">{{ $t("Please, indicate the ML tactic you are interested in.") }}
+                    <el-tooltip v-if="!comparisonMode" placement="top" :content="$t('ML tactics are optimization techniques applied to machine learning models to enhance efficiency (e.g., pruning). These tactics aim to reduce computational and energy costs while preserving or minimally impacting model performance.')">
+                        <el-icon class="info-icon"><InfoFilled /></el-icon>
+                    </el-tooltip>
+                </p>
                 <el-form-item>
                     <el-select v-model="selectedMlTactic" @change="onMlTacticChange"
                         placeholder="Select">
                         <el-option v-for="(mlTactic, i) in mlTactics" :key="i" :value="mlTactic.id"
                             :label="mlTactic.name" />
                     </el-select>
-                    <el-alert v-if="!comparisonMode" type="info" show-icon :closable="false" style="margin-top: 10px">
-                        <p style="font-size: 14px">{{ $t('ML tactics are optimization techniques applied to machine learning models to enhance efficiency (e.g., pruning). These tactics aim to reduce computational and energy costs while preserving or minimally impacting model performance.') }}</p>
-                    </el-alert>
                 </el-form-item>
             </div>
             <div v-if="selectedMlTactic !== null && tacticParameters.length > 0">
                 <h3 class="section-title">{{ $t("Tactic Parameter") }}</h3>
-                <p class="field-description">{{ $t("Please, specify the parameter for the chosen tactic.") }}</p>
+                <p class="field-description">{{ $t("Please, specify the parameter for the chosen tactic.") }}
+                    <el-tooltip v-if="!comparisonMode" placement="top" :content="$t('Tactic parameters define specific configurations or settings for the selected ML tactic. These parameters directly influence how aggressively the optimization is applied.')">
+                        <el-icon class="info-icon"><InfoFilled /></el-icon>
+                    </el-tooltip>
+                </p>
                 <el-form-item>
                     <el-select v-model="selectedTacticParameter" @change="onTacticParameterChange"
                         placeholder="Select a parameter">
                         <el-option v-for="parameter in tacticParameters" :key="parameter.id"
                             :value="parameter.id" :label="`${parameter.name}: ${parameter.value}`" />
                     </el-select>
-                    <el-alert v-if="!comparisonMode" type="info" show-icon :closable="false" style="margin-top: 10px">
-                        <p style="font-size: 14px">{{ $t('Tactic parameters define specific configurations or settings for the selected ML tactic. These parameters directly influence how aggressively the optimization is applied.') }}</p>
-                    </el-alert>
                 </el-form-item>
             </div>
 
@@ -79,9 +82,11 @@ import mlTactics from "@/tools/gaissaroianalyzer/services/mlTactics";
 import tacticParameters from "@/tools/gaissaroianalyzer/services/tacticParameters";
 import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
 import { formatData } from "@/utils";
+import { InfoFilled } from '@element-plus/icons-vue'
 
 export default {
     name: "AnalysisSelector",
+    components: { InfoFilled },
     props: {
         analysisType: { 
             required: true, 
@@ -334,5 +339,12 @@ h2 {
     color: white !important;
     cursor: not-allowed !important;
     opacity: 0.7;
+}
+
+.info-icon {
+    margin-left: 6px;
+    color: var(--el-color-info);
+    cursor: help;
+    vertical-align: middle;
 }
 </style>

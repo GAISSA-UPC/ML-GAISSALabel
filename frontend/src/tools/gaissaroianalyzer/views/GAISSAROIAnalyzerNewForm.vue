@@ -14,7 +14,13 @@
         <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Model Architecture and ML Tactic") }}</h3>
         <p>{{ $t('First, please indicate the model architecture you are working with.') }}</p><br>
 
-        <el-form-item :label="$t('Model Architecture')" prop="modelArchitecture">
+        <el-form-item prop="modelArchitecture">
+            <template #label>
+                {{ $t('Model Architecture') }}
+                <el-tooltip placement="top" :content="$t('Model architecture refers to the specific structure and framework of a machine learning or deep learning system (e.g., SVM, KNN, AlexNet, GoogLeNet). Different architectures have distinct design principles and computational requirements, which influence both their performance and their environmental impact.')">
+                    <el-icon class="info-icon"><InfoFilled /></el-icon>
+                </el-tooltip>
+            </template>
             <el-select 
                 v-model="formData.modelArchitecture" 
                 filterable 
@@ -28,12 +34,15 @@
                     :label="model.name" 
                     :value="model.id" />
             </el-select>
-            <el-alert type="info" show-icon :closable="false" style="margin-top: 10px">
-                <p style="font-size: 14px">{{ $t('Model architecture refers to the specific structure and framework of a machine learning or deep learning system (e.g., SVM, KNN, AlexNet, GoogLeNet). Different architectures have distinct design principles and computational requirements, which influence both their performance and their environmental impact.') }}</p>
-            </el-alert>
         </el-form-item>
 
-        <el-form-item :label="$t('ML Tactic')" prop="mlTactic">
+        <el-form-item prop="mlTactic">
+            <template #label>
+                {{ $t('ML Tactic') }}
+                <el-tooltip placement="top" :content="$t('ML tactics are optimization techniques applied to machine learning models to enhance efficiency (e.g., pruning). These tactics aim to reduce computational and energy costs while preserving or minimally impacting model performance.')">
+                    <el-icon class="info-icon"><InfoFilled /></el-icon>
+                </el-tooltip>
+            </template>
             <el-select 
                 v-model="formData.mlTactic" 
                 filterable 
@@ -47,12 +56,15 @@
                     :label="tactic.name" 
                     :value="tactic.id" />
             </el-select>
-            <el-alert type="info" show-icon :closable="false" style="margin-top: 10px">
-                <p style="font-size: 14px">{{ $t('ML tactics are optimization techniques applied to machine learning models to enhance efficiency (e.g., pruning). These tactics aim to reduce computational and energy costs while preserving or minimally impacting model performance.') }}</p>
-            </el-alert>
         </el-form-item>
 
-        <el-form-item :label="$t('Tactic Parameter')" prop="tacticParameter">
+        <el-form-item prop="tacticParameter">
+            <template #label>
+                {{ $t('Tactic Parameter') }}
+                <el-tooltip placement="top" :content="$t('Tactic parameters define specific configurations or settings for the selected ML tactic. These parameters directly influence how aggressively the optimization is applied.')">
+                    <el-icon class="info-icon"><InfoFilled /></el-icon>
+                </el-tooltip>
+            </template>
             <el-select 
                 v-model="formData.tacticParameter" 
                 filterable 
@@ -65,9 +77,6 @@
                     :label="`${parameter.name}: ${parameter.value}`" 
                     :value="parameter.id" />
             </el-select>
-            <el-alert type="info" show-icon :closable="false" style="margin-top: 10px">
-                <p style="font-size: 14px">{{ $t('Tactic parameters define specific configurations or settings for the selected ML tactic. These parameters directly influence how aggressively the optimization is applied.') }}</p>
-            </el-alert>
         </el-form-item>
         <br>
 
@@ -81,8 +90,13 @@
 
             <el-form-item v-if="formData.mlTactic"
                 v-for="metric in applicableMetrics" 
-                :key="metric.id"
-                :label="metric.name">
+                :key="metric.id">
+                <template #label>
+                    <span>{{ metric.name }}</span>
+                    <el-tooltip v-if="metric.description" placement="top" :content="metric.description">
+                        <el-icon class="info-icon"><InfoFilled /></el-icon>
+                    </el-tooltip>
+                </template>
                 <el-input-number 
                     v-model="metricValues[metric.id]" 
                     :precision="8" 
@@ -91,9 +105,6 @@
                     :max="metric.max_value !== null ? metric.max_value : undefined"
                     style="width: 200px"></el-input-number>
                 <p style="margin-left: 10px">{{ metric.unit }}</p>
-                <el-alert v-if="metric.description" type="info" show-icon :closable="false" style="margin-top: 10px">
-                    <p style="font-size: 14px">{{ metric.description }}</p>
-                </el-alert>
                 <el-alert v-if="metric.min_value !== null || metric.max_value !== null" type="warning" show-icon :closable="false" style="margin-top: 10px">
                     <p style="font-size: 14px">
                       <template v-if="metric.min_value !== null && metric.max_value !== null">
@@ -118,28 +129,34 @@
             <div v-for="metric in energyRelatedMetrics" :key="`cost-${metric.id}`">
                 <h4 v-if="energyRelatedMetrics.length > 1">{{ metric.name }} - {{ $t('Cost Information') }}</h4>
                 
-                <el-form-item :label="$t('Energy Cost Rate (€/kWh)')">
+                <el-form-item>
+                    <template #label>
+                        {{ $t('Energy Cost Rate (€/kWh)') }}
+                        <el-tooltip placement="top" :content="$t('The cost of the electricity supply used.')">
+                            <el-icon class="info-icon"><InfoFilled /></el-icon>
+                        </el-tooltip>
+                    </template>
                     <el-input-number 
                         v-model="energyCostRates[metric.id]" 
                         :precision="6" 
                         :step="0.001"
                         :min="0"
                         style="width: 200px"></el-input-number>
-                    <el-alert type="info" show-icon :closable="false" style="margin-top: 10px">
-                        <p style="font-size: 14px">{{ $t('The cost of the electricity supply used.') }}</p>
-                    </el-alert>
                 </el-form-item>
                 
-                <el-form-item :label="$t('Implementation Cost (€)')">
+                <el-form-item>
+                    <template #label>
+                        {{ $t('Implementation Cost (€)') }}
+                        <el-tooltip placement="top" :content="$t('The cost associated with implementing the ML tactic, including development, testing, and deployment costs.')">
+                            <el-icon class="info-icon"><InfoFilled /></el-icon>
+                        </el-tooltip>
+                    </template>
                     <el-input-number 
                         v-model="implementationCosts[metric.id]" 
                         :precision="8"
                         :step="0.01"
                         :min="0"
                         style="width: 200px"></el-input-number>
-                    <el-alert type="info" show-icon :closable="false" style="margin-top: 10px">
-                        <p style="font-size: 14px">{{ $t('The cost associated with implementing the ML tactic, including development, testing, and deployment costs.') }}</p>
-                    </el-alert>
                 </el-form-item>
             </div>
             <br>
@@ -148,7 +165,13 @@
         <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Location Information") }}</h3>
         <p>{{ $t("Please specify the country or region where the model is being deployed.") }}</p><br>
 
-        <el-form-item :label="$t('Country')" prop="country">
+        <el-form-item prop="country">
+            <template #label>
+                {{ $t('Country') }}
+                <el-tooltip placement="top" :content="$t('The country or region specified will be used to determine the carbon intensity of the electricity supply.')">
+                    <el-icon class="info-icon"><InfoFilled /></el-icon>
+                </el-tooltip>
+            </template>
             <el-select 
                 v-model="formData.country" 
                 filterable 
@@ -161,9 +184,6 @@
                     :label="`${country.name} (${country.country_code})`" 
                     :value="country.id" />
             </el-select>
-            <el-alert type="info" show-icon :closable="false" style="margin-top: 10px">
-                <p style="font-size: 14px">{{ $t('The country or region specified will be used to determine the carbon intensity of the electricity supply.') }}</p>
-            </el-alert>
         </el-form-item>
         <br>
 
@@ -184,9 +204,11 @@ import roiMetrics from "@/tools/gaissaroianalyzer/services/roiMetrics";
 import tacticParameters from "@/tools/gaissaroianalyzer/services/tacticParameters";
 import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
 import countries from "@/tools/gaissaroianalyzer/services/countries";
+import { InfoFilled } from '@element-plus/icons-vue'
 
 export default {
     name: "GAISSAROIAnalyzerNewForm",
+    components: { InfoFilled },
     data() {
         return {
             modelArchitectures: [],
@@ -467,5 +489,12 @@ p {
     color: white !important;
     cursor: not-allowed !important;
     opacity: 0.7;
+}
+
+.info-icon {
+    margin-left: 6px;
+    color: var(--el-color-info);
+    cursor: help;
+    vertical-align: middle;
 }
 </style>
