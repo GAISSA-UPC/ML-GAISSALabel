@@ -163,6 +163,11 @@ export default {
             const response = await mlTactics.list(params);
             if (response && response.data) {
                 this.mlTactics = response.data;
+
+                // Auto-select if there's only one ML tactic
+                if (this.mlTactics.length === 1) {
+                    this.selectedMlTactic = this.mlTactics[0].id;
+                }
             }
         },
         async refreshModelArchitectures() {
@@ -172,6 +177,11 @@ export default {
             const response = await modelArchitectures.getCompatibleArchitecturesWithTactic(this.selectedMlTactic, params);
             if (response && response.data) {
                 this.modelArchitectures = response.data;
+
+                // Auto-select if there's only one model architecture
+                if (this.modelArchitectures.length === 1) {
+                    this.selectedModelArchitecture = this.modelArchitectures[0].id;
+                }
             }
         },
         async refreshTacticParameters() {
@@ -188,6 +198,11 @@ export default {
             const response = await tacticParameters.list(this.selectedMlTactic, filter);
             if (response && response.data) {
                 this.tacticParameters = response.data;
+
+                // Auto-select if there's only one tactic parameter
+                if (this.tacticParameters.length === 1) {
+                    this.selectedTacticParameter = this.tacticParameters[0].id;
+                }
             }
         },
         async onMlTacticChange() {
@@ -227,6 +242,11 @@ export default {
                 const response = await roiAnalyses.list(params);
                 if (response && response.data) {
                     this.experiments = response.data;
+                    
+                    // Auto-select if there's only one experiment
+                    if (this.experiments.length === 1) {
+                        this.selectedExperiment = this.experiments[0].id;
+                    }
                 }
             } else {
                 this.experiments = [];
