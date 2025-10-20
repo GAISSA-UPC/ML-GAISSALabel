@@ -2,11 +2,11 @@
     <el-card shadow="always" :body-style="{ padding: '20px' }">
         <h2 class="section-title">{{ $t("Model Information") }}</h2>
         <el-descriptions v-if="modelData" :column="1" border>
-            <el-descriptions-item :label="$t('Model architecture')">
-                {{ modelData.model_architecture_name }}
-            </el-descriptions-item>
             <el-descriptions-item :label="$t('ML Tactic')">
                 {{ modelData.tactic_parameter_option_details?.tactic_name }}
+            </el-descriptions-item>
+            <el-descriptions-item :label="$t('Model architecture')">
+                {{ modelData.model_architecture_name }}
             </el-descriptions-item>
             <el-descriptions-item :label="$t('Tactic parameter')">
                 {{ modelData.tactic_parameter_option_details?.name }}: {{

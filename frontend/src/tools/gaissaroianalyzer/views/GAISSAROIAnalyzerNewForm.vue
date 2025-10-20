@@ -11,30 +11,8 @@
     <br>
 
     <el-form label-position="top">
-        <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("Model Architecture and ML Tactic") }}</h3>
-        <p>{{ $t('First, please indicate the model architecture you are working with.') }}</p><br>
-
-        <el-form-item prop="modelArchitecture">
-            <template #label>
-                {{ $t('Model Architecture') }}
-                <el-tooltip placement="top" :content="$t('Model architecture refers to the specific structure and framework of a machine learning or deep learning system (e.g., SVM, KNN, AlexNet, GoogLeNet). Different architectures have distinct design principles and computational requirements, which influence both their performance and their environmental impact.')">
-                    <el-icon class="info-icon"><InfoFilled /></el-icon>
-                </el-tooltip>
-            </template>
-            <el-select 
-                v-model="formData.modelArchitecture" 
-                filterable 
-                clearable 
-                placeholder="Select"
-                @change="handleModelArchChange"
-                class="model-select">
-                <el-option 
-                    v-for="model in modelArchitectures" 
-                    :key="model.id" 
-                    :label="model.name" 
-                    :value="model.id" />
-            </el-select>
-        </el-form-item>
+        <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("ML Tactic and Model Architecture") }}</h3>
+        <p>{{ $t('First, please indicate the ML tactic you want to evaluate.') }}</p><br>
 
         <el-form-item prop="mlTactic">
             <template #label>
@@ -55,6 +33,28 @@
                     :key="tactic.id" 
                     :label="tactic.name" 
                     :value="tactic.id" />
+            </el-select>
+        </el-form-item>
+
+        <el-form-item prop="modelArchitecture">
+            <template #label>
+                {{ $t('Model Architecture') }}
+                <el-tooltip placement="top" :content="$t('Model architecture refers to the specific structure and framework of a machine learning or deep learning system (e.g., SVM, KNN, AlexNet, GoogLeNet). Different architectures have distinct design principles and computational requirements, which influence both their performance and their environmental impact.')">
+                    <el-icon class="info-icon"><InfoFilled /></el-icon>
+                </el-tooltip>
+            </template>
+            <el-select 
+                v-model="formData.modelArchitecture" 
+                filterable 
+                clearable 
+                placeholder="Select"
+                @change="handleModelArchChange"
+                class="model-select">
+                <el-option 
+                    v-for="model in modelArchitectures" 
+                    :key="model.id" 
+                    :label="model.name" 
+                    :value="model.id" />
             </el-select>
         </el-form-item>
 
@@ -85,7 +85,7 @@
             <p>{{ $t("Next, introduce the values for each of the metrics described.") }}</p><br>
 
             <p v-if="!formData.mlTactic" style="color: grey;">
-                {{ $t("Please select a model architecture and a machine learning tactic to see the applicable metrics.") }}
+                {{ $t("Please select an ML tactic and a model architecture to see the applicable metrics.") }}
             </p>
 
             <el-form-item v-if="formData.mlTactic"
@@ -250,15 +250,26 @@ export default {
         }
     },
     methods: {
-        async fetchModelArchitectures() {
+        async fetchTactics() {
             try {
-                const response = await modelArchitectures.list();
+                const response = await mlTactics.list();
+                if (response && response.data) {
+                    this.tactics = response.data;
+                }
+            } catch (error) {
+                console.error("Error fetching ML tactics:", error);
+                this.error = "Failed to load available ML tactics. Please try again."
+            }
+        },
+        async fetchModelArchitecturesForTactic(tacticId) {
+            try {
+                const response = await modelArchitectures.getCompatibleArchitecturesWithTactic(tacticId);
                 if (response && response.data) {
                     this.modelArchitectures = response.data;
                 }
             } catch (error) {
-                console.error("Error fetching model architectures:", error);
-                this.error = "Failed to load model architectures. Please try again.";
+                console.error(`Error fetching architectures for tactic ${tacticId}:`, error);
+                this.error = "Failed to load compatible model architectures. Please try again.";
             }
         },
         async fetchCountries() {
@@ -272,19 +283,8 @@ export default {
                 this.error = "Failed to load countries. Please try again.";
             }
         },
-        async fetchTacticsForModelArchitecture(architectureId) {
-            try {
-                const response = await mlTactics.getCompatibleTacticsWithArchitecture(architectureId);
-                if (response && response.data) {
-                    this.tactics = response.data;
-                }
-            } catch (error) {
-                console.error(`Error fetching tactics for architecture ${architectureId}:`, error);
-                this.error = "Failed to load available ML tactics. Please try again."
-            }
-        },
         async fetchTacticParameters() {
-            if (!this.formData.mlTactic) {
+            if (!this.formData.mlTactic || !this.formData.modelArchitecture) {
                 this.tacticParameters = [];
                 return;
             }
@@ -338,34 +338,32 @@ export default {
                 this.error = "Failed to load applicable metrics. Please try again.";
             }
         },
-        handleModelArchChange() {
-            // Reset tactic selection
-            this.formData.mlTactic = null;
-            this.formData.tacticParameter = null;
-            this.applicableMetrics = [];
-            this.energyRelatedMetrics = [];
-            this.tacticParameters = [];
-            this.tactics = [];
-            
-            // Fetch tactics compatible with the selected model architecture
-            if (this.formData.modelArchitecture) {
-                this.fetchTacticsForModelArchitecture(this.formData.modelArchitecture);
-            } else {
-                this.tactics = [];
-            }
-        },
         handleTacticChange() {
-            // Reset tactic parameter selection and metrics
+            // Reset model architecture selection and dependent fields
+            this.formData.modelArchitecture = null;
             this.formData.tacticParameter = null;
             this.metricValues = {};
             this.energyCostRates = {};
             this.implementationCosts = {};
             this.tacticParameters = [];
             this.applicableMetrics = [];
+            this.modelArchitectures = [];
             
-            // Fetch parameters and metrics for the selected tactic
+            // Fetch architectures compatible with the selected tactic and metrics
+            if (this.formData.mlTactic) {
+                this.fetchModelArchitecturesForTactic(this.formData.mlTactic);
+                this.fetchApplicableMetrics();
+            } else {
+                this.modelArchitectures = [];
+            }
+        },
+        handleModelArchChange() {
+            // Reset tactic parameter selection
+            this.formData.tacticParameter = null;
+            this.tacticParameters = [];
+            
+            // Fetch parameters for the selected tactic and architecture combination
             this.fetchTacticParameters();
-            this.fetchApplicableMetrics();
         },
         async generateROI() {
             if (!this.formIsValid) {
@@ -442,7 +440,7 @@ export default {
     },
     async mounted() {
         // Load initial data
-        await this.fetchModelArchitectures();
+        await this.fetchTactics();
         await this.fetchCountries();
     }
 };

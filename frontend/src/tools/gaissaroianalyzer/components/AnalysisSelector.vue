@@ -8,36 +8,36 @@
         </p>
 
         <el-form label-position="top" class="form-container">
-            <h3 class="section-title">{{ $t("Model Architecture") }}</h3>
-            <p class="field-description">
-                {{ $t("Please, indicate the model architecture you are interested in.") }}
-                <el-tooltip v-if="!comparisonMode" placement="top" :content="$t('Model architecture refers to the specific structure and framework of a machine learning or deep learning system (e.g., SVM, KNN, AlexNet, GoogLeNet). Different architectures have distinct design principles and computational requirements, which influence both their performance and their environmental impact.')">
+            <h3 class="section-title">{{ $t("ML Tactic") }}</h3>
+            <p class="field-description">{{ $t("Please, indicate the ML tactic you are interested in.") }}
+                <el-tooltip v-if="!comparisonMode" placement="top" :content="$t('ML tactics are optimization techniques applied to machine learning models to enhance efficiency (e.g., pruning). These tactics aim to reduce computational and energy costs while preserving or minimally impacting model performance.')">
                     <el-icon class="info-icon"><InfoFilled /></el-icon>
                 </el-tooltip>
             </p>
             <el-form-item>
-                <el-select v-model="selectedModelArchitecture" @change="onModelArchitectureChange" placeholder="Select"
-                    filterable>
-                    <el-option v-for="(modelArchitecture, i) in modelArchitectures" :key="i" :value="modelArchitecture.id" :label="modelArchitecture.name" />
+                <el-select v-model="selectedMlTactic" @change="onMlTacticChange"
+                    placeholder="Select" filterable>
+                    <el-option v-for="(mlTactic, i) in mlTactics" :key="i" :value="mlTactic.id"
+                        :label="mlTactic.name" />
                 </el-select>
             </el-form-item>
 
-            <div v-if="selectedModelArchitecture !== null">
-                <h3 class="section-title">{{ $t("ML Tactic") }}</h3>
-                <p class="field-description">{{ $t("Please, indicate the ML tactic you are interested in.") }}
-                    <el-tooltip v-if="!comparisonMode" placement="top" :content="$t('ML tactics are optimization techniques applied to machine learning models to enhance efficiency (e.g., pruning). These tactics aim to reduce computational and energy costs while preserving or minimally impacting model performance.')">
+            <div v-if="selectedMlTactic !== null">
+                <h3 class="section-title">{{ $t("Model Architecture") }}</h3>
+                <p class="field-description">
+                    {{ $t("Please, indicate the model architecture you are interested in.") }}
+                    <el-tooltip v-if="!comparisonMode" placement="top" :content="$t('Model architecture refers to the specific structure and framework of a machine learning or deep learning system (e.g., SVM, KNN, AlexNet, GoogLeNet). Different architectures have distinct design principles and computational requirements, which influence both their performance and their environmental impact.')">
                         <el-icon class="info-icon"><InfoFilled /></el-icon>
                     </el-tooltip>
                 </p>
                 <el-form-item>
-                    <el-select v-model="selectedMlTactic" @change="onMlTacticChange"
-                        placeholder="Select">
-                        <el-option v-for="(mlTactic, i) in mlTactics" :key="i" :value="mlTactic.id"
-                            :label="mlTactic.name" />
+                    <el-select v-model="selectedModelArchitecture" @change="onModelArchitectureChange" placeholder="Select"
+                        filterable>
+                        <el-option v-for="(modelArchitecture, i) in modelArchitectures" :key="i" :value="modelArchitecture.id" :label="modelArchitecture.name" />
                     </el-select>
                 </el-form-item>
             </div>
-            <div v-if="selectedMlTactic !== null && tacticParameters.length > 0">
+            <div v-if="selectedModelArchitecture !== null && tacticParameters.length > 0">
                 <h3 class="section-title">{{ $t("Tactic Parameter") }}</h3>
                 <p class="field-description">{{ $t("Please, specify the parameter for the chosen tactic.") }}
                     <el-tooltip v-if="!comparisonMode" placement="top" :content="$t('Tactic parameters define specific configurations or settings for the selected ML tactic. These parameters directly influence how aggressively the optimization is applied.')">
@@ -146,36 +146,36 @@ export default {
             this.selectedMlTactic = null;
             this.selectedTacticParameter = null;
             this.selectedExperiment = null;
-            this.mlTactics = [];
+            this.modelArchitectures = [];
             this.tacticParameters = [];
             this.experiments = [];
             this.resetSelection();
             
-            // Refresh model architectures for the new analysis type
-            await this.refreshModelArchitectures();
+            // Refresh ML tactics for the new analysis type
+            await this.refreshMlTactics();
         }
     },
     methods: {
-        async refreshModelArchitectures() {
-            const params = {
-                analysis_type: this.analysisType
-            };
-            const response = await modelArchitectures.list(params);
-            if (response && response.data) {
-                this.modelArchitectures = response.data;
-            }
-        },
         async refreshMlTactics() {
             const params = {
                 analysis_type: this.analysisType
             };
-            const response = await mlTactics.getCompatibleTacticsWithArchitecture(this.selectedModelArchitecture, params);
+            const response = await mlTactics.list(params);
             if (response && response.data) {
                 this.mlTactics = response.data;
             }
         },
+        async refreshModelArchitectures() {
+            const params = {
+                analysis_type: this.analysisType
+            };
+            const response = await modelArchitectures.getCompatibleArchitecturesWithTactic(this.selectedMlTactic, params);
+            if (response && response.data) {
+                this.modelArchitectures = response.data;
+            }
+        },
         async refreshTacticParameters() {
-            if (!this.selectedMlTactic) {
+            if (!this.selectedMlTactic || !this.selectedModelArchitecture) {
                 this.tacticParameters = [];
                 return;
             }
@@ -190,17 +190,17 @@ export default {
                 this.tacticParameters = response.data;
             }
         },
-        async onModelArchitectureChange() {
-            this.selectedMlTactic = null;
+        async onMlTacticChange() {
+            this.selectedModelArchitecture = null;
             this.tacticParameters = [];
-            this.mlTactics = [];
+            this.modelArchitectures = [];
             this.selectedTacticParameter = null;
             this.experiments = [];
             this.selectedExperiment = null;
             this.resetSelection();
-            await this.refreshMlTactics();
+            await this.refreshModelArchitectures();
         },
-        async onMlTacticChange() {
+        async onModelArchitectureChange() {
             this.selectedTacticParameter = null;
             this.experiments = [];
             this.tacticParameters = [];
@@ -271,7 +271,7 @@ export default {
         formatData,
     },
     async mounted() {
-        await this.refreshModelArchitectures();
+        await this.refreshMlTactics();
     },
 };
 </script>

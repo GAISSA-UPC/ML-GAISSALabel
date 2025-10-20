@@ -92,6 +92,23 @@ class MLTacticView(viewsets.ModelViewSet):
     ordering_fields = ['id', 'name']
     ordering = ['id']
 
+    def get_queryset(self):
+        """Filter ML tactics by analysis type if analysis_type parameter is provided."""
+        queryset = super().get_queryset()
+        
+        analysis_type = self.request.query_params.get('analysis_type')
+        if analysis_type:
+            if analysis_type == 'calculation':
+                queryset = queryset.filter(
+                    parameter_options__roi_analyses__roianalysiscalculation__isnull=False
+                ).distinct()
+            elif analysis_type == 'research':
+                queryset = queryset.filter(
+                    parameter_options__roi_analyses__roianalysisresearch__isnull=False
+                ).distinct()
+                
+        return queryset
+
     @action(detail=True, methods=['get'], url_path='applicable-metrics')
     def get_applicable_metrics(self, request, pk=None):
         """Get applicable metrics for a specific tactic."""
@@ -100,6 +117,32 @@ class MLTacticView(viewsets.ModelViewSet):
         
         # Serialize the metrics and return them
         serializer = ROIMetricSerializer(applicable_metrics, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['get'], url_path='compatible-architectures')
+    def get_compatible_architectures(self, request, pk=None):
+        """Get compatible model architectures for a specific tactic."""
+        tactic = self.get_object()
+        compatible_architectures = tactic.compatible_architectures.all()
+        
+        # Filter by analysis type if analysis_type parameter is provided
+        analysis_type = self.request.query_params.get('analysis_type')
+        if analysis_type:
+            if analysis_type == 'calculation':
+                # Filter to include only architectures that have calculation analyses with this tactic
+                compatible_architectures = compatible_architectures.filter(
+                    roi_analyses__tactic_parameter_option__tactic=tactic,
+                    roi_analyses__roianalysiscalculation__isnull=False
+                ).distinct()
+            elif analysis_type == 'research':
+                # Filter to include only architectures that have research analyses with this tactic
+                compatible_architectures = compatible_architectures.filter(
+                    roi_analyses__tactic_parameter_option__tactic=tactic,
+                    roi_analyses__roianalysisresearch__isnull=False
+                ).distinct()
+        
+        # Serialize the architectures and return them
+        serializer = ModelArchitectureSerializer(compatible_architectures, many=True)
         return Response(serializer.data)
 
 
