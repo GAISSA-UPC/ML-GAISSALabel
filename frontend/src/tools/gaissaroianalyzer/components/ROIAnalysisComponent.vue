@@ -111,12 +111,6 @@
                         </div>
                     </div>
 
-                    <p class="results-description" v-if="costMetricsResults.length">
-                        {{ $t(`This table provides a detailed economic analysis of the applied tactic, showing the
-                        estimated cost savings and Return on Investment metrics for
-                        ${costMetricsResults[0]?.num_inferences.toLocaleString('en-US')} inferences.`) }}
-                    </p>
-
                     <div v-if="costMetricsResults.length" class="roi-cards-container">
                         <ROIDetailsCard v-for="(metric, index) in costMetricsResults" :key="index" :costMetric="metric"
                             :formatNumber="formatNumber"

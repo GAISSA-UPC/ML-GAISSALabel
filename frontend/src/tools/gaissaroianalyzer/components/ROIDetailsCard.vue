@@ -1,6 +1,32 @@
 <template>
     <div class="roi-card">
         <h3 v-if="showTitle">{{ costMetric.metric_name }}</h3>
+        
+        <!-- Cost Metric Card (visual representation) -->
+        <slot name="costMetricCard"></slot>
+
+        <!-- Recommendation based on Break-Even Point -->
+        <div class="recommendation-container" v-if="tacticName">
+            <font-awesome-icon v-if="costMetric.break_even_inferences !== 'Infinity'" :icon="['fas', 'lightbulb']"
+                class="recommendation-icon positive" />
+            <font-awesome-icon v-else :icon="['fas', 'lightbulb']" class="recommendation-icon negative" />
+            <div v-if="costMetric.break_even_inferences !== 'Infinity'" class="recommendation positive">
+                <strong>We recommend you to apply the tactic {{ tacticName }}</strong>
+                if you expect to perform an amount of inferences higher than {{ costMetric.break_even_inferences }}.
+            </div>
+            <div v-else class="recommendation negative">
+                We encourage you to consider a different ML tactic as this one does not provide a positive return on
+                investment.
+            </div>
+        </div>
+
+        <p class="results-description">
+            {{ $t(`This table provides a detailed economic analysis of the applied tactic, showing the
+            estimated cost savings and Return on Investment metrics for
+            ${costMetric.num_inferences.toLocaleString('en-US')} inferences.`) }}
+        </p>
+
+        <!-- Detailed ROI Metrics Table -->
         <el-descriptions :column="columnCount" border>
             <el-descriptions-item :label="$t('Incurred Cost (€)')">
                 {{ formatNumber(costMetric.total_new_cost) }}
@@ -33,23 +59,6 @@
                 {{ formatNumber(costMetric.infinite_roi_percentage) }}%
             </el-descriptions-item>
         </el-descriptions>
-
-        <!-- Recommendation based on Break-Even Point -->
-        <div class="recommendation-container" v-if="tacticName">
-            <font-awesome-icon v-if="costMetric.break_even_inferences !== 'Infinity'" :icon="['fas', 'lightbulb']"
-                class="recommendation-icon positive" />
-            <font-awesome-icon v-else :icon="['fas', 'lightbulb']" class="recommendation-icon negative" />
-            <div v-if="costMetric.break_even_inferences !== 'Infinity'" class="recommendation positive">
-                <strong>We recommend you to apply the tactic {{ tacticName }}</strong>
-                if you expect to perform an amount of inferences higher than {{ costMetric.break_even_inferences }}.
-            </div>
-            <div v-else class="recommendation negative">
-                We encourage you to consider a different ML tactic as this one does not provide a positive return on
-                investment.
-            </div>
-        </div>
-
-        <slot name="costMetricCard"></slot>
     </div>
 </template>
 

@@ -15,7 +15,7 @@ import {i18n} from './i18n.js'
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faBars, faHome, faTag, faDumbbell, faBullseye, faChartLine, faPeopleGroup, faCloudArrowUp, faPlus,
     faIdCardClip, faUser, faCircleInfo, faCalendarDays, faPenToSquare, faTrash, faCloud, faArrowRight,
-    faLeaf, faSeedling, faDownLong, faEquals, faUpLong, faFilePdf, faLightbulb, faBrain, faRocket, 
+    faLeaf, faSeedling, faDownLong, faEquals, faUpLong, faFilePdf, faGlobe, faLightbulb, faBrain, faRocket, 
     faScrewdriverWrench, faChartBar, faGasPump, faTree, faCar, faMobileAlt
  } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -24,7 +24,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(
     faBars, faHome, faTag, faDumbbell, faBullseye, faChartLine, faPeopleGroup, faCloudArrowUp, faPlus,
     faIdCardClip, faUser, faCircleInfo, faCalendarDays, faPenToSquare, faTrash, faCloud, faArrowRight,
-    faLeaf, faSeedling, faDownLong, faEquals, faUpLong, faFilePdf, faLightbulb, faBrain, faRocket, 
+    faLeaf, faSeedling, faDownLong, faEquals, faUpLong, faFilePdf, faGlobe, faLightbulb, faBrain, faRocket,
     faScrewdriverWrench, faChartBar, faGasPump, faTree, faCar, faMobileAlt
 );
 
