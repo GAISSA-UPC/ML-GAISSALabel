@@ -1,25 +1,68 @@
 <template>
     <div class="gaissa-roi-analyzer">
         <h1>{{ $t("GAISSA ROI Analyzer") }}</h1>
+        
+        <!-- Analysis Swapper for switching between configurations -->
+        <AnalysisSwapper 
+            v-if="analysisData"
+            :currentAnalysis="analysisData"
+            @analysisChanged="handleAnalysisChange" />
+
+        <!-- ROI Analysis Main Component -->
         <ROIAnalysisComponent 
-            :analysisId="$route.params.id_experiment"
+            :analysisId="currentAnalysisId"
             :showExportButton="true"
-            containerId="roi-analysis-container" />
+            containerId="roi-analysis-container"
+            @analysisLoaded="handleAnalysisLoaded" />
     </div>
 </template>
 
 <script>
 import ROIAnalysisComponent from '../components/ROIAnalysisComponent.vue';
+import AnalysisSwapper from '../components/AnalysisSwapper.vue';
 
 export default {
     name: "GAISSAROIAnalyzerAnalysis",
     components: {
-        ROIAnalysisComponent
+        ROIAnalysisComponent,
+        AnalysisSwapper
+    },
+    data() {
+        return {
+            analysisData: null,
+            currentAnalysisId: null
+        };
+    },
+    watch: {
+        '$route.params.id_experiment': {
+            immediate: true,
+            handler(newId) {
+                this.currentAnalysisId = newId;
+            }
+        }
+    },
+    methods: {
+        handleAnalysisLoaded(data) {
+            this.analysisData = data;
+        },
+        handleAnalysisChange(newAnalysisId) {
+            // Navigate to the new analysis
+            this.$router.push({
+                name: "GAISSA ROI Analyzer Analysis",
+                params: {
+                    id_experiment: newAnalysisId
+                }
+            });
+        }
     }
 };
 </script>
 
 <style scoped>
+h1 { 
+    margin-bottom: 10px; 
+}
+
 .gaissa-roi-analyzer {
     padding: 20px;
 }

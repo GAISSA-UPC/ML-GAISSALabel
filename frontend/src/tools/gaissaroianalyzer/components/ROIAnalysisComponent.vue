@@ -524,6 +524,9 @@ export default {
                 if (data) {
                     this.analysisData = data;
 
+                    // Emit the loaded analysis data to parent components
+                    this.$emit('analysisLoaded', data);
+
                     // For calculation-type analyses, fetch the sources for the tactic
                     if (!this.isResearchAnalysis) {
                         try {
