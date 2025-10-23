@@ -167,6 +167,8 @@ export default {
                 // Auto-select if there's only one ML tactic
                 if (this.mlTactics.length === 1) {
                     this.selectedMlTactic = this.mlTactics[0].id;
+                    // Trigger the change handler to load architectures
+                    await this.onMlTacticChange();
                 }
             }
         },
@@ -181,6 +183,8 @@ export default {
                 // Auto-select if there's only one model architecture
                 if (this.modelArchitectures.length === 1) {
                     this.selectedModelArchitecture = this.modelArchitectures[0].id;
+                    // Trigger the change handler to load parameters
+                    await this.onModelArchitectureChange();
                 }
             }
         },
@@ -202,6 +206,8 @@ export default {
                 // Auto-select if there's only one tactic parameter
                 if (this.tacticParameters.length === 1) {
                     this.selectedTacticParameter = this.tacticParameters[0].id;
+                    // Trigger the change handler to load experiments
+                    await this.onTacticParameterChange();
                 }
             }
         },
@@ -233,12 +239,11 @@ export default {
         async refreshExperiments() {
             let params = {
                 model_architecture: this.selectedModelArchitecture,
-                tactic: this.selectedMlTactic,
                 tactic_parameter_option: this.selectedTacticParameter,
                 analysis_type: this.analysisType
             };
             
-            if (this.selectedModelArchitecture && this.selectedTacticParameter && this.selectedMlTactic) {
+            if (this.selectedModelArchitecture && this.selectedTacticParameter) {
                 const response = await roiAnalyses.list(params);
                 if (response && response.data) {
                     this.experiments = response.data;

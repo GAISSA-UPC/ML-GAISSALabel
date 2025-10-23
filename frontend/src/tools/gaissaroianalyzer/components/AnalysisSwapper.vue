@@ -92,6 +92,12 @@ export default {
             immediate: true,    // Run on component creation
             handler() {
                 if (this.currentAnalysis) {
+                    // Reset state when analysis changes
+                    this.selectedParameter = null;
+                    this.selectedAnalysisId = null;
+                    this.availableAnalyses = [];
+                    this.error = null;
+                    // Load new parameters
                     this.loadParameters();
                 }
             }

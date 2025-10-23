@@ -178,12 +178,26 @@ class TacticParameterOptionView(viewsets.ModelViewSet):
         
         # Filter by analysis type if analysis_type parameter is provided
         analysis_type = self.request.query_params.get('analysis_type')
-        if analysis_type:
+        if analysis_type and model_architecture_id:
             if analysis_type == 'calculation':
-                # Filter to include only parameter options that have calculation analyses with this tactic
+                # Filter to include only parameter options that have calculation analyses 
+                # for this specific model architecture
+                queryset = queryset.filter(
+                    roi_analyses__roianalysiscalculation__isnull=False,
+                    roi_analyses__model_architecture_id=model_architecture_id
+                ).distinct()
+            elif analysis_type == 'research':
+                # Filter to include only parameter options that have research analyses
+                # for this specific model architecture
+                queryset = queryset.filter(
+                    roi_analyses__roianalysisresearch__isnull=False,
+                    roi_analyses__model_architecture_id=model_architecture_id
+                ).distinct()
+        elif analysis_type:
+            # If analysis_type is provided but no model_architecture, filter without architecture constraint
+            if analysis_type == 'calculation':
                 queryset = queryset.filter(roi_analyses__roianalysiscalculation__isnull=False).distinct()
             elif analysis_type == 'research':
-                # Filter to include only parameter options that have research analyses with this tactic
                 queryset = queryset.filter(roi_analyses__roianalysisresearch__isnull=False).distinct()
         return queryset
 
