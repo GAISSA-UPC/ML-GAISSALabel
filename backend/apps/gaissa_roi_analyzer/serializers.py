@@ -3,12 +3,18 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from .models import (
-    ModelArchitecture, TacticSource, ROIMetric, MLTactic, TacticParameterOption,
+    MLPipelineStage, ModelArchitecture, TacticSource, ROIMetric, MLTactic, TacticParameterOption,
     ROIAnalysis, ROIAnalysisCalculation, ROIAnalysisResearch,
     AnalysisMetricValue, EnergyAnalysisMetricValue, ExpectedMetricReduction
 )
 from apps.core.models import Country
 from .calculators.roi_metrics_calculator import ROIMetricsCalculator
+
+
+class MLPipelineStageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MLPipelineStage
+        fields = '__all__'
 
 
 class ModelArchitectureSerializer(serializers.ModelSerializer):
@@ -30,6 +36,7 @@ class ROIMetricSerializer(serializers.ModelSerializer):
 
 
 class MLTacticSerializer(serializers.ModelSerializer):
+    pipeline_stage_name = serializers.CharField(source='pipeline_stage.get_name_display', read_only=True)
     sources = TacticSourceSerializer(many=True, read_only=True)
     source_ids = serializers.PrimaryKeyRelatedField(
         many=True, queryset=TacticSource.objects.all(), write_only=True, source='sources', required=True
@@ -58,7 +65,7 @@ class MLTacticSerializer(serializers.ModelSerializer):
     class Meta:
         model = MLTactic
         fields = [
-            'id', 'name', 'information', 
+            'id', 'name', 'information', 'pipeline_stage', 'pipeline_stage_name',
             'sources', 'source_ids', 
             'applicable_metrics', 'applicable_metric_ids',
             'compatible_architectures', 'compatible_architecture_ids'

@@ -3,6 +3,28 @@ from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 
 
+class MLPipelineStage(models.Model):
+    """Pipeline stage for ML tactics categorization."""
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255, unique=True, verbose_name=_('Stage Name'))
+
+    class Meta:
+        verbose_name = _('ML Pipeline Stage')
+        verbose_name_plural = _('ML Pipeline Stages')
+
+    def clean(self):
+        super().clean()
+        if not self.name or self.name.strip() == '':
+            raise ValidationError(_('Name field cannot be empty.'))
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+
 class ModelArchitecture(models.Model):
     """Model architecture for ML models (e.g., AlexNet, ResNet, etc.)"""
     id = models.AutoField(primary_key=True)
@@ -84,6 +106,14 @@ class MLTactic(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True, verbose_name=_('Tactic Name'))
     information = models.TextField(null=True, blank=True, verbose_name=_('Information'))
+    pipeline_stage = models.ForeignKey(
+        MLPipelineStage, 
+        related_name='tactics', 
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        verbose_name=_('Pipeline Stage')
+    )
     sources = models.ManyToManyField(TacticSource, related_name='tactics', blank=False, verbose_name=_('Sources'))
     compatible_architectures = models.ManyToManyField(ModelArchitecture, related_name='compatible_tactics', blank=True, verbose_name=_('Compatible Architectures'))
     applicable_metrics = models.ManyToManyField(ROIMetric, related_name='applicable_tactics', blank=True, verbose_name=_('Applicable Metrics'))

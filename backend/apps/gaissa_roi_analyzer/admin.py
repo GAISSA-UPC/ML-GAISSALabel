@@ -1,9 +1,16 @@
 from django.contrib import admin
 from .models import (
-    ModelArchitecture, TacticSource, ROIMetric, MLTactic, TacticParameterOption,
+    MLPipelineStage, ModelArchitecture, TacticSource, ROIMetric, MLTactic, TacticParameterOption,
     ROIAnalysis, ROIAnalysisCalculation, ROIAnalysisResearch,
     AnalysisMetricValue, EnergyAnalysisMetricValue, ExpectedMetricReduction
 )
+
+
+@admin.register(MLPipelineStage)
+class MLPipelineStageAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    search_fields = ['name']
+    ordering = ('id',)
 
 
 @admin.register(ModelArchitecture)
@@ -30,7 +37,8 @@ class ROIMetricAdmin(admin.ModelAdmin):
 
 @admin.register(MLTactic)
 class MLTacticAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'information')
+    list_display = ('id', 'name', 'pipeline_stage', 'information')
+    list_filter = ('pipeline_stage',)
     search_fields = ('name',)
     filter_horizontal = ('sources', 'compatible_architectures', 'applicable_metrics')
     ordering = ('id',)

@@ -4,18 +4,30 @@ from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import (
-    ModelArchitecture, TacticSource, MLTactic, TacticParameterOption, 
+    MLPipelineStage, ModelArchitecture, TacticSource, MLTactic, TacticParameterOption, 
     ROIAnalysis, ROIAnalysisCalculation, ROIAnalysisResearch, ROIMetric, 
     AnalysisMetricValue, EnergyAnalysisMetricValue, ExpectedMetricReduction
 )
 from .serializers import (
-    ModelArchitectureSerializer, TacticSourceSerializer, MLTacticSerializer, 
+    MLPipelineStageSerializer, ModelArchitectureSerializer, TacticSourceSerializer, MLTacticSerializer, 
     TacticParameterOptionSerializer, ROIAnalysisSerializer, AnalysisListSerializer, 
     ROIAnalysisCalculationSerializer, ROIAnalysisResearchSerializer, ROIMetricSerializer,
     AnalysisMetricValueSerializer, EnergyAnalysisMetricValueSerializer, 
     ExpectedMetricReductionSerializer
 )
 from apps.core import permissions
+
+
+class MLPipelineStageView(viewsets.ModelViewSet):
+    """ViewSet for ML pipeline stages."""
+    queryset = MLPipelineStage.objects.all()
+    serializer_class = MLPipelineStageSerializer
+    permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSAROIAnalyzerEnabled]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['id', 'name']
+    search_fields = ['name', 'description']
+    ordering_fields = ['id', 'name']
+    ordering = ['id']
 
 
 class ModelArchitectureView(viewsets.ModelViewSet):
@@ -87,7 +99,7 @@ class MLTacticView(viewsets.ModelViewSet):
     serializer_class = MLTacticSerializer
     permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSAROIAnalyzerEnabled]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['id', 'name', 'sources']
+    filterset_fields = ['id', 'name', 'sources', 'pipeline_stage']
     search_fields = ['name', 'information']
     ordering_fields = ['id', 'name']
     ordering = ['id']

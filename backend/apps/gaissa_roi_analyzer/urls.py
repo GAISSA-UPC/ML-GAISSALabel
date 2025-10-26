@@ -5,6 +5,7 @@ from . import views
 router = routers.DefaultRouter()
 
 # GAISSA ROI Analyzer URLs
+router.register(r'pipeline-stages', views.MLPipelineStageView, basename='roi_pipeline_stages')
 router.register(r'model-architectures', views.ModelArchitectureView, basename='roi_model_architectures')
 router.register(r'sources', views.TacticSourceView, basename='roi_sources')
 router.register(r'tactics', views.MLTacticView, basename='roi_tactics')
