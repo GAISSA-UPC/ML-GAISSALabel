@@ -110,8 +110,8 @@ class MLTactic(models.Model):
         MLPipelineStage, 
         related_name='tactics', 
         on_delete=models.PROTECT,
-        null=True,
-        blank=True,
+        null=False,
+        blank=False,
         verbose_name=_('Pipeline Stage')
     )
     sources = models.ManyToManyField(TacticSource, related_name='tactics', blank=False, verbose_name=_('Sources'))

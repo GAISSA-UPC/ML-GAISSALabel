@@ -36,7 +36,7 @@ class ROIMetricSerializer(serializers.ModelSerializer):
 
 
 class MLTacticSerializer(serializers.ModelSerializer):
-    pipeline_stage_name = serializers.CharField(source='pipeline_stage.get_name_display', read_only=True)
+    pipeline_stage_name = serializers.CharField(source='pipeline_stage.name', read_only=True)
     sources = TacticSourceSerializer(many=True, read_only=True)
     source_ids = serializers.PrimaryKeyRelatedField(
         many=True, queryset=TacticSource.objects.all(), write_only=True, source='sources', required=True

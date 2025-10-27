@@ -8,6 +8,20 @@
         </p>
 
         <el-form label-position="top" class="form-container">
+            <h3 class="section-title">{{ $t("ML Pipeline Stage") }}</h3>
+            <p class="field-description">{{ $t("Please, select the ML pipeline stage to filter the tactics.") }}
+                <el-tooltip v-if="!comparisonMode" placement="top" :content="$t('Pipeline stages categorize ML tactics by their role in the ML workflow.')">
+                    <el-icon class="info-icon"><InfoFilled /></el-icon>
+                </el-tooltip>
+            </p>
+            <el-form-item>
+                <el-select v-model="selectedPipelineStage" @change="onPipelineStageChange"
+                    placeholder="Select" filterable clearable>
+                    <el-option v-for="(stage, i) in pipelineStages" :key="i" :value="stage.id"
+                        :label="stage.name" />
+                </el-select>
+            </el-form-item>
+
             <h3 class="section-title">{{ $t("ML Tactic") }}</h3>
             <p class="field-description">{{ $t("Please, indicate the ML tactic you are interested in.") }}
                 <el-tooltip v-if="!comparisonMode" placement="top" :content="$t('ML tactics are optimization techniques applied to machine learning models to enhance efficiency (e.g., pruning). These tactics aim to reduce computational and energy costs while preserving or minimally impacting model performance.')">
@@ -81,6 +95,7 @@ import modelArchitectures from "@/tools/gaissaroianalyzer/services/modelArchitec
 import mlTactics from "@/tools/gaissaroianalyzer/services/mlTactics";
 import tacticParameters from "@/tools/gaissaroianalyzer/services/tacticParameters";
 import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
+import pipelineStages from "@/tools/gaissaroianalyzer/services/pipelineStages";
 import { formatData } from "@/utils";
 import { InfoFilled } from '@element-plus/icons-vue'
 
@@ -114,6 +129,8 @@ export default {
     },
     data() {
         return {
+            pipelineStages: [],
+            selectedPipelineStage: null,
             modelArchitectures: [],
             selectedModelArchitecture: null,
             mlTactics: [],
@@ -156,10 +173,19 @@ export default {
         }
     },
     methods: {
+        async fetchPipelineStages() {
+            const response = await pipelineStages.list();
+            if (response && response.data) {
+                this.pipelineStages = response.data;
+            }
+        },
         async refreshMlTactics() {
             const params = {
                 analysis_type: this.analysisType
             };
+            if (this.selectedPipelineStage) {
+                params.pipeline_stage = this.selectedPipelineStage;
+            }
             const response = await mlTactics.list(params);
             if (response && response.data) {
                 this.mlTactics = response.data;
@@ -171,6 +197,20 @@ export default {
                     await this.onMlTacticChange();
                 }
             }
+        },
+        onPipelineStageChange() {
+            // Reset tactic and dependent selections
+            this.selectedMlTactic = null;
+            this.selectedModelArchitecture = null;
+            this.selectedTacticParameter = null;
+            this.selectedExperiment = null;
+            this.modelArchitectures = [];
+            this.tacticParameters = [];
+            this.experiments = [];
+            this.resetSelection();
+            
+            // Refresh tactics with pipeline stage filter
+            this.refreshMlTactics();
         },
         async refreshModelArchitectures() {
             const params = {
@@ -296,6 +336,7 @@ export default {
         formatData,
     },
     async mounted() {
+        await this.fetchPipelineStages();
         await this.refreshMlTactics();
     },
 };

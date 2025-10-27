@@ -11,8 +11,34 @@
     <br>
 
     <el-form label-position="top">
+        <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("ML Pipeline Stage") }}</h3>
+        <p>{{ $t('First, please select the ML pipeline stage to filter the tactics.') }}</p><br>
+
+        <el-form-item prop="pipelineStage">
+            <template #label>
+                {{ $t('Pipeline Stage') }}
+                <el-tooltip placement="top" :content="$t('Pipeline stages categorize ML tactics by their role in the ML workflow.')">
+                    <el-icon class="info-icon"><InfoFilled /></el-icon>
+                </el-tooltip>
+            </template>
+            <el-select 
+                v-model="formData.pipelineStage" 
+                filterable 
+                clearable 
+                placeholder="Select"
+                @change="handlePipelineStageChange"
+                class="model-select">
+                <el-option 
+                    v-for="stage in pipelineStages" 
+                    :key="stage.id" 
+                    :label="stage.name" 
+                    :value="stage.id" />
+            </el-select>
+        </el-form-item>
+        <br>
+
         <h3 style="color: var(--gaissa_green);font-weight: bold">{{ $t("ML Tactic and Model Architecture") }}</h3>
-        <p>{{ $t('First, please indicate the ML tactic you want to evaluate.') }}</p><br>
+        <p>{{ $t('Next, please indicate the ML tactic you want to evaluate.') }}</p><br>
 
         <el-form-item prop="mlTactic">
             <template #label>
@@ -204,6 +230,7 @@ import roiMetrics from "@/tools/gaissaroianalyzer/services/roiMetrics";
 import tacticParameters from "@/tools/gaissaroianalyzer/services/tacticParameters";
 import roiAnalyses from "@/tools/gaissaroianalyzer/services/roiAnalyses";
 import countries from "@/tools/gaissaroianalyzer/services/countries";
+import pipelineStages from "@/tools/gaissaroianalyzer/services/pipelineStages";
 import { InfoFilled } from '@element-plus/icons-vue'
 
 export default {
@@ -211,6 +238,7 @@ export default {
     components: { InfoFilled },
     data() {
         return {
+            pipelineStages: [],
             modelArchitectures: [],
             tactics: [],
             tacticParameters: [],
@@ -218,6 +246,7 @@ export default {
             energyRelatedMetrics: [],
             countries: [],
             formData: {
+                pipelineStage: null,
                 modelArchitecture: null,
                 mlTactic: null,
                 tacticParameter: null,
@@ -250,9 +279,24 @@ export default {
         }
     },
     methods: {
+        async fetchPipelineStages() {
+            try {
+                const response = await pipelineStages.list();
+                if (response && response.data) {
+                    this.pipelineStages = response.data;
+                }
+            } catch (error) {
+                console.error("Error fetching pipeline stages:", error);
+                this.error = "Failed to load pipeline stages. Please try again."
+            }
+        },
         async fetchTactics() {
             try {
-                const response = await mlTactics.list();
+                const filters = {};
+                if (this.formData.pipelineStage) {
+                    filters.pipeline_stage = this.formData.pipelineStage;
+                }
+                const response = await mlTactics.list(filters);
                 if (response && response.data) {
                     this.tactics = response.data;
                 }
@@ -336,6 +380,22 @@ export default {
             } catch (error) {
                 console.error(`Error fetching metrics for tactic ${this.formData.mlTactic}:`, error);
                 this.error = "Failed to load applicable metrics. Please try again.";
+            }
+        },
+        handlePipelineStageChange() {
+            // Reset tactic and all dependent fields when pipeline stage changes
+            this.formData.mlTactic = null;
+            this.formData.modelArchitecture = null;
+            this.formData.tacticParameter = null;
+            this.metricValues = {};
+            this.tactics = [];
+            this.tacticParameters = [];
+            this.applicableMetrics = [];
+            this.modelArchitectures = [];
+            
+            // Fetch tactics filtered by the selected pipeline stage
+            if (this.formData.pipelineStage) {
+                this.fetchTactics();
             }
         },
         handleTacticChange() {
@@ -440,7 +500,7 @@ export default {
     },
     async mounted() {
         // Load initial data
-        await this.fetchTactics();
+        await this.fetchPipelineStages();
         await this.fetchCountries();
     }
 };
