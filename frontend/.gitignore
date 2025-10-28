@@ -1,6 +1,11 @@
 *.DS_Store
 public/sitemap.xml
 
+# Environment files (use .env.example as template)
+.env.development
+.env.production
+.env.local
+
 # Logs
 logs
 *.log

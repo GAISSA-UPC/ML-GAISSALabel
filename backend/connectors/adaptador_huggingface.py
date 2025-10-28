@@ -6,6 +6,7 @@ import requests
 import ast
 import yaml
 import pytz
+import os
 
 from scipy import stats
 from requests.exceptions import JSONDecodeError
@@ -344,8 +345,10 @@ def api_calls_parameters(model, datasets):
 
 
     size = datasets_size = created_at = None
-    api_token = 'REMOVED_TOKEN'
-    headers = {"authorization": f"Bearer {api_token}"}
+    
+    # Get API token from environment variable
+    api_token = os.environ.get('HUGGINGFACE_API_TOKEN')
+    headers = {"authorization": f"Bearer {api_token}"} if api_token else {}
 
     try:
         commits = requests.get(f'https://huggingface.co/api/models/{model.modelId}/commits/main', timeout=2, headers=headers)
