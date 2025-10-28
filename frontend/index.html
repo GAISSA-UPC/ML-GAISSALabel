@@ -37,6 +37,10 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://gaissalabel.essi.upc.edu/">
     
+    <!-- Performance: Resource Hints for faster connections -->
+    <link rel="dns-prefetch" href="https://gaissalabel.essi.upc.edu">
+    <link rel="preconnect" href="https://gaissalabel.essi.upc.edu" crossorigin>
+    
     <!-- Favicon and Icons -->
     <link rel="icon" href="/gaissalogo_small.webp">
     <link rel="apple-touch-icon" href="/gaissalogo_small.webp">
@@ -97,6 +101,11 @@
     <noscript>
       <link rel="stylesheet" href="/assets/index.css">
     </noscript>
+    
+    <!-- Performance: Preload critical JavaScript chunks -->
+    <link rel="modulepreload" href="/assets/vendor.js">
+    <link rel="modulepreload" href="/assets/element-plus.js">
+    <link rel="modulepreload" href="/assets/fontawesome.js">
 
     <title>GAISSA Tools - ML Model Efficiency Assessment Platform</title>
   </head>

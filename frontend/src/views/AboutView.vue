@@ -11,7 +11,7 @@
 
     <div class="content-center">
         <div class="image-container">
-            <img src="/gaissalogo.webp" style="max-width: 25%" alt="GAISSA logo"/>
+            <img src="/gaissalogo.webp" style="max-width: 25%" alt="GAISSA logo" loading="lazy"/>
         </div>
         
         <!-- Carbon Badge Section -->
