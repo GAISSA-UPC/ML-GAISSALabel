@@ -193,6 +193,21 @@
             </el-row>
         </section>
 
+        <!-- Video Section -->
+        <section class="video-section">
+            <h2 class="section-title">{{ $t('Watch Our Introduction Video') }}</h2>
+            <div class="video-container">
+                <iframe 
+                    src="https://www.youtube.com/embed/8JOG4zWyzws" 
+                    title="GAISSA ROI Analyzer: Estimating the Return on Investment of Green Tactics in ML-Enabled Systems" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    referrerpolicy="strict-origin-when-cross-origin" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </section>
+
         <!-- Call to Action -->
         <section class="cta-section">
             <el-card class="cta-card" shadow="always">
@@ -300,6 +315,32 @@ export default {
     opacity: 0.95;
 }
 
+/* Video Section */
+.video-section {
+    margin-bottom: 60px;
+}
+
+.video-container {
+    position: relative;
+    width: 70%;
+    max-width: 996px;
+    margin: 0 auto;
+    padding-bottom: 39.375%;  /* For width 100%: 56.25%; 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+}
+
 /* Section Titles */
 .section-title {
     font-size: 2rem;
@@ -331,7 +372,6 @@ export default {
 
 .stat-card {
     text-align: center;
-    padding: 30px 20px;
     border-radius: 15px;
     transition: all 0.3s ease;
     height: 100%;
@@ -522,7 +562,6 @@ export default {
 
 .guide-card {
     text-align: center;
-    padding: 30px 20px;
     border-radius: 15px;
     height: 100%;
     position: relative;
@@ -661,14 +700,6 @@ export default {
 
     .cta-buttons .el-button {
         width: 100%;
-    }
-
-    .stat-card {
-        padding: 0;
-    }
-
-    .guide-card {
-        padding: 10px;
     }
 }
 
