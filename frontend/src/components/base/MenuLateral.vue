@@ -9,14 +9,14 @@
             <font-awesome-icon :icon="['fas', 'house']" class="icon"/>
             <template #title>{{ $t('Home') }}</template>
         </el-menu-item>
+        
         <el-sub-menu index="1" v-if="isGAISSALabelEnabled">
             <template #title>
-                <font-awesome-icon :icon="['fas', 'tag']" class="icon"/>
-                <span>{{ $t('GAISSALabel') }}</span>
+                <div @click.stop="$router.push({name: 'gaissalabel-home'})" class="clickable-submenu-title" :class="{'is-active': activeRoute === 'gaissalabel-home'}">
+                    <font-awesome-icon :icon="['fas', 'tag']" class="icon"/>
+                    <span>{{ $t('GAISSALabel') }}</span>
+                </div>
             </template>
-            <el-menu-item index="gaissalabel-home" @click="$router.push({name: 'gaissalabel-home'})">
-                {{ $t('Home') }}
-            </el-menu-item>
             <el-sub-menu index="1-1">
                 <template #title>
                     <font-awesome-icon :icon="['fas', 'dumbbell']" class="icon"/>
@@ -51,27 +51,32 @@
                 </el-menu-item>
             </el-sub-menu>
         </el-sub-menu>
+        
         <el-sub-menu index="2" v-if="isGAISSAROIAnalyzerEnabled">
             <template #title>
-                <font-awesome-icon :icon="['fas', 'chart-line']" class="icon"/>
-                <span class="wrap-title">{{ $t('GAISSA ROI Analyzer') }}</span>
+                <div @click.stop="$router.push({name: 'GAISSA ROI Analyzer Home'})" class="clickable-submenu-title" :class="{'is-active': activeRoute === 'GAISSA ROI Analyzer Home'}">
+                    <font-awesome-icon :icon="['fas', 'chart-line']" class="icon"/>
+                    <span class="wrap-title">{{ $t('GAISSA ROI Analyzer') }}</span>
+                </div>
             </template>
-            <el-menu-item index="GAISSA ROI Analyzer Home" @click="$router.push({name: 'GAISSA ROI Analyzer Home'})">
-                {{ $t('Home') }}
-            </el-menu-item>
             <el-menu-item index="GAISSA ROI Analyzer Research Repository" @click="$router.push({name: 'GAISSA ROI Analyzer Research Repository'})">
+                <font-awesome-icon :icon="['fas', 'flask']" class="icon"/>
                 {{ $t('Research Analyses') }}
             </el-menu-item>
-            <el-menu-item index="GAISSA ROI Analyzer Calculation Repository" @click="$router.push({name: 'GAISSA ROI Analyzer Calculation Repository'})">
-                {{ $t('Saved Analyses') }}
-            </el-menu-item>
             <el-menu-item index="GAISSA ROI Analyzer New Form" @click="$router.push({name: 'GAISSA ROI Analyzer New Form'})">
+                <font-awesome-icon :icon="['fas', 'calculator']" class="icon"/>
                 {{ $t('Calculate ROI') }}
             </el-menu-item>
+            <el-menu-item index="GAISSA ROI Analyzer Calculation Repository" @click="$router.push({name: 'GAISSA ROI Analyzer Calculation Repository'})">
+                <font-awesome-icon :icon="['fas', 'folder-open']" class="icon"/>
+                {{ $t('Saved Analyses') }}
+            </el-menu-item>
             <el-menu-item index="GAISSA ROI Analyzer Comparison" @click="$router.push({name: 'GAISSA ROI Analyzer Comparison'})">
+                <font-awesome-icon :icon="['fas', 'balance-scale']" class="icon"/>
                 {{ $t('Compare Analyses') }}
             </el-menu-item>
         </el-sub-menu>
+        
         <el-sub-menu index="3" v-if="isLogged">
             <template #title>
                 <font-awesome-icon :icon="['fas', 'screwdriver-wrench']" class="icon"/>
@@ -90,6 +95,7 @@
                 {{ $t('Calculation tools') }}
             </el-menu-item>
         </el-sub-menu>
+        
         <el-menu-item index="about" @click="$router.push({name: 'about'})">
             <font-awesome-icon :icon="['fas', 'people-group']" class="icon"/>
             <template #title>{{ $t('About') }}</template>
@@ -167,6 +173,21 @@ export default {
     text-align: left;
     line-height: 1.2;
     white-space: normal;
+}
+
+.clickable-submenu-title {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    cursor: pointer;
+}
+
+.clickable-submenu-title.is-active {
+    color: var(--gaissa_green);
+}
+
+.clickable-submenu-title.is-active .icon {
+    color: var(--gaissa_green);
 }
 
 @media (max-width: 1339px) {
