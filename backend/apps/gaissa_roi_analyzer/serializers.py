@@ -74,13 +74,14 @@ class MLTacticSerializer(serializers.ModelSerializer):
 
 class TacticParameterOptionSerializer(serializers.ModelSerializer):
     tactic_name = serializers.CharField(source='tactic.name', read_only=True)
+    pipeline_stage_name = serializers.CharField(source='tactic.pipeline_stage.name', read_only=True)
     tactic_id = serializers.PrimaryKeyRelatedField(
         queryset=MLTactic.objects.all(), write_only=True, source='tactic'
     )
 
     class Meta:
         model = TacticParameterOption
-        fields = ['id', 'tactic', 'tactic_id', 'tactic_name', 'name', 'value']
+        fields = ['id', 'tactic', 'tactic_id', 'tactic_name', 'pipeline_stage_name', 'name', 'value']
         read_only_fields = ['tactic'] # tactic is set via tactic_id
 
 

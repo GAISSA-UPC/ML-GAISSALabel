@@ -11,7 +11,12 @@
 
         <el-row :gutter="20" type="flex" justify="center" class="row-bg">
             <el-col :xs="24" :sm="24" :md="forceMobile ? 24 : 12" :lg="forceMobile ? 24 : 12" :xl="forceMobile ? 24 : 12" class="mobile-card">
-                <ModelInformationCard v-if="analysisData" :modelData="analysisData" :formatDate="formatData" />
+                <ModelInformationCard 
+                    v-if="analysisData" 
+                    :modelData="analysisData" 
+                    :formatDate="formatData" 
+                    :showSwapper="showSwapper"
+                    @analysisChanged="$emit('analysisChanged', $event)" />
                 <el-card v-else shadow="always" :body-style="{ padding: '20px' }">
                     <div class="loading-placeholder">
                         <p>{{ $t("Loading analysis data...") }}</p>
@@ -193,6 +198,10 @@ export default {
             default: 'roi-analysis-container'
         },
         forceMobile: {
+            type: Boolean,
+            default: false
+        },
+        showSwapper: {
             type: Boolean,
             default: false
         }

@@ -1,7 +1,11 @@
 <template>
     <el-card shadow="always" :body-style="{ padding: '20px' }">
         <h2 class="section-title">{{ $t("Model Information") }}</h2>
+        
         <el-descriptions v-if="modelData" :column="1" border>
+            <el-descriptions-item :label="$t('ML Pipeline Stage')">
+                {{ modelData.tactic_parameter_option_details?.pipeline_stage_name }}
+            </el-descriptions-item>
             <el-descriptions-item :label="$t('ML Tactic')">
                 {{ modelData.tactic_parameter_option_details?.tactic_name }}
             </el-descriptions-item>
@@ -26,12 +30,23 @@
             </el-descriptions-item>
         </el-descriptions>
         <p v-else>{{ $t("Loading model information...") }}</p>
+
+        <!-- Analysis Swapper -->
+        <AnalysisSwapper 
+            v-if="showSwapper && modelData"
+            :currentAnalysis="modelData"
+            @analysisChanged="$emit('analysisChanged', $event)" />
     </el-card>
 </template>
 
 <script>
+import AnalysisSwapper from './AnalysisSwapper.vue';
+
 export default {
     name: "ModelInformationCard",
+    components: {
+        AnalysisSwapper
+    },
     props: {
         modelData: {
             type: Object,
@@ -40,6 +55,10 @@ export default {
         formatDate: {
             type: Function,
             required: true
+        },
+        showSwapper: {
+            type: Boolean,
+            default: false
         }
     },
     computed: {

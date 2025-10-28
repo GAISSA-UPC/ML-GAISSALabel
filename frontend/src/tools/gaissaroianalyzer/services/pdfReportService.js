@@ -34,6 +34,11 @@ export default {
             if (clonedInferenceInputControl) {
                 clonedInferenceInputControl.style.display = 'none';
             }
+
+            const clonedAnalysisSwapper = clonedElement.querySelector('.analysis-swapper-collapse');
+            if (clonedAnalysisSwapper) {
+                clonedAnalysisSwapper.style.display = 'none';
+            }
             
             // Apply styles to prepare for PDF
             clonedElement.style.width = '1200px';

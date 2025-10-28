@@ -1,31 +1,25 @@
 <template>
     <div class="gaissa-roi-analyzer">
         <h1>{{ $t("GAISSA ROI Analyzer") }}</h1>
-        
-        <!-- Analysis Swapper for switching between configurations -->
-        <AnalysisSwapper 
-            v-if="analysisData"
-            :currentAnalysis="analysisData"
-            @analysisChanged="handleAnalysisChange" />
 
         <!-- ROI Analysis Main Component -->
         <ROIAnalysisComponent 
             :analysisId="currentAnalysisId"
             :showExportButton="true"
+            :showSwapper="true"
             containerId="roi-analysis-container"
-            @analysisLoaded="handleAnalysisLoaded" />
+            @analysisLoaded="handleAnalysisLoaded"
+            @analysisChanged="handleAnalysisChange" />
     </div>
 </template>
 
 <script>
 import ROIAnalysisComponent from '../components/ROIAnalysisComponent.vue';
-import AnalysisSwapper from '../components/AnalysisSwapper.vue';
 
 export default {
     name: "GAISSAROIAnalyzerAnalysis",
     components: {
-        ROIAnalysisComponent,
-        AnalysisSwapper
+        ROIAnalysisComponent
     },
     data() {
         return {

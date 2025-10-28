@@ -200,7 +200,7 @@ export default {
 <style scoped>
 /* Use Element Plus collapse, no custom border needed */
 .analysis-swapper-collapse {
-    margin-bottom: 20px;
+    margin-top: 20px;
 }
 
 /* Custom header styling */
