@@ -45,3 +45,14 @@ class CarbonIntensityView(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['country', 'data_year']
     ordering_fields = ['country', 'carbon_intensity', 'data_year']
+    
+    def get_queryset(self):
+        """Optimize queryset to prevent N+1 queries."""
+        queryset = super().get_queryset()
+        
+        # Use select_related for ForeignKey (country) to avoid N+1 queries
+        # CarbonIntensitySerializer accesses country.name
+        if self.action in ['list', 'retrieve']:
+            queryset = queryset.select_related('country')
+        
+        return queryset

@@ -108,6 +108,14 @@ class MLTacticView(viewsets.ModelViewSet):
         """Filter ML tactics by analysis type if analysis_type parameter is provided."""
         queryset = super().get_queryset()
         
+        # Optimize: Use select_related for ForeignKey and prefetch_related for ManyToMany
+        if self.action in ['list', 'retrieve']:
+            queryset = queryset.select_related('pipeline_stage').prefetch_related(
+                'sources',
+                'applicable_metrics',
+                'compatible_architectures'
+            )
+        
         analysis_type = self.request.query_params.get('analysis_type')
         if analysis_type:
             if analysis_type == 'calculation':
@@ -171,6 +179,11 @@ class TacticParameterOptionView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        
+        # Optimize: Use select_related for nested ForeignKeys (tactic)
+        if self.action in ['list', 'retrieve']:
+            queryset = queryset.select_related('tactic')
+        
         tactic_id = self.kwargs.get('tactic_id')
         
         if tactic_id is not None:
@@ -242,6 +255,28 @@ class ROIAnalysisViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Filter analyses by type if analysis_type parameter is provided."""
         queryset = super().get_queryset()
+        
+        # Optimize: Eagerly load all related data to avoid N+1 queries
+        if self.action in ['list', 'retrieve']:
+            # Use select_related for ForeignKey and OneToOne relationships
+            queryset = queryset.select_related(
+                'model_architecture',
+                'tactic_parameter_option',
+                'tactic_parameter_option__tactic',
+                'country',
+                'roianalysiscalculation',
+                'roianalysisresearch',
+                'roianalysisresearch__source'
+            )
+            
+            # Only prefetch metric_values for detail view (retrieve action)
+            # AnalysisListSerializer doesn't use metric_values
+            if self.action == 'retrieve':
+                queryset = queryset.prefetch_related(
+                    'metric_values',
+                    'metric_values__metric',
+                )
+        
         analysis_type = self.request.query_params.get('analysis_type')
         
         if analysis_type:
@@ -337,6 +372,13 @@ class AnalysisMetricValueView(viewsets.ModelViewSet):
     filterset_fields = ['analysis', 'metric']
     ordering_fields = ['id', 'analysis', 'metric']
     ordering = ['id']
+    
+    def get_queryset(self):
+        """Optimize queryset with select_related for related objects."""
+        queryset = super().get_queryset()
+        if self.action in ['list', 'retrieve']:
+            queryset = queryset.select_related('metric')
+        return queryset
 
 
 class EnergyAnalysisMetricValueView(viewsets.ModelViewSet):
@@ -348,6 +390,19 @@ class EnergyAnalysisMetricValueView(viewsets.ModelViewSet):
     filterset_fields = ['analysis', 'metric']
     ordering_fields = ['id', 'analysis', 'metric']
     ordering = ['id']
+    
+    def get_queryset(self):
+        """Optimize queryset with select_related for related objects."""
+        queryset = super().get_queryset()
+        if self.action in ['list', 'retrieve']:
+            # Include nested relationships for the analysis
+            queryset = queryset.select_related(
+                'analysis',
+                'analysis__model_architecture',
+                'analysis__tactic_parameter_option',
+                'metric'
+            )
+        return queryset
     
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -372,6 +427,18 @@ class ExpectedMetricReductionView(viewsets.ModelViewSet):
     filterset_fields = ['model_architecture', 'tactic_parameter_option', 'metric']
     ordering_fields = ['id', 'model_architecture', 'tactic_parameter_option', 'metric']
     ordering = ['id']
+    
+    def get_queryset(self):
+        """Optimize queryset with select_related for related objects."""
+        queryset = super().get_queryset()
+        if self.action in ['list', 'retrieve']:
+            queryset = queryset.select_related(
+                'model_architecture',
+                'tactic_parameter_option',
+                'tactic_parameter_option__tactic',  # For tactic_name in nested serializer
+                'metric'
+            )
+        return queryset
 
 
 @api_view(['GET'])
@@ -384,15 +451,20 @@ def statistics_view(request):
     total_research_analyses = ROIAnalysisResearch.objects.count()
     total_calculation_analyses = ROIAnalysisCalculation.objects.count()
     
-    # Per-stage breakdown
-    stages = MLPipelineStage.objects.all()
+    # Optimize: Prefetch pipeline_stage for tactics to avoid N+1 queries
+    stages = MLPipelineStage.objects.all().prefetch_related(
+        'tactics',  # Prefetch related tactics for each stage
+    )
     stage_breakdown = []
     
     for stage in stages:
+        # Use prefetched tactics instead of new query
+        tactics_in_stage = stage.tactics.all()
+        
         stage_data = {
             'id': stage.id,
             'name': stage.name,
-            'tactics_count': MLTactic.objects.filter(pipeline_stage=stage).count(),
+            'tactics_count': tactics_in_stage.count(),  # Use prefetched data
             'research_analyses_count': ROIAnalysisResearch.objects.filter(
                 tactic_parameter_option__tactic__pipeline_stage=stage
             ).count(),

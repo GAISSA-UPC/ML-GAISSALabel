@@ -190,6 +190,17 @@ class MetriquesView(viewsets.ModelViewSet):
     search_fields = ['nom', 'fase']
     ordering_fields = ['id', 'nom', 'fase', 'pes', 'influencia']
 
+    def get_queryset(self):
+        """Optimize queryset to prevent N+1 queries."""
+        queryset = super().get_queryset()
+        
+        # MetricaAmbLimitsSerializer uses nested IntervalBasicSerializer
+        # Need to prefetch intervals to avoid N+1 queries
+        if self.action in ['list', 'retrieve', 'update', 'partial_update']:
+            queryset = queryset.prefetch_related('intervals')
+        
+        return queryset
+
     def get_serializer_class(self):
         if self.action == 'create':
             return MetricaSerializer
@@ -256,6 +267,22 @@ class EinesCalculView(viewsets.ModelViewSet):
     queryset = EinaCalcul.objects.all()
     serializer_class = EinaCalculSerializer
     permission_classes = [permissions.IsAdminEditOthersRead & permissions.IsGAISSALabelEnabled]
+
+    def get_queryset(self):
+        """Optimize queryset to prevent N+1 queries."""
+        queryset = super().get_queryset()
+        
+        # EinaCalculSerializer accesses transformacionsMetriques and transformacionsInformacions
+        # Need to prefetch these reverse ForeignKey relationships with nested select_related
+        if self.action in ['list', 'retrieve']:
+            queryset = queryset.prefetch_related(
+                'transformacionsMetriques',
+                'transformacionsMetriques__metrica',
+                'transformacionsInformacions',
+                'transformacionsInformacions__informacio'
+            )
+        
+        return queryset
 
     def get_serializer_class(self):
         if self.action == 'create':
