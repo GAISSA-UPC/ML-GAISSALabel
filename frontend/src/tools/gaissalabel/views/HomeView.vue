@@ -56,7 +56,7 @@
             <h3 class="section-title">{{ $t('Watch Our Introduction Video') }}</h3>
             <div class="video-container">
                 <iframe 
-                    src="https://www.youtube.com/embed/GK4DBUwxWDQ" 
+                    src="https://www.youtube-nocookie.com/embed/GK4DBUwxWDQ?rel=0&modestbranding=1" 
                     title="GAISSALabel: A Tool For ML Energy Labeling" 
                     frameborder="0" 
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 

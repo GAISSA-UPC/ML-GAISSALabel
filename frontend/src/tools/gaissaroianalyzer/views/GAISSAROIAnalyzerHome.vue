@@ -198,7 +198,7 @@
             <h2 class="section-title">{{ $t('Watch Our Introduction Video') }}</h2>
             <div class="video-container">
                 <iframe 
-                    src="https://www.youtube.com/embed/8JOG4zWyzws" 
+                    src="https://www.youtube-nocookie.com/embed/8JOG4zWyzws?rel=0&modestbranding=1" 
                     title="GAISSA ROI Analyzer: Estimating the Return on Investment of Green Tactics in ML-Enabled Systems" 
                     frameborder="0" 
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 

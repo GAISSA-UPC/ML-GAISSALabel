@@ -30,7 +30,7 @@
             <div class="login-card">
                 <!-- Logo Section -->
                 <div class="logo-section">
-                    <img src="/gaissalogo_small.webp" alt="GAISSA Tools" class="gaissa-logo" />
+                    <img src="/gaissalogo_small.webp" alt="GAISSA Tools" class="gaissa-logo" loading="lazy" />
                     <h1 class="login-title">{{ $t('Administrator Login') }}</h1>
                     <p class="login-subtitle">{{ $t('Access GAISSA Tools Administration Panel') }}</p>
                 </div>
