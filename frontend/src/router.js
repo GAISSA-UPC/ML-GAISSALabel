@@ -22,6 +22,7 @@ const InferenceDeploy = () => import('@/tools/gaissalabel/views/InferenceDeploy.
 const InferenceLabelInfo = () => import('@/tools/gaissalabel/views/InferenceLabelInfo.vue')
 
 // GAISSA ROI Analyzer routes
+const GAISSAROIAnalyzerHome = () => import("@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzerHome.vue")
 const GAISSAROIAnalyzerAnalysis = () => import("@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzerAnalysis.vue")
 const GAISSAROIAnalyzerNewForm = () => import("@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzerNewForm.vue")
 const GAISSAROIAnalyzerCalculationRepository = () => import("@/tools/gaissaroianalyzer/views/GAISSAROIAnalyzerCalculationRepository.vue")
@@ -126,6 +127,12 @@ const router = createRouter({
     },
 
     // GAISSA ROI Analyzer routes
+    {
+      path: '/gaissa-roi-analyzer',
+      name: 'GAISSA ROI Analyzer Home',
+      component: GAISSAROIAnalyzerHome,
+      meta: { tool: 'gaissaroianalyzer' }
+    },
     {
       path: '/gaissa-roi-analyzer/calculation-repository',
       name: 'GAISSA ROI Analyzer Calculation Repository',

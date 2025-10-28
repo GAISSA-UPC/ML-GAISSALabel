@@ -18,5 +18,6 @@ router.register(r'energy-metric-values', views.EnergyAnalysisMetricValueView, ba
 router.register(r'expected-reductions', views.ExpectedMetricReductionView, basename='roi_expected_reductions')
 
 urlpatterns = [
+    path('statistics/', views.statistics_view, name='roi_statistics'),
     path('', include(router.urls)),
 ]

@@ -78,12 +78,17 @@
                             <li>{{ $t('Environmental impact assesment') }}</li>
                             <li>{{ $t('Comparative analysis tools') }}</li>
                         </ul>
-                        <div class="tool-actions">
-                            <el-button type="primary" size="large" @click="navigateToROIAnalyzer" class="tool-button">
-                                {{ $t('Start Analysis') }}
-                            </el-button>
+                        <div class="secondary-action-buttons">
                             <el-button type="default" size="large" @click="navigateToROIRepository" class="tool-button-secondary">
                                 {{ $t('Browse Research') }}
+                            </el-button>
+                            <el-button type="default" size="large" @click="navigateToROIAnalysis" class="tool-button-secondary">
+                                {{ $t('Start Analysis') }}
+                            </el-button>
+                        </div>
+                        <div class="tool-actions">
+                            <el-button type="primary" size="large" @click="navigateToROIAnalyzer" class="tool-button">
+                                {{ $t('Get Started') }}
                             </el-button>
                         </div>
                     </div>
@@ -170,6 +175,9 @@ export default {
             this.$router.push({ name: 'gaissalabel-home' });
         },
         navigateToROIAnalyzer() {
+            this.$router.push({ name: 'GAISSA ROI Analyzer Home' });
+        },
+        navigateToROIAnalysis() {
             this.$router.push({ name: 'GAISSA ROI Analyzer New Form' });
         },
         navigateToROIRepository() {
@@ -427,6 +435,13 @@ export default {
     display: flex;
     gap: 15px;
     flex-wrap: wrap;
+}
+
+.secondary-action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: nowrap;
+    margin-bottom: 15px;
 }
 
 .tool-button,

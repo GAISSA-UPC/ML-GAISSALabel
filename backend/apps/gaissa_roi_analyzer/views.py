@@ -1,6 +1,6 @@
 from rest_framework import viewsets, filters, status
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import (
@@ -372,3 +372,40 @@ class ExpectedMetricReductionView(viewsets.ModelViewSet):
     filterset_fields = ['model_architecture', 'tactic_parameter_option', 'metric']
     ordering_fields = ['id', 'model_architecture', 'tactic_parameter_option', 'metric']
     ordering = ['id']
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsGAISSAROIAnalyzerEnabled])
+def statistics_view(request):
+    """Get aggregated statistics for the GAISSA ROI Analyzer."""
+    # Total counts
+    total_pipeline_stages = MLPipelineStage.objects.count()
+    total_tactics = MLTactic.objects.count()
+    total_research_analyses = ROIAnalysisResearch.objects.count()
+    total_calculation_analyses = ROIAnalysisCalculation.objects.count()
+    
+    # Per-stage breakdown
+    stages = MLPipelineStage.objects.all()
+    stage_breakdown = []
+    
+    for stage in stages:
+        stage_data = {
+            'id': stage.id,
+            'name': stage.name,
+            'tactics_count': MLTactic.objects.filter(pipeline_stage=stage).count(),
+            'research_analyses_count': ROIAnalysisResearch.objects.filter(
+                tactic_parameter_option__tactic__pipeline_stage=stage
+            ).count(),
+            'calculation_analyses_count': ROIAnalysisCalculation.objects.filter(
+                tactic_parameter_option__tactic__pipeline_stage=stage
+            ).count(),
+        }
+        stage_breakdown.append(stage_data)
+    
+    return Response({
+        'total_pipeline_stages': total_pipeline_stages,
+        'total_tactics': total_tactics,
+        'total_research_analyses': total_research_analyses,
+        'total_calculation_analyses': total_calculation_analyses,
+        'stage_breakdown': stage_breakdown
+    })

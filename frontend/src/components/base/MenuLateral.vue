@@ -56,6 +56,9 @@
                 <font-awesome-icon :icon="['fas', 'chart-line']" class="icon"/>
                 <span class="wrap-title">{{ $t('GAISSA ROI Analyzer') }}</span>
             </template>
+            <el-menu-item index="GAISSA ROI Analyzer Home" @click="$router.push({name: 'GAISSA ROI Analyzer Home'})">
+                {{ $t('Home') }}
+            </el-menu-item>
             <el-menu-item index="GAISSA ROI Analyzer Research Repository" @click="$router.push({name: 'GAISSA ROI Analyzer Research Repository'})">
                 {{ $t('Research Analyses') }}
             </el-menu-item>
