@@ -12,7 +12,7 @@
             />
             <span class="text-large font-600 mr-3" style="color: var(--gaissa_green);font-weight: bold"> GAISSA Tools </span>
         </div>
-        <div>
+        <div v-if="isLogged || isAboutPage">
             <el-button v-if="isLogged" color="var(--gaissa_green)" class="ml-2" @click="logout">{{ $t('Log out') }}</el-button>
             <el-button v-else color="var(--gaissa_green)" class="ml-2" @click="$router.push({name: 'Admin login'})">{{ $t('Admin') }}</el-button>
         </div>
@@ -31,7 +31,10 @@ export default {
     computed: {
         ...mapGetters({
             isLogged: 'auth/isLogged'
-        })
+        }),
+        isAboutPage() {
+            return this.$route.name === 'about';
+        }
     },
     methods: {
         obrirLink() {

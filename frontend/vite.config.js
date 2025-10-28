@@ -5,13 +5,11 @@ import viteCompression from 'vite-plugin-compression';
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
-import vuetify from 'vite-plugin-vuetify';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
-    vuetify({ autoImport: true }),
     AutoImport({
       resolvers: [ElementPlusResolver()],
     }),
@@ -74,7 +72,6 @@ export default defineConfig({
             if (id.includes('html2canvas') || id.includes('jspdf')) return 'pdf-export';
             if (id.includes('@fortawesome')) return 'fontawesome';
             if (id.includes('element-plus')) return 'element-plus';
-            if (id.includes('vuetify')) return 'vuetify';
             if (id.includes('lodash-es')) return 'lodash';
             if (id.includes('core-js')) return 'corejs';
             return 'vendor';

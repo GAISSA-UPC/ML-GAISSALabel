@@ -2,9 +2,6 @@ import '@/assets/base.css'
 import '@/assets/common.scss'
 
 import { createApp } from 'vue'
-// import 'vuetify/styles'
-import { createVuetify } from 'vuetify'
-
 
 import App from './App.vue'
 import router from './router'
@@ -31,11 +28,6 @@ library.add(
 );
 
 const app = createApp(App)
-
-const vuetify = createVuetify({
-
-})
-app.use(vuetify)
 
 // Router: Definició de les rutes de la single page application
 app.use(router)
