@@ -32,11 +32,13 @@
             <div class="tools-grid">
                 <!-- GAISSALabel Tool -->
                 <div class="tool-card gaissalabel-card" v-if="isGAISSALabelEnabled">
-                    <div class="tool-icon">
-                        <font-awesome-icon :icon="['fas', 'tag']" />
+                    <div class="tool-header">
+                        <div class="tool-icon">
+                            <font-awesome-icon :icon="['fas', 'tag']" />
+                        </div>
+                        <h3>GAISSALabel</h3>
                     </div>
                     <div class="tool-content">
-                        <h3>GAISSALabel</h3>
                         <p>{{ $t('Evaluate the environmental footprint of your ML models during training and inference phases.') }}</p>
                         <ul class="tool-features">
                             <li>{{ $t('Training efficiency assessment') }}</li>
@@ -66,11 +68,13 @@
                 <!-- GAISSA ROI Analyzer Tool -->
                 <div class="tool-card roi-analyzer-card" v-if="isGAISSAROIAnalyzerEnabled">
                     <div class="new-banner">NEW</div>
-                    <div class="tool-icon">
-                        <font-awesome-icon :icon="['fas', 'chart-line']" />
+                    <div class="tool-header">
+                        <div class="tool-icon">
+                            <font-awesome-icon :icon="['fas', 'chart-line']" />
+                        </div>
+                        <h3>GAISSA ROI Analyzer</h3>
                     </div>
                     <div class="tool-content">
-                        <h3>GAISSA ROI Analyzer</h3>
                         <p>{{ $t('Analyze the return on investment and business impact of your ML implementations.') }}</p>
                         <ul class="tool-features">
                             <li>{{ $t('ROI calculation and analysis') }}</li>
@@ -78,6 +82,20 @@
                             <li>{{ $t('Environmental impact assesment') }}</li>
                             <li>{{ $t('Comparative analysis tools') }}</li>
                         </ul>
+                        <div class="tool-stats">
+                            <div class="stat">
+                                <span class="stat-number">{{ roiStats.pipelineStages || 0 }}</span>
+                                <span class="stat-label">{{ $t('Stages') }}</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number">{{ roiStats.tactics || 0 }}</span>
+                                <span class="stat-label">{{ $t('ML Tactics') }}</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number">{{ roiStats.totalAnalyses || 0 }}</span>
+                                <span class="stat-label">{{ $t('Analyses') }}</span>
+                            </div>
+                        </div>
                         <div class="secondary-action-buttons">
                             <el-button type="default" size="large" @click="navigateToROIRepository" class="tool-button-secondary">
                                 {{ $t('Browse Research') }}
@@ -146,12 +164,18 @@
 
 <script>
 import estadistiques from "@/controllers/estadistiques";
+import roiStatistics from "@/tools/gaissaroianalyzer/services/statistics";
 
 export default {
     name: "GAISSAToolsHome",
     data() {
         return {
             estadistiques: {},
+            roiStats: {
+                pipelineStages: 0,
+                tactics: 0,
+                totalAnalyses: 0,
+            }
         };
     },
     computed: {
@@ -171,6 +195,18 @@ export default {
                 console.error('Error fetching statistics:', error);
             }
         },
+        async fetchROIStatistics() {
+            try {
+                const data = await roiStatistics.getStatistics();
+                if (data) {
+                    this.roiStats.pipelineStages = data.total_pipeline_stages || 0;
+                    this.roiStats.tactics = data.total_tactics || 0;
+                    this.roiStats.totalAnalyses = data.total_research_analyses + data.total_calculation_analyses || 0;
+                }
+            } catch (error) {
+                console.error('Error fetching ROI statistics:', error);
+            }
+        },
         navigateToGAISSALabel() {
             this.$router.push({ name: 'gaissalabel-home' });
         },
@@ -185,7 +221,12 @@ export default {
         }
     },
     async mounted() {
-        await this.refrescaEstadistiques();
+        if (this.isGAISSALabelEnabled) {
+            await this.refrescaEstadistiques();
+        }
+        if (this.isGAISSAROIAnalyzerEnabled) {
+            await this.fetchROIStatistics();
+        }
     },
 };
 </script>
@@ -312,6 +353,7 @@ export default {
     border: 2px solid transparent;
     position: relative;
     overflow: hidden;
+    display: grid;
 }
 
 .new-banner {
@@ -348,6 +390,20 @@ export default {
     border-color: #3498db;
 }
 
+.tool-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.tool-header h3 {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin: 0;
+    font-weight: 600;
+}
+
 .tool-icon {
     width: 80px;
     height: 80px;
@@ -355,9 +411,9 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 25px;
     font-size: 2rem;
     color: white;
+    flex-shrink: 0;
 }
 
 .gaissalabel-card .tool-icon {
@@ -368,11 +424,10 @@ export default {
     background: #3498db;
 }
 
-.tool-content h3 {
-    font-size: 1.8rem;
-    color: #2c3e50;
-    margin-bottom: 15px;
-    font-weight: 600;
+.tool-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .tool-content p {
@@ -429,6 +484,10 @@ export default {
     color: #5a6c7d;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+.roi-analyzer-card .stat-number {
+    color: #3498db;
 }
 
 .tool-actions {
