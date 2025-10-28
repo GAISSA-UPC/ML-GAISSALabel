@@ -97,35 +97,62 @@ To access the virtual machine, one needs to connect via SSH to the virtual machi
       python manage.py import_carbon_intensity
       ```
 
+   Alternatively, if using Poetry for dependency management, activate the Poetry virtual environment (instead of the above `source env/bin/activate` command):
+   ```
+   source /var/www/gaissalabel/.cache/pypoetry/virtualenvs/ml-gaissalabel-6KbGngQu-py3.10/bin/activate
+   ```
+
 3. Install any new backend requirements:
    (assuming step 2 has been performed)
    ```
    pip install -r requirements.txt
    ```
 
-4. Restart the backend:
+4. Set up environment variables (FIRST TIME ONLY):
+   Create .env file in backend directory from the provided template and fill in the required values.
+   ```
+   cp .env.example .env
+   nano .env
+   ```
+
+5. Restart the backend:
    ```
    sudo systemctl daemon-reload
    sudo systemctl restart gunicorn
    sudo systemctl restart nginx
    ```
 
-5. Regarding the frontend, install new dependencies and rebuild:
+6. Set up Node.js (FIRST TIME ONLY - if nvm not installed):
+   ```
+   # Install nvm (Node Version Manager)
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+   
+   # Load nvm
+   export NVM_DIR="$HOME/.nvm"
+   source "$NVM_DIR/nvm.sh"
+   
+   # Install Node.js LTS version (v20 or later required)
+   nvm install --lts
+   nvm use --lts
+   ```
+
+7. Set up environment variables (FIRST TIME ONLY):
+   Create .env.production file in frontend directory from the provided template and fill in the required values.
    ```
    cd frontend
-   npm install
-   nvm install --lts
-   npm run build
+   cp .env.production.example .env.production
+   nano .env.production
    ```
 
-   In case nvm is not installed, you can install it using the following command:
-
-      If you're allowed to install user-level tools (no sudo needed):
-      ```
-      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-      export NVM_DIR="$HOME/.nvm"
-      source "$NVM_DIR/nvm.sh"
-      ```
+8. Build and deploy the frontend:
+   ```   
+   # Install dependencies and build
+   npm install
+   npm run build
+   
+   # Restart nginx
+   sudo systemctl restart nginx
+   ```
 
 ## Get Started
 
@@ -135,38 +162,100 @@ Would you like to download the repository locally and run it? Follow these steps
 2. Access the cloned folder.
 3. You will need to start the backend and frontend separately. Starting with the backend:
 
-   - For the initial setup:
+   - Navigate, create, and activate a virtual environment:
      ```
+     cd backend
      python3 -m venv env
      source env/bin/activate
-     pip install -r requirements.txt
-     python manage.py migrate
-     python manage.py runserver
-     python manage.py import_carbon_intensity
      ```
 
-   - To run:
+   - Install dependencies:
+     ```
+     pip install -r requirements.txt
+     ```
+
+   - Set up environment variables:
+     Create a .env file in the backend directory from the provided template and fill in the required values.
+     ```
+     cp .env.example .env
+     nano .env
+     ```
+
+   - Apply database migrations:
+     ```
+     python manage.py migrate
+     ```
+
+   - Import carbon intensity data (first time only):
+     ```
+     python manage.py import_carbon_intensity
+     ```
+     
+     For more information about this command, see [Carbon Intensity Import Documentation](./backend/docs/carbon_intensity_import.md).
+
+   - Run the development server:
+     ```
+     python manage.py runserver
+     ```
+
+   - For subsequent runs (after initial setup):
      ```
      source env/bin/activate
      python manage.py runserver
      ```
 
-   - For migrations (during development):
+   - For migrations during development:
      ```
      python manage.py makemigrations
      python manage.py migrate
      ```
 
-4. Regarding the frontend:
+4. Set up and run the frontend:
+
+   - Navigate to the frontend directory:
+     ```
+     cd frontend
+     ```
+
+   - Install Node.js (if not already installed):
+     
+     You'll need Node.js LTS version (v20 or later). If you don't have nvm (Node Version Manager) installed:
+     ```
+     # Install nvm
+     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+     
+     # Load nvm
+     export NVM_DIR="$HOME/.nvm"
+     source "$NVM_DIR/nvm.sh"
+     
+     # Install Node.js LTS version
+     nvm install --lts
+     nvm use --lts
+     ```
+
+   - Set up environment variables:
+     Create a .env.development file in the frontend directory from the provided template and fill in the required values.
+     ```
+     cp .env.production.example .env.development
+     nano .env.development
+     ```
 
    - Install dependencies:
      ```
      npm install
      ```
 
-   - Run:
+   - Run the development server:
      ```
      npm run dev
+     ```
+
+   - For production build:
+     Create a .env.production file in the frontend directory from the provided template and fill in the required values.
+     ```
+     cp .env.production.example .env.production
+     nano .env.production
+     npm run build
      ```
 
 ## Testing
