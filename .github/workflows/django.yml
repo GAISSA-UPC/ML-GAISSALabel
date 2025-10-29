@@ -44,6 +44,19 @@ jobs:
         pip install -r requirements.txt
         pip install coverage
     
+    - name: Set up environment variables
+      working-directory: ./backend
+      run: |
+        echo "DJANGO_SECRET_KEY=test-secret-key-for-ci-only-not-production" >> .env
+        echo "DJANGO_DEBUG=True" >> .env
+        echo "DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1" >> .env
+        echo "DATABASE_NAME=bdgaissa" >> .env
+        echo "DATABASE_USER=pduran" >> .env
+        echo "DATABASE_PASSWORD=gaissapau" >> .env
+        echo "DATABASE_HOST=localhost" >> .env
+        echo "DATABASE_PORT=5432" >> .env
+        echo "URL_FRONTEND=http://localhost:5173" >> .env
+    
     - name: Set up test database
       working-directory: ./backend
       run: |
