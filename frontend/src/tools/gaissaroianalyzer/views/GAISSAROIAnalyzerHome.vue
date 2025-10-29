@@ -701,6 +701,11 @@ export default {
     .cta-buttons .el-button {
         width: 100%;
     }
+
+    .video-container {
+        width: 100%;
+        padding-bottom: 56.25%; /* Maintain 16:9 aspect ratio */
+    }
 }
 
 @media (max-width: 992px) {
@@ -710,6 +715,11 @@ export default {
 
     .pipeline-stage-card {
         padding: 10px;
+    }
+
+    .video-container {
+        width: 90%;
+        padding-bottom: 50.625%; /* Adjust aspect ratio for smaller screens */
     }
 }
 

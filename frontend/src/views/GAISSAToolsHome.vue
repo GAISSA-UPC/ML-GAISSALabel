@@ -651,12 +651,20 @@ export default {
     }
 
     .tool-stats {
-        flex-direction: column;
-        gap: 15px;
+        gap: 10px;
+        padding: 10px;
     }
 
     .stat {
         padding: 10px 0;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
     }
 
     .cta-buttons {
@@ -667,6 +675,21 @@ export default {
     .cta-buttons .el-button {
         width: 100%;
         max-width: 300px;
+    }
+
+    .tool-card {
+        padding: 20px;
+    }
+
+    .tool-button-secondary {
+        white-space: normal;
+        line-height: 1.3;
+        height: 60px;
+    }
+
+    .cta-buttons {
+        flex-direction: column;
+        align-items: stretch;
     }
 }
 </style>

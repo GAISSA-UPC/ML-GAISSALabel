@@ -230,6 +230,20 @@ const router = createRouter({
       name: 'Admin login',
       component: AdminLogin
     },
+
+    // Catch-all route for 404 - must be last
+    {
+      path: '/gaissalabel/:pathMatch(.*)*',
+      redirect: { name: 'gaissalabel-home' }
+    },
+    {
+      path: '/gaissa-roi-analyzer/:pathMatch(.*)*',
+      redirect: { name: 'GAISSA ROI Analyzer Home' }
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: { name: 'home' }
+    }
   ]
 })
 
@@ -254,6 +268,19 @@ router.beforeEach((to, from, next) => {
 
   if (to.matched.some((record) => record.meta.tool === 'gaissaroianalyzer')) {
     if (!store.getters['configuration/isGAISSAROIAnalyzerEnabled']) {
+      next({ name: 'home' });
+      return;
+    }
+  }
+
+  // Handle redirects for catch-all routes when tools are disabled
+  if (to.redirectedFrom) {
+    const redirectedPath = to.redirectedFrom.path;
+    if (redirectedPath.startsWith('/gaissalabel') && !store.getters['configuration/isGAISSALabelEnabled']) {
+      next({ name: 'home' });
+      return;
+    }
+    if (redirectedPath.startsWith('/gaissa-roi-analyzer') && !store.getters['configuration/isGAISSAROIAnalyzerEnabled']) {
       next({ name: 'home' });
       return;
     }

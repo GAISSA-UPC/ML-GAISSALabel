@@ -551,14 +551,23 @@ export default {
                             this.tacticSources = [];
                         }
                     }
+                } else {
+                    // Analysis not found, redirect to home
+                    ElMessage({
+                        message: this.$t('Analysis not found. Please try again later.'),
+                        type: 'warning',
+                        duration: 3000
+                    });
+                    this.$router.push({ name: 'GAISSA ROI Analyzer Home' });
                 }
             } catch (error) {
                 console.error("Error loading analysis data:", error);
                 ElMessage({
-                    message: this.$t('Failed to load ROI analysis data. Please try again.'),
+                    message: this.$t('Failed to load ROI analysis data. Redirecting to home.'),
                     type: 'error',
                     duration: 3000
                 });
+                this.$router.push({ name: 'GAISSA ROI Analyzer Home' });
             }
         },
         async generatePDFReport() {

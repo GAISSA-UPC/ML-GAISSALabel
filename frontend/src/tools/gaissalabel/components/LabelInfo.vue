@@ -138,18 +138,29 @@ export default {
     },
     methods: {
         async refrescaDadesExperiment() {
-            let response = null
-            if (this.fase === this.$t('Training')) {
-                response = await trainings.retrieve(this.$route.params.id_model, this.$route.params.id_training)
-                this.info = response.data['infoEntrenament']
+            try {
+                let response = null
+                if (this.fase === this.$t('Training')) {
+                    response = await trainings.retrieve(this.$route.params.id_model, this.$route.params.id_training)
+                    this.info = response.data['infoEntrenament']
+                }
+                else {
+                    response = await inferencies.retrieve(this.$route.params.id_model, this.$route.params.id_inference)
+                    this.info = response.data['infoInferencia']
+                }
+
+                this.labelBase64 = response.data['energy_label']
+                this.resultats = response.data['resultats']
+                this.infoAddicional = this.info['infoAddicional']
+            } catch (error) {
+                console.error("Error loading experiment data:", error);
+                ElMessage({
+                    message: this.$t('Experiment not found. Please try again later.'),
+                    type: 'warning',
+                    duration: 3000
+                });
+                this.$router.push({ name: 'gaissalabel-home' });
             }
-            else {
-                response = await inferencies.retrieve(this.$route.params.id_model, this.$route.params.id_inference)
-                this.info = response.data['infoInferencia']
-            }
-            this.labelBase64 = response.data['energy_label']
-            this.resultats = response.data['resultats']
-            this.infoAddicional = this.info['infoAddicional']
         },
         async refrescaInfoMetriques() {
             const faseAbr = (this.fase === 'Training') ? 'T' : 'I'
