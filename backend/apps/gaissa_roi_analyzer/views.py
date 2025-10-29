@@ -180,9 +180,9 @@ class TacticParameterOptionView(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         
-        # Optimize: Use select_related for nested ForeignKeys (tactic)
+        # Optimize: Use select_related for nested ForeignKeys (tactic and pipeline_stage)
         if self.action in ['list', 'retrieve']:
-            queryset = queryset.select_related('tactic')
+            queryset = queryset.select_related('tactic', 'tactic__pipeline_stage')
         
         tactic_id = self.kwargs.get('tactic_id')
         
@@ -263,6 +263,7 @@ class ROIAnalysisViewSet(viewsets.ModelViewSet):
                 'model_architecture',
                 'tactic_parameter_option',
                 'tactic_parameter_option__tactic',
+                'tactic_parameter_option__tactic__pipeline_stage',
                 'country',
                 'roianalysiscalculation',
                 'roianalysisresearch',
