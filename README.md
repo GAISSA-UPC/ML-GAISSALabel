@@ -99,7 +99,7 @@ To access the virtual machine, one needs to connect via SSH to the virtual machi
 
    Alternatively, if using Poetry for dependency management, activate the Poetry virtual environment (instead of the above `source env/bin/activate` command):
    ```
-   source /var/www/gaissalabel/.cache/pypoetry/virtualenvs/ml-gaissalabel-6KbGngQu-py3.10/bin/activate
+   source /var/www/gaissalabel/venvs/ml-gaissalabel-py3.11/bin/activate
    ```
 
 3. Install any new backend requirements:

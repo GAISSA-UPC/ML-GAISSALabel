@@ -689,7 +689,10 @@ export default {
 
     .cta-buttons {
         flex-direction: column;
-        align-items: stretch;
+    }
+
+    .cta-buttons .el-button {
+        margin-left: 0;
     }
 }
 </style>
